@@ -20,12 +20,12 @@
     var CONFIG = {"hostname":"ilikeoyt.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="title: FreeMarker模板注入date: 2023-12-28 10:44:52tags:  FreeMarker 模板注入什么是freemarker？FreeMarker 是一款模板引擎： 即一种基于模板和要改变的数据， 并用来生成输出文本(HTML网页，电子邮件，配置文件，源代码等)的通用工具。 它不是面向最终用户的，而是一个Java类库，是一款程序员可以嵌入他们所开发产品的组件">
+  <meta name="description" content="FreeMarker 模板注入什么是freemarker？FreeMarker 是一款模板引擎： 即一种基于模板和要改变的数据， 并用来生成输出文本(HTML网页，电子邮件，配置文件，源代码等)的通用工具。 它不是面向最终用户的，而是一个Java类库，是一款程序员可以嵌入他们所开发产品的组件。 模板编写为FreeMarker Template Language (FTL)。它是简单的，专用的语言，">
 <meta property="og:type" content="article">
 <meta property="og:title" content="FreeMarker模板注入">
 <meta property="og:url" content="https://ilikeoyt.github.io/2023/12/28/FreeMarker%E6%A8%A1%E6%9D%BF%E6%B3%A8%E5%85%A5/index.html">
 <meta property="og:site_name" content="ycx&#39;s blog">
-<meta property="og:description" content="title: FreeMarker模板注入date: 2023-12-28 10:44:52tags:  FreeMarker 模板注入什么是freemarker？FreeMarker 是一款模板引擎： 即一种基于模板和要改变的数据， 并用来生成输出文本(HTML网页，电子邮件，配置文件，源代码等)的通用工具。 它不是面向最终用户的，而是一个Java类库，是一款程序员可以嵌入他们所开发产品的组件">
+<meta property="og:description" content="FreeMarker 模板注入什么是freemarker？FreeMarker 是一款模板引擎： 即一种基于模板和要改变的数据， 并用来生成输出文本(HTML网页，电子邮件，配置文件，源代码等)的通用工具。 它不是面向最终用户的，而是一个Java类库，是一款程序员可以嵌入他们所开发产品的组件。 模板编写为FreeMarker Template Language (FTL)。它是简单的，专用的语言，">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://ilikeoyt.github.io/image/image-20231226121757720-17036820305361.png">
 <meta property="og:image" content="https://ilikeoyt.github.io/image/image-20231226121823098-17036820305366.png">
@@ -62,7 +62,7 @@
 <meta property="og:image" content="https://ilikeoyt.github.io/image/image-20231227205738214-170368203053734.png">
 <meta property="og:image" content="https://ilikeoyt.github.io/image/image-20231227205917251-170368203053733.png">
 <meta property="article:published_time" content="2023-12-28T02:44:52.000Z">
-<meta property="article:modified_time" content="2023-12-28T02:50:38.052Z">
+<meta property="article:modified_time" content="2023-12-28T02:55:06.275Z">
 <meta property="article:author" content="ycxlo">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://ilikeoyt.github.io/image/image-20231226121757720-17036820305361.png">
@@ -209,7 +209,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2023-12-28 10:44:52 / Modified: 10:50:38" itemprop="dateCreated datePublished" datetime="2023-12-28T10:44:52+08:00">2023-12-28</time>
+              <time title="Created: 2023-12-28 10:44:52 / Modified: 10:55:06" itemprop="dateCreated datePublished" datetime="2023-12-28T10:44:52+08:00">2023-12-28</time>
             </span>
 
           
@@ -223,13 +223,12 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <hr>
-<p>title: FreeMarker模板注入<br>date: 2023-12-28 10:44:52<br>tags:</p>
-<hr>
-<h1 id="FreeMarker-模板注入"><a href="#FreeMarker-模板注入" class="headerlink" title="FreeMarker 模板注入"></a>FreeMarker 模板注入</h1><h2 id="什么是freemarker？"><a href="#什么是freemarker？" class="headerlink" title="什么是freemarker？"></a>什么是freemarker？</h2><p>FreeMarker 是一款模板引擎： 即一种基于模板和要改变的数据， 并用来生成输出文本(HTML网页，电子邮件，配置文件，源代码等)的通用工具。 它不是面向最终用户的，而是一个Java类库，是一款程序员可以嵌入他们所开发产品的组件。</p>
+        <h1 id="FreeMarker-模板注入"><a href="#FreeMarker-模板注入" class="headerlink" title="FreeMarker 模板注入"></a>FreeMarker 模板注入</h1><h2 id="什么是freemarker？"><a href="#什么是freemarker？" class="headerlink" title="什么是freemarker？"></a>什么是freemarker？</h2><p>FreeMarker 是一款模板引擎： 即一种基于模板和要改变的数据， 并用来生成输出文本(HTML网页，电子邮件，配置文件，源代码等)的通用工具。 它不是面向最终用户的，而是一个Java类库，是一款程序员可以嵌入他们所开发产品的组件。</p>
 <p>模板编写为FreeMarker Template Language (FTL)。它是简单的，专用的语言， 不是 像PHP那样成熟的编程语言。 那就意味着要准备数据在真实编程语言中来显示，比如数据库查询和业务运算， 之后模板显示已经准备好的数据。在模板中，你可以专注于如何展现数据， 而在模板之外可以专注于要展示什么数据。</p>
 <p>这种方式通常被称为 MVC (模型 视图 控制器) 模式，对于动态网页来说，是一种特别流行的模式。 它帮助从开发人员(Java 程序员)中分离出网页设计师(HTML设计师)。设计师无需面对模板中的复杂逻辑， 在没有程序员来修改或重新编译代码时，也可以修改页面的样式。</p>
 <p>其实FreeMarker的原理就是：模板+数据模型&#x3D;输出</p>
+<span id="more"></span>
+
 <h2 id="FreeMarker-SSTI-成因与攻击面"><a href="#FreeMarker-SSTI-成因与攻击面" class="headerlink" title="FreeMarker SSTI 成因与攻击面"></a>FreeMarker SSTI 成因与攻击面</h2><p>我们都知道 SSTI 的攻击面其实是模板引擎的渲染，所以我们要让 Web 服务器将 HTML 语句渲染为模板引擎，前提是要先有 HTML 语句。那么 HTML 如何才能被弄上去呢？这就有关乎我们的攻击面了。</p>
 <p>将 HTML 语句放到服务器上有两种方法：</p>
 <p>1、文件上传 HTML 文件。</p>
