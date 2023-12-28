@@ -145,6 +145,79 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://ilikeoyt.github.io/2023/07/13/java-cc%E9%93%BE2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ycxlo">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ycx's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/07/13/java-cc%E9%93%BE2/" class="post-title-link" itemprop="url">java_cc链2</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2023-07-13 20:34:05" itemprop="dateCreated datePublished" datetime="2023-07-13T20:34:05+08:00">2023-07-13</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-07-14 15:40:02" itemprop="dateModified" datetime="2023-07-14T15:40:02+08:00">2023-07-14</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="java安全入门（二）（cc链2）"><a href="#java安全入门（二）（cc链2）" class="headerlink" title="java安全入门（二）（cc链2）"></a>java安全入门（二）（cc链2）</h1><p>CC1链在实际利用过程存在一些限制，例如jdk8u71版本已经无法利用反序列化漏洞了，通过分析发现jdk8u71版本中改写了sun.reflect.annotation.AnnotationInvocationHandler类的readObject方法，CC1链在jdk8u71版本以上已经被修复了，因此jdk8u71版本重新构造了一条新的利用链（CC2链）</p>
+<p>不过CC2链使用了apache commons collections组件4.0版本来进行构造，并没有使用3.1版本，首先 CommonsCollections3 中无法使用，因为其 TransformingComparator 无法序列化。其次只有 CommonsCollections4-4.0 可以使用，因为 CommonsCollections4 其他版本去掉了 InvokerTransformer 的 Serializable 继承，导致无法序列化。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2023/07/13/java-cc%E9%93%BE2/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="https://ilikeoyt.github.io/2023/07/13/java-cc%E9%93%BE1/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -745,73 +818,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://ilikeoyt.github.io/2023/06/08/VM%E6%B2%99%E7%9B%92%E9%80%83%E9%80%B8/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ycxlo">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ycx's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2023/06/08/VM%E6%B2%99%E7%9B%92%E9%80%83%E9%80%B8/" class="post-title-link" itemprop="url">VM沙盒逃逸</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-              
-
-              <time title="Created: 2023-06-08 19:43:07 / Modified: 19:43:35" itemprop="dateCreated datePublished" datetime="2023-06-08T19:43:07+08:00">2023-06-08</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="VM沙盒逃逸"><a href="#VM沙盒逃逸" class="headerlink" title="VM沙盒逃逸"></a>VM沙盒逃逸</h1><h2 id="什么是沙箱"><a href="#什么是沙箱" class="headerlink" title="什么是沙箱"></a>什么是沙箱</h2><p>就只针对于node.js而言，沙箱和<a target="_blank" rel="noopener" href="https://so.csdn.net/so/search?q=docker%E5%AE%B9%E5%99%A8&spm=1001.2101.3001.7020">docker容器</a>其实是差不多的，都是将程序与程序之间，程序与主机之间互相分隔开，但是沙箱是为了隔离有害程序的，避免影响到主机环境。为什么node.js语言要引入沙箱，这就要说说js语言中的作用域（也叫上下文）。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">在JavaScript中，上下文（context）是指代码执行时的环境。每段JavaScript代码都运行在一个特定的上下文中，其中包含了当前代码的变量、函数、对象等信息。</span><br><span class="line"></span><br><span class="line">JavaScript中存在两种类型的上下文：全局上下文和函数上下文。</span><br><span class="line"></span><br><span class="line">全局上下文是指在代码最外层定义的变量和函数，它们可以在整个JavaScript程序中被访问。全局上下文在页面加载时就被创建，并且在整个页面的生命周期中都存在。</span><br><span class="line"></span><br><span class="line">函数上下文是指在函数执行时创建的上下文。每当函数被调用时，就会创建一个新的函数上下文，这个上下文包含了函数的参数、内部变量和函数等信息。函数执行完毕后，该函数上下文就会被销毁。</span><br><span class="line"></span><br><span class="line">在JavaScript中，上下文是按照执行顺序进行嵌套的。当代码执行到一个函数内部时，就会创建一个新的函数上下文，并将其压入上下文栈中。当函数执行完毕后，该函数上下文就会被弹出栈，JavaScript引擎会回到上一个上下文中继续执行代码。</span><br><span class="line"></span><br><span class="line">上下文在JavaScript中非常重要，它决定了当前代码可以访问哪些变量和函数。理解JavaScript上下文的工作原理对于编写高效、可靠的JavaScript代码非常重要。</span><br></pre></td></tr></table></figure>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2023/06/08/VM%E6%B2%99%E7%9B%92%E9%80%83%E9%80%B8/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -881,7 +887,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">51</span>
+          <span class="site-state-item-count">52</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
