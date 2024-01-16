@@ -145,6 +145,73 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://ilikeoyt.github.io/2023/08/02/PostgreSQL-JDBC-%EF%BC%88CVE-2022-21724%EF%BC%89/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ycxlo">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ycx's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/08/02/PostgreSQL-JDBC-%EF%BC%88CVE-2022-21724%EF%BC%89/" class="post-title-link" itemprop="url">PostgreSQL JDBC （CVE-2022-21724）</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2023-08-02 18:24:48 / Modified: 18:25:21" itemprop="dateCreated datePublished" datetime="2023-08-02T18:24:48+08:00">2023-08-02</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="PostgreSQL-JDBC-（CVE-2022-21724）"><a href="#PostgreSQL-JDBC-（CVE-2022-21724）" class="headerlink" title="PostgreSQL JDBC （CVE-2022-21724）"></a>PostgreSQL JDBC （CVE-2022-21724）</h1><h2 id="任意代码执行-socketFactory-x2F-socketFactoryArg"><a href="#任意代码执行-socketFactory-x2F-socketFactoryArg" class="headerlink" title="任意代码执行 socketFactory&#x2F;socketFactoryArg"></a>任意代码执行 socketFactory&#x2F;socketFactoryArg</h2><p>跟着大佬的调用栈一步步分析</p>
+<p>首先在Driver的connect方法处下个断点</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2023/08/02/PostgreSQL-JDBC-%EF%BC%88CVE-2022-21724%EF%BC%89/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="https://ilikeoyt.github.io/2023/07/30/%E6%97%A0%E4%BE%9D%E8%B5%96CB%E6%94%BB%E5%87%BBShiro550/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -761,72 +828,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://ilikeoyt.github.io/2023/07/19/java-cc%E9%93%BE5/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ycxlo">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ycx's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2023/07/19/java-cc%E9%93%BE5/" class="post-title-link" itemprop="url">java_cc链5</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-              
-
-              <time title="Created: 2023-07-19 17:38:24 / Modified: 17:38:51" itemprop="dateCreated datePublished" datetime="2023-07-19T17:38:24+08:00">2023-07-19</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="java-cc链5"><a href="#java-cc链5" class="headerlink" title="java_cc链5"></a>java_cc链5</h1><p>这里我们又回到了去触发 LazyMap.get()，只不过我们改变了 LazyMap.get() 的触发方式，不再和 CC1 和 CC3 一样借助 AnnotationInvocationHandler 的反序列化触发。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2023/07/19/java-cc%E9%93%BE5/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -896,7 +897,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">55</span>
+          <span class="site-state-item-count">56</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
