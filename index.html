@@ -145,6 +145,73 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://ilikeoyt.github.io/2024/02/26/Weblogic-T3%E5%8D%8F%E8%AE%AE%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ycxlo">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ycx's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2024/02/26/Weblogic-T3%E5%8D%8F%E8%AE%AE%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/" class="post-title-link" itemprop="url">Weblogic T3协议反序列化</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2024-02-26 16:07:41 / Modified: 16:08:15" itemprop="dateCreated datePublished" datetime="2024-02-26T16:07:41+08:00">2024-02-26</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="环境搭建"><a href="#环境搭建" class="headerlink" title="环境搭建"></a>环境搭建</h2><p>参考：<a target="_blank" rel="noopener" href="https://www.penson.top/article/av40">https://www.penson.top/article/av40</a></p>
+<h2 id="何为T3协议"><a href="#何为T3协议" class="headerlink" title="何为T3协议"></a>何为T3协议</h2><p>T3 协议其实是 Weblogic 内独有的一个协议，在 Weblogic 中对 RMI 传输就是使用的 T3 协议。在 RMI 传输当中，被传输的是一串序列化的数据，在这串数据被接收后，执行反序列化的操作。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2024/02/26/Weblogic-T3%E5%8D%8F%E8%AE%AE%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="https://ilikeoyt.github.io/2024/01/16/java-sql%E6%B3%A8%E5%85%A5/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -750,73 +817,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://ilikeoyt.github.io/2023/08/20/SnakeYaml%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ycxlo">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ycx's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2023/08/20/SnakeYaml%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/" class="post-title-link" itemprop="url">SnakeYaml反序列化</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-              
-
-              <time title="Created: 2023-08-20 14:10:42 / Modified: 14:11:12" itemprop="dateCreated datePublished" datetime="2023-08-20T14:10:42+08:00">2023-08-20</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="SnakeYaml反序列化"><a href="#SnakeYaml反序列化" class="headerlink" title="SnakeYaml反序列化"></a>SnakeYaml反序列化</h1><h2 id="什么是SnakeYaml？"><a href="#什么是SnakeYaml？" class="headerlink" title="什么是SnakeYaml？"></a>什么是SnakeYaml？</h2><p>snakeyaml包主要用来解析yaml格式的内容，yaml语言比普通的xml与properties等配置文件的可读性更高，像是Spring系列就支持yaml的配置文件，而SnakeYaml是一个完整的YAML1.1规范Processor，支持UTF-8&#x2F;UTF-16，支持Java对象的序列化&#x2F;反序列化，支持所有YAML定义的类型。</p>
-<p>语法参考：<a target="_blank" rel="noopener" href="https://www.yiibai.com/yaml">https://www.yiibai.com/yaml</a></p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2023/08/20/SnakeYaml%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -886,7 +886,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">56</span>
+          <span class="site-state-item-count">57</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
