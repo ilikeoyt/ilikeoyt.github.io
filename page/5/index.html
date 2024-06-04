@@ -145,6 +145,73 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://ilikeoyt.github.io/2023/07/12/java%E7%B1%BB%E5%8A%A0%E8%BD%BD/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ycxlo">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ycx's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/07/12/java%E7%B1%BB%E5%8A%A0%E8%BD%BD/" class="post-title-link" itemprop="url">java类加载</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2023-07-12 15:49:44 / Modified: 15:50:23" itemprop="dateCreated datePublished" datetime="2023-07-12T15:49:44+08:00">2023-07-12</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="java类加载机制"><a href="#java类加载机制" class="headerlink" title="java类加载机制"></a>java类加载机制</h1><p>在Java的世界里，每一个类或者接口，在经历编译器后，都会生成一个个.class文件。</p>
+<p>类加载机制指的是将这些.class文件中的二进制数据读入到内存中，并对数据进行校验，解析和初始化。最终，每一个类都会在方法区保存一份它的元数据，在堆中创建一个与之对应的Class对象。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2023/07/12/java%E7%B1%BB%E5%8A%A0%E8%BD%BD/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="https://ilikeoyt.github.io/2023/07/11/java%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -747,74 +814,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://ilikeoyt.github.io/2023/06/07/redis%E6%9C%AA%E6%8E%88%E6%9D%83/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ycxlo">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ycx's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2023/06/07/redis%E6%9C%AA%E6%8E%88%E6%9D%83/" class="post-title-link" itemprop="url">redis未授权</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-              
-
-              <time title="Created: 2023-06-07 19:44:58 / Modified: 19:45:29" itemprop="dateCreated datePublished" datetime="2023-06-07T19:44:58+08:00">2023-06-07</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="reids未授权访问复现"><a href="#reids未授权访问复现" class="headerlink" title="reids未授权访问复现"></a>reids未授权访问复现</h1><p>环境搭建请参考<a target="_blank" rel="noopener" href="https://www.cnblogs.com/bmjoker/p/9548962.html">https://www.cnblogs.com/bmjoker/p/9548962.html</a></p>
-<p>redis是什么？</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Redis是一个开源的内存数据结构存储系统，常用作数据库、缓存和消息中间件。它支持多种数据结构，包括字符串、哈希表、列表、集合、有序集合等，提供了丰富的操作命令，可以进行原子性的操作，支持持久化和复制等高级功能，同时具有高性能、高可用性和可扩展性等优点。Redis通常用于高性能、高并发的Web应用程序、实时系统和分布式系统中，是一个非常流行的数据存储和缓存解决方案。</span><br></pre></td></tr></table></figure>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2023/06/07/redis%E6%9C%AA%E6%8E%88%E6%9D%83/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -884,7 +883,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">59</span>
+          <span class="site-state-item-count">60</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>

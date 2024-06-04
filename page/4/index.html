@@ -145,6 +145,79 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://ilikeoyt.github.io/2023/07/24/java-URLDNSLOG%E9%93%BE/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ycxlo">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ycx's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/07/24/java-URLDNSLOG%E9%93%BE/" class="post-title-link" itemprop="url">java_URLDNSLOG链</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2023-07-24 14:36:52" itemprop="dateCreated datePublished" datetime="2023-07-24T14:36:52+08:00">2023-07-24</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-07-25 09:59:15" itemprop="dateModified" datetime="2023-07-25T09:59:15+08:00">2023-07-25</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="java-URLDNSLOG链"><a href="#java-URLDNSLOG链" class="headerlink" title="java_URLDNSLOG链"></a>java_URLDNSLOG链</h1><p><code>URLDNS</code>是<code>ysoserial</code>中的一条利用链，通常用于检测是否存在<code>Java</code>反序列化漏洞，该利用链具有如下特点</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">URLDNS 利用链只能发起 DNS 请求，并不能进行其它利用</span><br><span class="line">不限制 jdk 版本，使用 Java 内置类，对第三方依赖没有要求</span><br><span class="line">目标无回显，可以通过 DNS 请求来验证是否存在反序列化漏洞</span><br></pre></td></tr></table></figure>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2023/07/24/java-URLDNSLOG%E9%93%BE/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="https://ilikeoyt.github.io/2023/07/21/java-CommonsBeanutils1%E5%88%A9%E7%94%A8%E9%93%BE/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -757,73 +830,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://ilikeoyt.github.io/2023/07/12/java%E7%B1%BB%E5%8A%A0%E8%BD%BD/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ycxlo">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ycx's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2023/07/12/java%E7%B1%BB%E5%8A%A0%E8%BD%BD/" class="post-title-link" itemprop="url">java类加载</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-              
-
-              <time title="Created: 2023-07-12 15:49:44 / Modified: 15:50:23" itemprop="dateCreated datePublished" datetime="2023-07-12T15:49:44+08:00">2023-07-12</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="java类加载机制"><a href="#java类加载机制" class="headerlink" title="java类加载机制"></a>java类加载机制</h1><p>在Java的世界里，每一个类或者接口，在经历编译器后，都会生成一个个.class文件。</p>
-<p>类加载机制指的是将这些.class文件中的二进制数据读入到内存中，并对数据进行校验，解析和初始化。最终，每一个类都会在方法区保存一份它的元数据，在堆中创建一个与之对应的Class对象。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2023/07/12/java%E7%B1%BB%E5%8A%A0%E8%BD%BD/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -893,7 +899,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">59</span>
+          <span class="site-state-item-count">60</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>

