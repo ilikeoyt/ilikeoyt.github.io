@@ -145,6 +145,78 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/01/09/%E5%88%9D%E8%AF%86java-agent%E5%86%85%E5%AD%98%E9%A9%AC/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ycxlo's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2024/01/09/%E5%88%9D%E8%AF%86java-agent%E5%86%85%E5%AD%98%E9%A9%AC/" class="post-title-link" itemprop="url">初识java agent内存马</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2024-01-09 11:11:59" itemprop="dateCreated datePublished" datetime="2024-01-09T11:11:59+08:00">2024-01-09</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2025-05-25 11:30:44" itemprop="dateModified" datetime="2025-05-25T11:30:44+08:00">2025-05-25</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="什么是Java-Agent？"><a href="#什么是Java-Agent？" class="headerlink" title="什么是Java Agent？"></a>什么是Java Agent？</h2><p>java agent 是 Java 程序，可以通过在 Java 虚拟机（JVM）启动时提供参数来加载和运行。它可以通过 java.lang.instrument 包提供的 Java 标准接口进行<strong>代码插桩（字节码插桩）</strong>，从而在 Java 应用程序的类加载和运行期间改变 Java 字节码。而java agent内存马就是利用这个特性产生。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2024/01/09/%E5%88%9D%E8%AF%86java-agent%E5%86%85%E5%AD%98%E9%A9%AC/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2024/01/09/CC%E9%93%BE11/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -801,81 +873,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/08/22/Hessian%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="John Doe">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ycxlo's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2023/08/22/Hessian%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/" class="post-title-link" itemprop="url">Hessian反序列化</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2023-08-22 11:12:34" itemprop="dateCreated datePublished" datetime="2023-08-22T11:12:34+08:00">2023-08-22</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2025-05-25 11:35:01" itemprop="dateModified" datetime="2025-05-25T11:35:01+08:00">2025-05-25</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="什么是Hessian？"><a href="#什么是Hessian？" class="headerlink" title="什么是Hessian？"></a>什么是Hessian？</h2><p>Hessian 是一种基于二进制协议的网络传输协议，用于通过网络在不同的系统之间进行远程方法调用（RPC）。它以其高效、简单和易于使用而受到广泛关注。</p>
-<p>Hessian 协议使用二进制编码来序列化对象，并通过网络传输这些二进制数据。相比于文本协议（如XML或JSON），二进制协议可以显著减少传输的数据量，提高传输效率。</p>
-<p>Hessian 协议支持多种编程语言，使得不同语言的应用程序可以方便地进行跨语言的远程方法调用。通常，开发人员只需定义接口和方法，然后在客户端和服务器端分别实现这些接口，Hessian 协议会负责将方法调用请求和响应进行序列化和反序列化，从而实现远程过程调用。</p>
-<p>Hessian 在一些 Java 后端框架中应用广泛，例如 Dubbo、Spring 等。它具有轻量级、高性能、跨语言等特点，适用于构建分布式系统或者跨语言的微服务架构。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2023/08/22/Hessian%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -945,7 +942,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">57</span>
+          <span class="site-state-item-count">58</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

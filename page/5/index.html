@@ -145,6 +145,79 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/08/02/PostgreSQL-JDBC-%EF%BC%88CVE-2022-21724%EF%BC%89/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ycxlo's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/08/02/PostgreSQL-JDBC-%EF%BC%88CVE-2022-21724%EF%BC%89/" class="post-title-link" itemprop="url">PostgreSQL JDBC （CVE-2022-21724）</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-08-02 11:18:17" itemprop="dateCreated datePublished" datetime="2023-08-02T11:18:17+08:00">2023-08-02</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2025-05-25 11:40:27" itemprop="dateModified" datetime="2025-05-25T11:40:27+08:00">2025-05-25</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="任意代码执行-socketFactory-socketFactoryArg"><a href="#任意代码执行-socketFactory-socketFactoryArg" class="headerlink" title="任意代码执行 socketFactory&#x2F;socketFactoryArg"></a>任意代码执行 socketFactory&#x2F;socketFactoryArg</h2><p>跟着大佬的调用栈一步步分析</p>
+<p>首先在Driver的connect方法处下个断点</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2023/08/02/PostgreSQL-JDBC-%EF%BC%88CVE-2022-21724%EF%BC%89/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2023/07/30/%E6%97%A0%E4%BE%9D%E8%B5%96CB%E6%94%BB%E5%87%BBShiro550/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -895,78 +968,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/07/14/java-cc%E9%93%BE3/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="John Doe">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ycxlo's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2023/07/14/java-cc%E9%93%BE3/" class="post-title-link" itemprop="url">java_cc链3</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2023-07-14 11:19:30" itemprop="dateCreated datePublished" datetime="2023-07-14T11:19:30+08:00">2023-07-14</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2025-05-25 11:45:13" itemprop="dateModified" datetime="2025-05-25T11:45:13+08:00">2025-05-25</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>cc3链和cc1想法还是很相似的，然后构造恶意类和调用使用了不同的两个新类，这里感觉cc3链有一些像cc1链的变种，就像是给你一些绕过的操作，有点像cc1和cc2的结合体，但是去掉了cc2的一些东西（因为cc的版本不一致）。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2023/07/14/java-cc%E9%93%BE3/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1036,7 +1037,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">57</span>
+          <span class="site-state-item-count">58</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

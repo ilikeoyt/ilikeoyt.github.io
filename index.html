@@ -145,6 +145,78 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2025/05/25/sqlmap-MCP/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ycxlo's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2025/05/25/sqlmap-MCP/" class="post-title-link" itemprop="url">sqlmap_MCP</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2025-05-25 16:18:32 / 修改时间：16:24:07" itemprop="dateCreated datePublished" datetime="2025-05-25T16:18:32+08:00">2025-05-25</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="MCP核心架构"><a href="#MCP核心架构" class="headerlink" title="MCP核心架构"></a>MCP核心架构</h2><ul>
+<li>MCP 主机（MCP Hosts）：发起请求的 LLM 应用程序（例如 Claude Desktop、IDE 或 AI 工具）。</li>
+<li>MCP 客户端（MCP Clients）：在主机程序内部，与 MCP server 保持 1:1 的连接。</li>
+<li>MCP 服务器（MCP Servers）：为 MCP client 提供上下文、工具和 prompt 信息。</li>
+<li>本地资源（Local Resources）：本地计算机中可供 MCP server 安全访问的资源（例如文件、数据库）。</li>
+<li>远程资源（Remote Resources）：MCP server 可以连接到的远程资源（例如通过 API）。</li>
+</ul>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2025/05/25/sqlmap-MCP/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2024/12/20/JS%E9%80%86%E5%90%91%E5%AE%9E%E6%88%98/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -797,78 +869,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2024/07/16/WordPress-%E6%8F%92%E4%BB%B6Recall-SQL%E6%B3%A8%E5%85%A5%E6%BC%8F%E6%B4%9E-%E5%88%86%E6%9E%90%EF%BC%88CVE-2024-32709%EF%BC%89/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="John Doe">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ycxlo's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2024/07/16/WordPress-%E6%8F%92%E4%BB%B6Recall-SQL%E6%B3%A8%E5%85%A5%E6%BC%8F%E6%B4%9E-%E5%88%86%E6%9E%90%EF%BC%88CVE-2024-32709%EF%BC%89/" class="post-title-link" itemprop="url">WordPress 插件Recall SQL注入漏洞&分析（CVE-2024-32709）</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2024-07-16 11:10:10" itemprop="dateCreated datePublished" datetime="2024-07-16T11:10:10+08:00">2024-07-16</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2025-05-25 11:25:59" itemprop="dateModified" datetime="2025-05-25T11:25:59+08:00">2025-05-25</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="漏洞描述"><a href="#漏洞描述" class="headerlink" title="漏洞描述"></a>漏洞描述</h2><p>WordPress 插件Recall 存在SQL注入漏洞，导致获取数据泄露。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2024/07/16/WordPress-%E6%8F%92%E4%BB%B6Recall-SQL%E6%B3%A8%E5%85%A5%E6%BC%8F%E6%B4%9E-%E5%88%86%E6%9E%90%EF%BC%88CVE-2024-32709%EF%BC%89/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -938,7 +938,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">57</span>
+          <span class="site-state-item-count">58</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
