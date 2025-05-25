@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="Java数据库的连接方式大致有三种：JDBC，Mybatis，和Hibernate">
+<meta property="og:type" content="article">
+<meta property="og:title" content="java--sql注入">
+<meta property="og:url" content="http://example.com/2024/01/16/java-sql%E6%B3%A8%E5%85%A5/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="Java数据库的连接方式大致有三种：JDBC，Mybatis，和Hibernate">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240113171341974.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240113172324159.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240113220657412.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240113220827336.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240114152211159.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240114155337007.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240114155511220.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240114160356247.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240114160709198.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240114160731785.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240116100639979.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240116101058898.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240116102114225.png">
+<meta property="og:image" content="https://ilikeoyt.github.io/image/image-20240116102704681.png">
+<meta property="article:published_time" content="2024-01-16T03:11:12.000Z">
+<meta property="article:modified_time" content="2025-05-25T03:29:33.817Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://ilikeoyt.github.io/image/image-20240113171341974.png">
+
+<link rel="canonical" href="http://example.com/2024/01/16/java-sql%E6%B3%A8%E5%85%A5/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>java--sql注入 | Hexo</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Hexo</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/01/16/java-sql%E6%B3%A8%E5%85%A5/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          java--sql注入
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2024-01-16 11:11:12" itemprop="dateCreated datePublished" datetime="2024-01-16T11:11:12+08:00">2024-01-16</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2025-05-25 11:29:33" itemprop="dateModified" datetime="2025-05-25T11:29:33+08:00">2025-05-25</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>Java数据库的连接方式大致有三种：JDBC，Mybatis，和Hibernate</p>
+<span id="more"></span>
+
+<h2 id="JDBC"><a href="#JDBC" class="headerlink" title="JDBC"></a>JDBC</h2><p>利用Tomcat编写的测试代码如下</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">package servlet;</span><br><span class="line"></span><br><span class="line">import javax.servlet.ServletException;</span><br><span class="line">import javax.servlet.annotation.WebServlet;</span><br><span class="line">import javax.servlet.http.HttpServlet;</span><br><span class="line">import javax.servlet.http.HttpServletRequest;</span><br><span class="line">import javax.servlet.http.HttpServletResponse;</span><br><span class="line">import java.io.IOException;</span><br><span class="line">import java.sql.*;</span><br><span class="line"></span><br><span class="line">@WebServlet(value = &quot;/demo&quot;,name = &quot;123&quot;)</span><br><span class="line">public class Sql extends HttpServlet &#123;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException &#123;</span><br><span class="line">        System.out.println(&quot;get访问&quot;);</span><br><span class="line">        String id = req.getParameter(&quot;id&quot;);</span><br><span class="line"></span><br><span class="line">        Connection conn = null;</span><br><span class="line"></span><br><span class="line">        try &#123;</span><br><span class="line">            Class.forName(&quot;com.mysql.jdbc.Driver&quot;);</span><br><span class="line"></span><br><span class="line">            conn = DriverManager.getConnection(&quot;jdbc:mysql://127.0.0.1:3306/security&quot;, &quot;root&quot;, &quot;root&quot;);</span><br><span class="line">            String sql = &quot;select * from users where id = &#x27;&quot;+id+&quot;&#x27; &quot;;</span><br><span class="line"></span><br><span class="line">            Statement statement = conn.createStatement();</span><br><span class="line">            ResultSet resultSet = statement.executeQuery(sql);</span><br><span class="line">            System.out.println(resultSet);</span><br><span class="line">        &#125; catch (ClassNotFoundException | SQLException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException &#123;</span><br><span class="line">        this.doGet(req,resp);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>注意需要将相应的mysql-connector的jar包导入到lib目录下</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240113171341974.png" alt="image-20240113171341974"></p>
+<p>该段代码的功能为获取id参数，并将其拼接到sql查询语句，由于没做任何过滤，便可能产生sql注入</p>
+<p>注入方法和普通的sql注入一样</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">1%27%20union%20select%20123,1,1%23</span><br></pre></td></tr></table></figure>
+
+<p>但好像用sqlmap跑不出来，会有访问次数的限制</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240113172324159.png" alt="image-20240113172324159"></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">在实际运用当中如果不采用框架使用JDBC的方式，普遍会编写一个工具类来完成这些繁琐的配置，但是具体的实现还是调用这些方法来进行实现，只是进行了一个简单的封装。</span><br><span class="line"></span><br><span class="line">在代码审计的时候，如果看到是JDBC的方式进行连接可以跟踪一下他的代码，看他有没有调用自己定义的过滤方法，如果没有的话，就会存在sql注入，当然这是在未使用预编译的情况下。</span><br></pre></td></tr></table></figure>
+
+<p>Like型注入：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">String name = req.getParameter(&quot;name&quot;);</span><br><span class="line">String sql = &quot;select * from users where name like &#x27;%&#x27;+name+&#x27;%&#x27;&quot;;</span><br></pre></td></tr></table></figure>
+
+<p>Header注入：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">String referer = req.getHeader(&quot;referer&quot;);</span><br><span class="line">String sql = &quot;update user set referer =&#x27;&quot;+referer+&quot;&#x27;&quot;;</span><br></pre></td></tr></table></figure>
+
+<h4 id="易产生的漏洞点"><a href="#易产生的漏洞点" class="headerlink" title="易产生的漏洞点"></a>易产生的漏洞点</h4><ol>
+<li>未使用占用符</li>
+</ol>
+<p>PreparedStatement只有在使用”?”作为占位符才能预防sql注入，直接拼接仍会存在sql注入漏洞</p>
+<ol>
+<li>使用in语句</li>
+</ol>
+<p>删除语句中可能会存在此类语句,由于无法确定delIds含有对象个数而直接拼接sql语句，造成sql注入。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">String sql = &quot;delete from users where id in(&quot;+delIds+&quot;); //存在sql注入</span><br></pre></td></tr></table></figure>
+
+<p>解决方法为遍历传入的对象个数，使用“?”占位符。</p>
+<ol>
+<li>使用like语句</li>
+</ol>
+<p>使用like语句直接拼接会造成sql注入</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">String sql = &quot;select * from users where password like &#x27;%&quot; + con + &quot;%&#x27;&quot;; //存在sql注入</span><br></pre></td></tr></table></figure>
+
+<ol>
+<li>%和_</li>
+</ol>
+<p>没有手动过滤%。预编译是不能处理这个符号的， 所以需要手动过滤，否则会造成慢查询，造成 dos。</p>
+<ol>
+<li>Order by 、from 等无法预编译</li>
+</ol>
+<p>通过上面对使用in关键字和like关键字发现，只需要对要传参的位置使用占位符进行预编译时似乎就可以完全防止SQL注入，然而事实并非如此，当使用order by语句时是无法使用预编译的，原因是order by子句后面需要加字段名或者字段位置，而字段名是不能带引号的，否则就会被认为是一个字符串而不是字段名，然而使用PreapareStatement将会强制给参数加上’，所以，在使用order by语句时就必须得使用拼接的Statement，所以就会造成SQL注入，需要进行手动过滤，否则存在sql注入。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">String sql = &quot;Select * from news where title =?&quot; + &quot;order by &#x27;&quot; + time + &quot;&#x27; asc&quot;</span><br></pre></td></tr></table></figure>
+
+<h4 id="防范：JDBC预编译"><a href="#防范：JDBC预编译" class="headerlink" title="防范：JDBC预编译"></a>防范：JDBC预编译</h4><p>预编译的定义其实就是使用问号先来占位，后面再传入具体的值。<br>后面传值的时候，程序会把传入的参数，自动转换为spring类型的字符，并不会拼接成sql语句生效。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line">package servlet;</span><br><span class="line"></span><br><span class="line">import javax.servlet.ServletException;</span><br><span class="line">import javax.servlet.annotation.WebServlet;</span><br><span class="line">import javax.servlet.http.HttpServlet;</span><br><span class="line">import javax.servlet.http.HttpServletRequest;</span><br><span class="line">import javax.servlet.http.HttpServletResponse;</span><br><span class="line">import java.io.IOException;</span><br><span class="line">import java.sql.*;</span><br><span class="line"></span><br><span class="line">@WebServlet(value = &quot;/demo&quot;,name = &quot;123&quot;)</span><br><span class="line">public class Sql extends HttpServlet &#123;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException &#123;</span><br><span class="line">        System.out.println(&quot;get访问&quot;);</span><br><span class="line">        String id = req.getParameter(&quot;id&quot;);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        Connection conn = null;</span><br><span class="line"></span><br><span class="line">        try &#123;</span><br><span class="line">            Class.forName(&quot;com.mysql.jdbc.Driver&quot;);</span><br><span class="line"></span><br><span class="line">            conn = DriverManager.getConnection(&quot;jdbc:mysql://127.0.0.1:3306/security&quot;, &quot;root&quot;, &quot;root&quot;);</span><br><span class="line">            String sql = &quot;select * from users where id = ?&quot;;</span><br><span class="line"></span><br><span class="line">            PreparedStatement pstmt = conn.prepareStatement(sql);  //使用预编译传入sql语句</span><br><span class="line">            pstmt.setString(1,id);   //设置第一个参数为username</span><br><span class="line">            ResultSet rs = pstmt.executeQuery();</span><br><span class="line">            System.out.println(rs);</span><br><span class="line">        &#125; catch (ClassNotFoundException | SQLException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException &#123;</span><br><span class="line">        this.doGet(req,resp);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>传入<code>id=1&#39;&#39;</code>，发现不会报错，正常解析</p>
+<h2 id="Mybatis-注入"><a href="#Mybatis-注入" class="headerlink" title="Mybatis 注入"></a>Mybatis 注入</h2><p>Mybatis获取值的方式有两种，分别是<code>$&#123;&#125;</code> 和 <code>#&#123;&#125;</code>。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">#&#123;&#125;:解析的是占位符问号，可以防止SQL注入，使用了预编译。</span><br><span class="line">$&#123;&#125;:直接获取值</span><br></pre></td></tr></table></figure>
+
+<p>在Mybatis里面一般会采用<code>#&#123;&#125;</code>来进行取值，但是也会有特殊情况。</p>
+<p>两者的区别如下：</p>
+<ol>
+<li><code>#&#123;&#125;</code> 为参数占位符 <code>?</code>，即 SQL 预编译。<code>$&#123;&#125;</code> 为字符串替换，即 SQL 拼接。</li>
+<li><code>#&#123;&#125;</code> 是“动态解析-&gt;预编译-&gt;执行”的过程。<code>$&#123;&#125;</code> 是“动态解析-&gt;编译-&gt;执行”的过程。</li>
+<li><code>#&#123;&#125;</code> 的变量替换是在 DBMS 中。<code>$&#123;&#125;</code> 的变量替换是在 DBMS 外。</li>
+<li>变量替换后，<code>#&#123;&#125;</code> 对应的变量自动加上引号。变量替换后，<code>$&#123;&#125;</code> 对应的变量不会加上引号。</li>
+</ol>
+<p>环境结构如下：</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240113220657412.png" alt="image-20240113220657412"></p>
+<p>Mapper.xml</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span><br><span class="line"></span><br><span class="line">&lt;!DOCTYPE mapper PUBLIC &quot;-//mybatis.org//DTD Mapper 3.0//EN&quot;</span><br><span class="line"></span><br><span class="line">        &quot;http://mybatis.org/dtd/mybatis-3-mapper.dtd&quot;&gt;</span><br><span class="line"></span><br><span class="line">&lt;mapper namespace=&quot;main.java.Mybatis.security&quot;&gt;</span><br><span class="line"></span><br><span class="line">    &lt;select id=&quot;GetUserByID&quot; parameterType=&quot;int&quot; resultType=&quot;security&quot;&gt;</span><br><span class="line"></span><br><span class="line">        select * from users where id = #&#123;id&#125;</span><br><span class="line"></span><br><span class="line">    &lt;/select&gt;</span><br><span class="line"></span><br><span class="line">&lt;/mapper&gt;</span><br></pre></td></tr></table></figure>
+
+<p>config.xml</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span><br><span class="line"></span><br><span class="line">&lt;!DOCTYPE configuration PUBLIC &quot;-//mybatis.org//DTD Config 3.0//EN&quot;</span><br><span class="line"></span><br><span class="line">        &quot;http://mybatis.org/dtd/mybatis-3-config.dtd&quot;&gt;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&lt;configuration&gt;</span><br><span class="line"></span><br><span class="line">    &lt;!--环境配置，连接的数据库，这里使用的是MySQL--&gt;</span><br><span class="line"></span><br><span class="line">    &lt;environments default=&quot;mysql&quot;&gt;</span><br><span class="line"></span><br><span class="line">        &lt;environment id=&quot;mysql&quot;&gt;</span><br><span class="line"></span><br><span class="line">            &lt;!--指定事务管理的类型，这里简单使用Java的JDBC的提交和回滚设置--&gt;</span><br><span class="line"></span><br><span class="line">            &lt;transactionManager type=&quot;JDBC&quot;/&gt;</span><br><span class="line"></span><br><span class="line">            &lt;!--dataSource 指连接源配置，POOLED是JDBC连接对象的数据源连接池的实现--&gt;</span><br><span class="line"></span><br><span class="line">            &lt;dataSource type=&quot;POOLED&quot;&gt;</span><br><span class="line"></span><br><span class="line">                &lt;property name=&quot;driver&quot; value=&quot;com.mysql.jdbc.Driver&quot;/&gt;</span><br><span class="line"></span><br><span class="line">                &lt;property name=&quot;url&quot; value=&quot;jdbc:mysql://127.0.0.1:3306/security&quot;/&gt;</span><br><span class="line"></span><br><span class="line">                &lt;property name=&quot;username&quot; value=&quot;root&quot;/&gt;</span><br><span class="line"></span><br><span class="line">                &lt;property name=&quot;password&quot; value=&quot;root&quot;/&gt;</span><br><span class="line"></span><br><span class="line">            &lt;/dataSource&gt;</span><br><span class="line"></span><br><span class="line">        &lt;/environment&gt;</span><br><span class="line"></span><br><span class="line">    &lt;/environments&gt;</span><br><span class="line"></span><br><span class="line">    &lt;mappers&gt;        &lt;!--这是告诉Mybatis区哪找持久化类的映射文件，对于在src下的文件直接写文件名,如果在某包下，则要写明路径,如：com/mybatistest/config/Mapper.xml--&gt;</span><br><span class="line"></span><br><span class="line">        &lt;mapper resource=&quot;Mapper.xml&quot;/&gt;</span><br><span class="line"></span><br><span class="line">    &lt;/mappers&gt;</span><br><span class="line"></span><br><span class="line">&lt;/configuration&gt;</span><br></pre></td></tr></table></figure>
+
+<p>security.java</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br></pre></td><td class="code"><pre><span class="line">public class security</span><br><span class="line"></span><br><span class="line">&#123;</span><br><span class="line"></span><br><span class="line">    private int id;</span><br><span class="line"></span><br><span class="line">    private String name;</span><br><span class="line"></span><br><span class="line">    private String email;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    public security(int id, String name, String email) &#123;</span><br><span class="line"></span><br><span class="line">        this.id = id;</span><br><span class="line"></span><br><span class="line">        this.name = name;</span><br><span class="line"></span><br><span class="line">        this.email = email;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    public int getId() &#123;</span><br><span class="line"></span><br><span class="line">        return id;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    public String getName() &#123;</span><br><span class="line"></span><br><span class="line">        return name;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    public String getEmail() &#123;</span><br><span class="line"></span><br><span class="line">        return email;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    public void setId(int id) &#123;</span><br><span class="line"></span><br><span class="line">        this.id = id;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    public void setName(String name) &#123;</span><br><span class="line"></span><br><span class="line">        this.name = name;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    public void setEmail(String email) &#123;</span><br><span class="line"></span><br><span class="line">        this.email = email;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line"></span><br><span class="line">    public String toString() &#123;</span><br><span class="line"></span><br><span class="line">        return &quot;Person&#123;&quot; +</span><br><span class="line"></span><br><span class="line">                &quot;id=&quot; + id +</span><br><span class="line"></span><br><span class="line">                &quot;, name=&#x27;&quot; + name + &#x27;\&#x27;&#x27; +</span><br><span class="line"></span><br><span class="line">                &quot;, email=&#x27;&quot; + email + &#x27;\&#x27;&#x27; +</span><br><span class="line"></span><br><span class="line">                &#x27;&#125;&#x27;;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Test.java</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">import org.apache.ibatis.io.Resources;</span><br><span class="line">import org.apache.ibatis.session.SqlSession;</span><br><span class="line">import org.apache.ibatis.session.SqlSessionFactory;</span><br><span class="line">import org.apache.ibatis.session.SqlSessionFactoryBuilder;</span><br><span class="line"></span><br><span class="line">import java.io.IOException;</span><br><span class="line">import java.io.InputStream;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">public class Test &#123;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) throws IOException &#123;</span><br><span class="line"></span><br><span class="line">        //加载配置文件（为了连接数据库）</span><br><span class="line">        String resource = &quot;config.xml&quot;;</span><br><span class="line"></span><br><span class="line">        InputStream is = Resources.getResourceAsStream(resource);</span><br><span class="line"></span><br><span class="line">        //初始化mybatis，创建SqlSessionFactory类实例</span><br><span class="line"></span><br><span class="line">        SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(is);</span><br><span class="line"></span><br><span class="line">        //创建Session实例</span><br><span class="line"></span><br><span class="line">        SqlSession session = sqlSessionFactory.openSession();</span><br><span class="line"></span><br><span class="line">        //通过Mapper.xml文件找到sql语句</span><br><span class="line"></span><br><span class="line">        String Statement = &quot;main.java.Mybatis.security.GetUserByID&quot;;</span><br><span class="line"></span><br><span class="line">        security se = session.selectOne(Statement,1);</span><br><span class="line"></span><br><span class="line">        System.out.println(se);</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>运行结果：</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240113220827336.png" alt="image-20240113220827336"></p>
+<h4 id="漏洞测试"><a href="#漏洞测试" class="headerlink" title="漏洞测试"></a>漏洞测试</h4><p>Mybatis 框架下易产生 SQL 注入漏洞的情况主要有以下三种：</p>
+<ol>
+<li>模糊查询</li>
+</ol>
+<p>在模糊查询场景下，考虑安全编码规范，使用 <code>#&#123;&#125;</code> 传入参数：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span><br><span class="line"></span><br><span class="line">&lt;!DOCTYPE mapper PUBLIC &quot;-//mybatis.org//DTD Mapper 3.0//EN&quot;</span><br><span class="line"></span><br><span class="line">        &quot;http://mybatis.org/dtd/mybatis-3-mapper.dtd&quot;&gt;</span><br><span class="line"></span><br><span class="line">&lt;mapper namespace=&quot;main.java.Mybatis.security&quot;&gt;</span><br><span class="line"></span><br><span class="line">    &lt;select id=&quot;GetUserByID&quot; parameterType=&quot;int&quot; resultType=&quot;security&quot;&gt;</span><br><span class="line"></span><br><span class="line">        select * from users where id like &#x27;%#&#123;username&#125;%&#x27;</span><br><span class="line"></span><br><span class="line">    &lt;/select&gt;</span><br><span class="line"></span><br><span class="line">&lt;/mapper&gt;</span><br></pre></td></tr></table></figure>
+
+<p>这种情况下由于安全编码会出现报错（使用concat函数解决，<code>concat(&#39;%&#39;,#&#123;_parameter&#125;, &#39;%&#39;)</code>）</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240114152211159.png" alt="image-20240114152211159"></p>
+<p>某些程序可能会因此将#改为$，如果此时还未对输入内容进行过滤，那么就会造成SQL注入漏洞</p>
+<p>注意此时的Mapper.xml文件必须这样编写（整了一个小时，气死了真的）</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span><br><span class="line"></span><br><span class="line">&lt;!DOCTYPE mapper PUBLIC &quot;-//mybatis.org//DTD Mapper 3.0//EN&quot;</span><br><span class="line"></span><br><span class="line">        &quot;http://mybatis.org/dtd/mybatis-3-mapper.dtd&quot;&gt;</span><br><span class="line"></span><br><span class="line">&lt;mapper namespace=&quot;security&quot;&gt;</span><br><span class="line"></span><br><span class="line">    &lt;select id=&quot;GetUserByID&quot; parameterType=&quot;int&quot; resultType=&quot;security&quot;&gt;</span><br><span class="line">        select * from users where id like &#x27;%$&#123;value&#125;%&#x27;</span><br><span class="line">    &lt;/select&gt;</span><br><span class="line"></span><br><span class="line">&lt;/mapper&gt;</span><br></pre></td></tr></table></figure>
+
+<p>再次运行Test.java文件，报错消失，正常显示</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240114155337007.png" alt="image-20240114155337007"></p>
+<p>尝试引发SQL报错</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240114155511220.png" alt="image-20240114155511220"></p>
+<ol>
+<li>带有IN谓词的查询</li>
+</ol>
+<p>同样，在IN语句中使用#{}可能会出现编码安全问题，正确用法为使用foreach语句（<code>id in&lt;foreach collection=&quot;ids&quot; item=&quot;item&quot; open=&quot;(&quot;separatosr=&quot;,&quot; close=&quot;)&quot;&gt;#&#123;ids&#125; &lt;/foreach&gt;</code>）</p>
+<p>Mapper.xml</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;select id=&quot;GetUserByID&quot; parameterType=&quot;String&quot; resultType=&quot;security&quot;&gt;</span><br><span class="line">        select * from users where name in ($&#123;value&#125;)</span><br><span class="line">    &lt;/select&gt;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://ilikeoyt.github.io/image/image-20240114160356247.png" alt="image-20240114160356247"></p>
+<ol>
+<li>Order by语句</li>
+</ol>
+<p>和JDBC一样，使用#{}预编译会发生报错，需要进行充分的过滤</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240114160709198.png" alt="image-20240114160709198"></p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240114160731785.png" alt="image-20240114160731785"></p>
+<h2 id="Mybatis-Plus"><a href="#Mybatis-Plus" class="headerlink" title="Mybatis-Plus"></a>Mybatis-Plus</h2><p><a target="_blank" rel="noopener" href="https://github.com/baomidou/mybatis-plus">MyBatis-Plus (opens new window)</a>（简称 MP）是一个 <a target="_blank" rel="noopener" href="https://www.mybatis.org/mybatis-3/">MyBatis (opens new window)</a>的增强工具，在 MyBatis 的基础上只做增强不做改变，为简化开发、提高效率而生。</p>
+<p>环境确实有点难搞，最终项目如下：</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240116100639979.png" alt="image-20240116100639979"></p>
+<h4 id="apply注入"><a href="#apply注入" class="headerlink" title="apply注入"></a>apply注入</h4><p><code>apply</code>函数用于在SQL查询语句中添加原生SQL片段。这个函数可以用于在生成的SQL语句中插入一些自定义的SQL代码。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">apply(String applySql, Object... params)</span><br><span class="line">apply(boolean condition, String applySql, Object... params)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>拼接sql</li>
+<li>注:该方法可用于数据库<strong>函数</strong> 动态入参的<code>params</code>对应前面<code>applySql</code>内部的<code>&#123;index&#125;</code>部分.这样是不会有sql注入风险的,反之会有!</li>
+<li>示例：</li>
+</ul>
+<p>apply()直接拼接sql语句存在sql注入</p>
+<p>测试类</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">package com.baomidou.mybatisplus.samples.quickstart.controller;</span><br><span class="line"></span><br><span class="line">import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;</span><br><span class="line">import com.baomidou.mybatisplus.samples.quickstart.entity.SysUser;</span><br><span class="line">import com.baomidou.mybatisplus.samples.quickstart.mapper.SysUserMapper;</span><br><span class="line">import org.springframework.beans.factory.annotation.Autowired;</span><br><span class="line">import org.springframework.stereotype.Controller;</span><br><span class="line">import org.springframework.web.bind.annotation.RequestMapping;</span><br><span class="line"></span><br><span class="line">@Controller</span><br><span class="line">public class applyvuln &#123;</span><br><span class="line"></span><br><span class="line">    @Autowired</span><br><span class="line">    private SysUserMapper sysUserMapper;</span><br><span class="line"></span><br><span class="line">    @RequestMapping(&quot;/applyvuln&quot;)</span><br><span class="line">    public SysUser applyvuln(String name, String email) &#123;</span><br><span class="line">        QueryWrapper&lt;SysUser&gt; wrapper = new QueryWrapper&lt;&gt;();</span><br><span class="line">        wrapper.eq(&quot;name&quot;, name).apply(&quot;email=&quot; + email);</span><br><span class="line">        SysUser sysUser = sysUserMapper.selectOne(wrapper);</span><br><span class="line">        return sysUser;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>传入?name&#x3D;Jack&amp;email&#x3D;1%27，出现报错：</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240116101058898.png" alt="image-20240116101058898"></p>
+<p>相反，我们使用使用{index}params进行预编译处理,不存在sql注入</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">package com.baomidou.mybatisplus.samples.quickstart.controller;</span><br><span class="line"></span><br><span class="line">import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;</span><br><span class="line">import com.baomidou.mybatisplus.samples.quickstart.entity.SysUser;</span><br><span class="line">import com.baomidou.mybatisplus.samples.quickstart.mapper.SysUserMapper;</span><br><span class="line">import org.springframework.beans.factory.annotation.Autowired;</span><br><span class="line">import org.springframework.stereotype.Controller;</span><br><span class="line">import org.springframework.web.bind.annotation.RequestMapping;</span><br><span class="line"></span><br><span class="line">@Controller</span><br><span class="line">public class applyvuln &#123;</span><br><span class="line"></span><br><span class="line">    @Autowired</span><br><span class="line">    private SysUserMapper sysUserMapper;</span><br><span class="line"></span><br><span class="line">    @RequestMapping(&quot;/applyvuln&quot;)</span><br><span class="line">    public SysUser applyvuln(String name, String email) &#123;</span><br><span class="line">        QueryWrapper&lt;SysUser&gt; wrapper = new QueryWrapper&lt;&gt;();</span><br><span class="line">        wrapper.eq(&quot;name&quot;, name).apply(&quot;email=&#123;0&#125;&quot;, email);</span><br><span class="line">        SysUser sysUser = sysUserMapper.selectOne(wrapper);</span><br><span class="line">        return sysUser;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://ilikeoyt.github.io/image/image-20240116102114225.png" alt="image-20240116102114225"></p>
+<p>进行预编译，正常运行程序，无报错</p>
+<h4 id="last"><a href="#last" class="headerlink" title="last"></a>last</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">last(String lastSql)</span><br><span class="line">last(boolean condition, String lastSql)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>无视优化规则直接拼接到 sql 的最后</li>
+<li>注：只能调用一次,多次调用以最后一次为准 ，若相关内容用户可控，则存在sql注入风险</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">package com.baomidou.mybatisplus.samples.quickstart.controller;</span><br><span class="line"></span><br><span class="line">import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;</span><br><span class="line">import com.baomidou.mybatisplus.samples.quickstart.entity.SysUser;</span><br><span class="line">import com.baomidou.mybatisplus.samples.quickstart.mapper.SysUserMapper;</span><br><span class="line">import org.springframework.beans.factory.annotation.Autowired;</span><br><span class="line">import org.springframework.stereotype.Controller;</span><br><span class="line">import org.springframework.web.bind.annotation.RequestMapping;</span><br><span class="line"></span><br><span class="line">import java.util.List;</span><br><span class="line"></span><br><span class="line">@Controller</span><br><span class="line">public class lastvuln &#123;</span><br><span class="line">    @Autowired</span><br><span class="line">    private SysUserMapper sysUserMapper;</span><br><span class="line"></span><br><span class="line">    @RequestMapping(&quot;/lastvuln&quot;)</span><br><span class="line">    public List&lt;SysUser&gt; applyvuln(String column) &#123;</span><br><span class="line">        QueryWrapper&lt;SysUser&gt; wrapper = new QueryWrapper&lt;&gt;();</span><br><span class="line">        wrapper.last(&quot;order by &quot; + column);</span><br><span class="line">        List&lt;SysUser&gt; list = sysUserMapper.selectList(wrapper);</span><br><span class="line">        return list;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>传入?column&#x3D;1’，出现报错</p>
+<p><img src="https://ilikeoyt.github.io/image/image-20240116102704681.png" alt="image-20240116102704681"></p>
+<h4 id="exists-notExists"><a href="#exists-notExists" class="headerlink" title="exists&#x2F;notExists"></a>exists&#x2F;notExists</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">exists(String existsSql)</span><br><span class="line">exists(boolean condition, String existsSql)</span><br><span class="line">notExists(String notExistsSql)</span><br><span class="line">notExists(boolean condition, String notExistsSql)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>拼接EXISTX &#x2F; NOT EXISTS ( sql语句 )</li>
+<li>注：若existsSql或notExistsSql中有关内容用户可控，则存在sql注入风险</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">@RequestMapping(&quot;/exsistvuln&quot;)</span><br><span class="line">    public List&lt;SysUser&gt; applyvuln(String column) &#123;</span><br><span class="line">        QueryWrapper&lt;SysUser&gt; wrapper = new QueryWrapper&lt;&gt;();</span><br><span class="line">        wrapper.exists(&quot;select title from tutorials where title = &quot; + title);</span><br><span class="line">        List&lt;SysUser&gt; list = sysUserMapper.selectList(wrapper);</span><br><span class="line">        return list;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="having"><a href="#having" class="headerlink" title="having"></a>having</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">having(String sqlHaving, Object... params)</span><br><span class="line">having(boolean condition, String sqlHaving, Object... params)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>HAVING ( sql语句 ),用于Having查询，一般用配合groupby在对分组统计函数进行过滤的场景中</li>
+<li>注：与apply一样，动态入参的params对应前面applySql内部的{index}部分，可以进行预编译防止SQL注入问题。</li>
+<li>示例：</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">@RequestMapping(&quot;/exsistvuln&quot;)</span><br><span class="line">    public List&lt;SysUser&gt; applyvuln(String column) &#123;</span><br><span class="line">        QueryWrapper&lt;SysUser&gt; wrapper = new QueryWrapper&lt;&gt;();</span><br><span class="line">        wrapper.select().groupBy(&quot;author&quot;).having(&quot;id &gt; &quot; +id);</span><br><span class="line">        List&lt;SysUser&gt; list = sysUserMapper.selectList(wrapper);</span><br><span class="line">        return list;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="order-by"><a href="#order-by" class="headerlink" title="order by"></a>order by</h4><ul>
+<li>orderBy</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">orderBy(boolean condition, boolean isAsc, R... columns)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>orderByAsc</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">orderByAsc(R... columns)</span><br><span class="line">orderByAsc(boolean condition, R... columns)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>orderByDesc</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">orderByDesc(R... columns)</span><br><span class="line">orderByDesc(boolean condition, R... columns)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>排序：ORDER BY 字段, (ASC&#x2F;DESC)</li>
+<li>注：Order by排序时不能进行预编译处理,故相关内容用户可控的话会存在sql注入风险。</li>
+<li>示例：</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">@RequestMapping(&quot;/orderbyvuln&quot;)</span><br><span class="line">public List&lt;Tutorial&gt; mybatishorderbyvuln(String column) &#123;</span><br><span class="line">    QueryWrapper&lt;Tutorial&gt; wrapper = new QueryWrapper&lt;&gt;();</span><br><span class="line">    wrapper.select().orderBy(true, true, column);</span><br><span class="line">    List&lt;Tutorial&gt; list = tutorialMapper.selectList(wrapper);</span><br><span class="line">    return list;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">@RequestMapping(&quot;/orderbyAscvuln&quot;)</span><br><span class="line">public List&lt;Tutorial&gt; mybatishorderbyAscvuln(String column) &#123;</span><br><span class="line">    QueryWrapper&lt;Tutorial&gt; wrapper = new QueryWrapper&lt;&gt;();</span><br><span class="line">    wrapper.select().orderByAsc(column);</span><br><span class="line">    List&lt;Tutorial&gt; list = tutorialMapper.selectList(wrapper);</span><br><span class="line">    return list;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">@RequestMapping(&quot;/orderbyDescvuln&quot;)</span><br><span class="line">public List&lt;Tutorial&gt; mybatishorderbyDescvuln(String column) &#123;</span><br><span class="line">    QueryWrapper&lt;Tutorial&gt; wrapper = new QueryWrapper&lt;&gt;();</span><br><span class="line">    wrapper.select().orderByDesc(column);</span><br><span class="line">    List&lt;Tutorial&gt; list = tutorialMapper.selectList(wrapper);</span><br><span class="line">    return list;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="group-By"><a href="#group-By" class="headerlink" title="group By"></a>group By</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">groupBy(R... columns)</span><br><span class="line">groupBy(boolean condition, R... columns)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>分组：GROUP BY 字段, … 主要用于用于结合聚合函数，根据一个或多个列对结果集进行分组</li>
+<li>示例：</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">@RequestMapping(&quot;/gropbycvuln&quot;)</span><br><span class="line">public List&lt;Tutorial&gt; mybatishsgropbycvuln(String column) &#123;</span><br><span class="line">    QueryWrapper&lt;Tutorial&gt; wrapper = new QueryWrapper&lt;&gt;();</span><br><span class="line">    wrapper.select().groupBy(column);</span><br><span class="line">    List&lt;Tutorial&gt; list = tutorialMapper.selectList(wrapper);</span><br><span class="line">    return list;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="insql-notinsql"><a href="#insql-notinsql" class="headerlink" title="insql&#x2F;notinsql"></a>insql&#x2F;notinsql</h4><p>子查询</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">inSql(R column, String inValue)</span><br><span class="line">inSql(boolean condition, R column, String inValue)</span><br><span class="line">notInSql(R column, String inValue)</span><br><span class="line">notInSql(boolean condition, R column, String inValue)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>字段IN &#x2F; NOT IN ( sql语句 )</li>
+<li>column字段、inValue字段可控的情况下存在注入风险。</li>
+<li>示例：</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">@RequestMapping(&quot;/insqlcvuln&quot;)</span><br><span class="line">public List&lt;Tutorial&gt; mybatisinsqlvuln(String column,String id) &#123;</span><br><span class="line">    QueryWrapper&lt;Tutorial&gt; wrapper = new QueryWrapper&lt;&gt;();</span><br><span class="line">    wrapper.select().inSql(column,&quot;select id from tutorials where id &gt;&quot; + id);</span><br><span class="line">    List&lt;Tutorial&gt; list = tutorialMapper.selectList(wrapper);</span><br><span class="line">    return list;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="特殊的Wrapper模式"><a href="#特殊的Wrapper模式" class="headerlink" title="特殊的Wrapper模式"></a>特殊的Wrapper模式</h2><p>Wrapper提供了自定义SQL场景，与传统的mybatis一样使用$进行注解，但实际上ew已经做了预编译处理。同样的也支持注解&amp;xml配置。</p>
+<p>注：需要mybatis-plus版本 &gt;&#x3D; 3.0.7 param 参数名要么叫ew,要么加上注解@Param(Constants.WRAPPER) 使用${ew.customSqlSegment} 不支持 Wrapper 内的entity生成where语句</p>
+<p>示例：</p>
+<p>1.注解模式</p>
+<ul>
+<li>配置mapper</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">import com.baomidou.mybatisplus.core.conditions.Wrapper;</span><br><span class="line">import com.baomidou.mybatisplus.core.toolkit.Constants;</span><br><span class="line">import org.apache.ibatis.annotations.Mapper;</span><br><span class="line">import org.apache.ibatis.annotations.Param;</span><br><span class="line">import org.apache.ibatis.annotations.Select;</span><br><span class="line">import org.joychou.dao.Person;</span><br><span class="line"></span><br><span class="line">import java.util.List;</span><br><span class="line"></span><br><span class="line">@Mapper</span><br><span class="line">public interface PersonMapper &#123;</span><br><span class="line"></span><br><span class="line">    @Select(&quot;select * from persons $&#123;ew.customSqlSegment&#125;&quot;)</span><br><span class="line">    List&lt;Person&gt; selectPerson(@Param(Constants.WRAPPER) Wrapper wrapper);</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>配置controller</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;</span><br><span class="line">import org.joychou.dao.Person;</span><br><span class="line">import org.joychou.dao.Tutorial;</span><br><span class="line">import org.joychou.mapper.PersonMapper;</span><br><span class="line">import org.springframework.beans.factory.annotation.Autowired;</span><br><span class="line">import org.springframework.web.bind.annotation.RequestMapping;</span><br><span class="line">import org.springframework.web.bind.annotation.RestController;</span><br><span class="line"></span><br><span class="line">import java.util.List;</span><br><span class="line"></span><br><span class="line">@RestController</span><br><span class="line">@RequestMapping(&quot;/sqlimybatis_plus&quot;)</span><br><span class="line">public class Mybatis_Plus_SQLI_2 &#123;</span><br><span class="line"></span><br><span class="line">    @Autowired</span><br><span class="line">    PersonMapper personMapper;</span><br><span class="line"></span><br><span class="line">    //orderby  R... columns 可控，存在SQL注入风险</span><br><span class="line">    @RequestMapping(&quot;/selectperson&quot;)</span><br><span class="line">    public List&lt;Person&gt; selectPerson(String column)&#123;</span><br><span class="line">        QueryWrapper&lt;Object&gt; wrapper = new QueryWrapper&lt;&gt;();</span><br><span class="line">        wrapper.orderByAsc(column);</span><br><span class="line">        return personMapper.selectPerson(wrapper);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    //like 自动进行预编译，不存在SQL注入风险</span><br><span class="line">    @RequestMapping(&quot;/selectpersonlike&quot;)</span><br><span class="line">    public List&lt;Person&gt; selectPersonlike(String name) &#123;</span><br><span class="line">        QueryWrapper&lt;Object&gt; wrapper = new QueryWrapper&lt;&gt;();</span><br><span class="line">        wrapper.like(&quot;name&quot;, name);</span><br><span class="line">        return personMapper.selectPerson(wrapper);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Wrapper自定义模式下like、in等会自动进行预编译，但若存在last、orderby等未进行预编译方法，若相应数据用户可控仍会存在SQL注入风险，风险API仍为2.1中常见注入场景。</p>
+<p>2.XML模式</p>
+<ul>
+<li>配置mapper</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">import com.baomidou.mybatisplus.core.conditions.Wrapper;</span><br><span class="line">import com.baomidou.mybatisplus.core.toolkit.Constants;</span><br><span class="line">import org.apache.ibatis.annotations.Mapper;</span><br><span class="line">import org.apache.ibatis.annotations.Param;</span><br><span class="line">import org.apache.ibatis.annotations.Select;</span><br><span class="line">import org.joychou.dao.Person;</span><br><span class="line"></span><br><span class="line">import java.util.List;</span><br><span class="line"></span><br><span class="line">@Mapper</span><br><span class="line">public interface PersonMapper &#123;</span><br><span class="line"></span><br><span class="line">    @Select(&quot;select * from persons $&#123;ew.customSqlSegment&#125;&quot;)</span><br><span class="line">    List&lt;Person&gt; selectPerson(@Param(Constants.WRAPPER) Wrapper wrapper);</span><br><span class="line"></span><br><span class="line">    List&lt;Person&gt; selectPersonXML1(Wrapper ew);</span><br><span class="line"></span><br><span class="line">    List&lt;Person&gt; selectPersonXML2(Wrapper ew);</span><br><span class="line"></span><br><span class="line">    List&lt;Person&gt; selectPersonXMLOrdeyBy(Wrapper ew);</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>配置XXXXMapper.xml</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span><br><span class="line">&lt;!DOCTYPE mapper PUBLIC &quot;-//mybatis.org//DTD Mapper 3.0//EN&quot; &quot;http://mybatis.org/dtd/mybatis-3-mapper.dtd&quot;&gt;</span><br><span class="line"></span><br><span class="line">&lt;mapper namespace=&quot;org.joychou.mapper.UserMapper&quot;&gt;</span><br><span class="line"></span><br><span class="line">    &lt;resultMap type=&quot;org.joychou.dao.Person&quot; id=&quot;Person&quot;&gt;</span><br><span class="line">        &lt;id column=&quot;id&quot; property=&quot;id&quot; javaType=&quot;java.lang.Integer&quot; jdbcType=&quot;NUMERIC&quot;/&gt;</span><br><span class="line">        &lt;id column=&quot;name&quot; property=&quot;name&quot; javaType=&quot;java.lang.String&quot; jdbcType=&quot;VARCHAR&quot;/&gt;</span><br><span class="line">        &lt;id column=&quot;address&quot; property=&quot;address&quot; javaType=&quot;java.lang.String&quot; jdbcType=&quot;VARCHAR&quot;/&gt;</span><br><span class="line">        &lt;id column=&quot;city&quot; property=&quot;city&quot; javaType=&quot;java.lang.String&quot; jdbcType=&quot;VARCHAR&quot;/&gt;</span><br><span class="line">    &lt;/resultMap&gt;</span><br><span class="line"></span><br><span class="line">    &lt;select id=&quot;selectPersonXML1&quot;  resultMap=&quot;Person&quot;&gt;</span><br><span class="line">        select * from persons where $&#123;ew.customSqlSegment&#125;</span><br><span class="line">    &lt;/select&gt;</span><br><span class="line"></span><br><span class="line">    &lt;select id=&quot;selectPersonXML2&quot;  resultMap=&quot;Person&quot;&gt;</span><br><span class="line">        select * from persons</span><br><span class="line">        &lt;where&gt;</span><br><span class="line">            $&#123;ew.SqlSegment&#125;</span><br><span class="line">        &lt;/where&gt;</span><br><span class="line">    &lt;/select&gt;</span><br><span class="line"></span><br><span class="line">    &lt;select id=&quot;selectPersonXMLOrdeyBy&quot;  resultMap=&quot;Person&quot;&gt;</span><br><span class="line">        select * from persons $&#123;ew.SqlSegment&#125;</span><br><span class="line">    &lt;/select&gt;</span><br><span class="line"></span><br><span class="line">&lt;/mapper&gt;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>配置controller</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line">import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;</span><br><span class="line">import org.joychou.dao.Person;</span><br><span class="line">import org.joychou.dao.Tutorial;</span><br><span class="line">import org.joychou.mapper.PersonMapper;</span><br><span class="line">import org.springframework.beans.factory.annotation.Autowired;</span><br><span class="line">import org.springframework.web.bind.annotation.RequestMapping;</span><br><span class="line">import org.springframework.web.bind.annotation.RestController;</span><br><span class="line"></span><br><span class="line">import java.util.List;</span><br><span class="line"></span><br><span class="line">@RestController</span><br><span class="line">@RequestMapping(&quot;/sqlimybatis_plus&quot;)</span><br><span class="line">public class Mybatis_Plus_SQLI_2 &#123;</span><br><span class="line"></span><br><span class="line">    @Autowired</span><br><span class="line">    PersonMapper personMapper;</span><br><span class="line"></span><br><span class="line">    @RequestMapping(&quot;/selectperson&quot;)</span><br><span class="line">    public List&lt;Person&gt; selectPerson(String column)&#123;</span><br><span class="line">        QueryWrapper&lt;Object&gt; wrapper = new QueryWrapper&lt;&gt;();</span><br><span class="line">        wrapper.orderByAsc(column);</span><br><span class="line">        return personMapper.selectPerson(wrapper);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @RequestMapping(&quot;/selectperson1&quot;)</span><br><span class="line">    public List&lt;Person&gt; selectPersonXML1(String name) &#123;</span><br><span class="line">        QueryWrapper&lt;Object&gt; wrapper = new QueryWrapper&lt;&gt;();</span><br><span class="line">        wrapper.eq(&quot;name&quot;, name);</span><br><span class="line">        return personMapper.selectPerson(wrapper);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @RequestMapping(&quot;/selectperson2&quot;)</span><br><span class="line">    public List&lt;Person&gt; selectPersonXML2(String name) &#123;</span><br><span class="line">        QueryWrapper&lt;Object&gt; wrapper = new QueryWrapper&lt;&gt;();</span><br><span class="line">        wrapper.eq(&quot;name&quot;, name);</span><br><span class="line">        return personMapper.selectPerson(wrapper);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @RequestMapping(&quot;/selectperson3&quot;)</span><br><span class="line">    public List&lt;Person&gt; selectPersonXMLOrderBy(String column) &#123;</span><br><span class="line">        QueryWrapper&lt;Object&gt; wrapper = new QueryWrapper&lt;&gt;();</span><br><span class="line">        wrapper.orderByAsc(column);</span><br><span class="line">        return personMapper.selectPerson(wrapper);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>以上selectPersonXML1、selectPersonXML2均实现相同功能，SQL注入问题与注解模式相同。</p>
+<h4 id="特殊插件"><a href="#特殊插件" class="headerlink" title="特殊插件"></a>特殊插件</h4><p>1.PaginationInnerInterceptor</p>
+<ul>
+<li>配置分页插件</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">import com.baomidou.mybatisplus.annotation.DbType;</span><br><span class="line">import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;</span><br><span class="line">import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;</span><br><span class="line">import org.springframework.context.annotation.Bean;</span><br><span class="line">import org.springframework.context.annotation.Configuration;</span><br><span class="line"></span><br><span class="line">@Configuration</span><br><span class="line">public class MybatisPlusConfig &#123;</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * 注册插件</span><br><span class="line">     */</span><br><span class="line">    @Bean</span><br><span class="line">    public MybatisPlusInterceptor mybatisPlusInterceptor() &#123;</span><br><span class="line"></span><br><span class="line">        MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();</span><br><span class="line">        // 添加分页插件</span><br><span class="line">        PaginationInnerInterceptor pageInterceptor = new PaginationInnerInterceptor();</span><br><span class="line">        // 设置请求的页面大于最大页后操作，true调回到首页，false继续请求。默认false</span><br><span class="line">        pageInterceptor.setOverflow(false);</span><br><span class="line">        // 单页分页条数限制，默认无限制</span><br><span class="line">        pageInterceptor.setMaxLimit(500L);</span><br><span class="line">        // 设置数据库类型</span><br><span class="line">        pageInterceptor.setDbType(DbType.MYSQL);</span><br><span class="line"></span><br><span class="line">        interceptor.addInnerInterceptor(pageInterceptor);</span><br><span class="line">        return interceptor;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>配置controller</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">@RequestMapping(&quot;/selectpage&quot;)</span><br><span class="line">public List&lt;Person&gt; mybatispluspage(Long page,Long size,String order)&#123;</span><br><span class="line"></span><br><span class="line">    QueryWrapper&lt;Person&gt; qw = new QueryWrapper&lt;&gt;();</span><br><span class="line">    Page&lt;Person&gt; personPage = new Page&lt;&gt;(page,size);</span><br><span class="line">    personPage.addOrder(OrderItem.asc(order));</span><br><span class="line">    IPage&lt;Person&gt; iPage = personMapper.selectPage(personPage, qw);</span><br><span class="line">    List&lt;Person&gt; persons = iPage.getRecords();</span><br><span class="line">    return persons;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>若直接使用addOrder()未进行过滤，则存在SQL注入漏洞。</p>
+<p>2.pagehelper</p>
+<p>因为Order by排序时不能进行预编译处理，所以在使用插件时需要额外注意如下function，同样会存在SQL注入风险：</p>
+<ul>
+<li>com.github.pagehelper.Page<ul>
+<li>主要是setOrderBy(java.lang.String)方法</li>
+</ul>
+</li>
+<li>com.github.pagehelper.page.PageMethod<ul>
+<li>主要是startPage(int,int,java.lang.String)方法</li>
+</ul>
+</li>
+<li>com.github.pagehelper.PageHelper<ul>
+<li>主要是startPage(int,int,java.lang.String)方法</li>
+</ul>
+</li>
+</ul>
+<p>Hibernate是一个开放源代码的对象关系映射框架，它对JDBC进行了非常轻量级的对象封装，使得Java程序员可以随心所欲的使用对象编程思维来操纵数据库。</p>
+<p>Hibernate可以使用hql来执行SQL语句，也可以直接执行SQL语句，无论是哪种方式都有可能导致SQL注入</p>
+<h2 id="Hibernate框架下的SQL注入"><a href="#Hibernate框架下的SQL注入" class="headerlink" title="Hibernate框架下的SQL注入"></a>Hibernate框架下的SQL注入</h2><p>Hibernate是一个开放源代码的对象关系映射框架，它对JDBC进行了非常轻量级的对象封装，使得Java程序员可以随心所欲的使用对象编程思维来操纵数据库。</p>
+<p>Hibernate可以使用hql来执行SQL语句，也可以直接执行SQL语句，无论是哪种方式都有可能导致SQL注入</p>
+<p>hql语句：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">String hql = &quot;from People where username = &#x27;&quot; + username + &quot;&#x27; and password = &#x27;&quot; + password + &quot;&#x27;&quot;;</span><br></pre></td></tr></table></figure>
+
+<p>这种拼接方式存在SQL注入</p>
+<p>正确使用以下几种HQL参数绑定的方式可以有效避免注入的产生：</p>
+<h4 id="1-命名参数（named-parameter）"><a href="#1-命名参数（named-parameter）" class="headerlink" title="1.命名参数（named parameter）"></a>1.命名参数（named parameter）</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Query&lt;User&gt; query = session.createQuery(&quot;from users name = ?1&quot;, User.class);</span><br><span class="line">String parameter = &quot;g1ts&quot;;</span><br><span class="line">Query&lt;User&gt; query = session.createQuery(&quot;from users name = :name&quot;, User.class);</span><br><span class="line">query.setParameter(&quot;name&quot;, parameter);</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-位置参数（Positional-parameter）"><a href="#2-位置参数（Positional-parameter）" class="headerlink" title="2.位置参数（Positional parameter）"></a>2.位置参数（Positional parameter）</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">String parameter = &quot;g1ts&quot;;</span><br><span class="line">Query&lt;User&gt; query = session.createQuery(&quot;from users name = ?1&quot;, User.class);</span><br><span class="line">query.setParameter(1, parameter);</span><br></pre></td></tr></table></figure>
+
+<h4 id="3-命名参数列表（named-parameter-list）"><a href="#3-命名参数列表（named-parameter-list）" class="headerlink" title="3.命名参数列表（named parameter list）"></a>3.命名参数列表（named parameter list）</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">List&lt;String&gt; names = Arrays.asList(&quot;g1ts&quot;, &quot;g2ts&quot;);</span><br><span class="line">Query&lt;User&gt; query = session.createQuery(&quot;from users where name in (:names)&quot;, User.class);</span><br><span class="line">query.setParameter(&quot;names&quot;, names);</span><br></pre></td></tr></table></figure>
+
+<h4 id="4-类实例（JavaBean）"><a href="#4-类实例（JavaBean）" class="headerlink" title="4.类实例（JavaBean）"></a>4.类实例（JavaBean）</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">user1.setName(&quot;g1ts&quot;);</span><br><span class="line">Query&lt;User&gt; query = session.createQuery(&quot;from users where name =:name&quot;, User.class);</span><br><span class="line">query.setProperties(user1);</span><br></pre></td></tr></table></figure>
+
+<h4 id="5-HQL拼接方法"><a href="#5-HQL拼接方法" class="headerlink" title="5.HQL拼接方法"></a>5.HQL拼接方法</h4><p>这种方式是最常用，而且容易忽视且容易被注入的，通常做法就是对参数的特殊字符进行过滤，推荐大家使用 Spring工具包的StringEscapeUtils.escapeSql()方法对参数进行过滤：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">import org.apache.commons.lang.StringEscapeUtils;</span><br><span class="line">public static void main(String[] args) &#123;</span><br><span class="line">  String str = StringEscapeUtils.escapeSql(&quot;&#x27;&quot;);</span><br><span class="line">  System.out.println(str);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>SQL</p>
+<p>Hibernate支持使用原生SQL语句执行，所以其风险和JDBC是一致的，直接使用拼接的方法时会导致SQL注入</p>
+<p>语句如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Query&lt;People&gt; query = session.createNativeQuery(&quot;select * from user where username = &#x27;&quot; + username + &quot;&#x27; and password = &#x27;&quot; + password + &quot;&#x27;&quot;);</span><br></pre></td></tr></table></figure>
+
+<p>正确写法：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">String parameter = &quot;g1ts&quot;;</span><br><span class="line">Query&lt;User&gt; query = session.createNativeQuery(&quot;select * from user where name = :name&quot;);</span><br><span class="line">query.setParameter(&quot;name&quot;,parameter);</span><br></pre></td></tr></table></figure>
+
+<p><a target="_blank" rel="noopener" href="https://ilikeoyt.github.io/2024/01/13/nginxWebUI-runCmd%E5%89%8D%E5%8F%B0%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E/"> nginxWebUI runCmd前台远程命令执行漏洞</a></p>
+<p><a target="_blank" rel="noopener" href="https://ilikeoyt.github.io/2024/02/26/Weblogic-T3%E5%8D%8F%E8%AE%AE%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/">Weblogic T3协议反序列化 </a></p>
+<p>© 2024 ycxlo</p>
+<p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> &amp; <a target="_blank" rel="noopener" href="https://muse.theme-next.org/">NexT.Muse</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/01/13/nginxWebUI-runCmd%E5%89%8D%E5%8F%B0%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E/" rel="prev" title="nginxWebUI runCmd前台远程命令执行漏洞">
+      <i class="fa fa-chevron-left"></i> nginxWebUI runCmd前台远程命令执行漏洞
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/02/26/Weblogic-T3%E5%8D%8F%E8%AE%AE%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/" rel="next" title="Weblogic T3协议反序列化">
+      Weblogic T3协议反序列化 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#JDBC"><span class="nav-number">1.</span> <span class="nav-text">JDBC</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%98%93%E4%BA%A7%E7%94%9F%E7%9A%84%E6%BC%8F%E6%B4%9E%E7%82%B9"><span class="nav-number">1.0.1.</span> <span class="nav-text">易产生的漏洞点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%98%B2%E8%8C%83%EF%BC%9AJDBC%E9%A2%84%E7%BC%96%E8%AF%91"><span class="nav-number">1.0.2.</span> <span class="nav-text">防范：JDBC预编译</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Mybatis-%E6%B3%A8%E5%85%A5"><span class="nav-number">2.</span> <span class="nav-text">Mybatis 注入</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%BC%8F%E6%B4%9E%E6%B5%8B%E8%AF%95"><span class="nav-number">2.0.1.</span> <span class="nav-text">漏洞测试</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Mybatis-Plus"><span class="nav-number">3.</span> <span class="nav-text">Mybatis-Plus</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#apply%E6%B3%A8%E5%85%A5"><span class="nav-number">3.0.1.</span> <span class="nav-text">apply注入</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#last"><span class="nav-number">3.0.2.</span> <span class="nav-text">last</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#exists-notExists"><span class="nav-number">3.0.3.</span> <span class="nav-text">exists&#x2F;notExists</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#having"><span class="nav-number">3.0.4.</span> <span class="nav-text">having</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#order-by"><span class="nav-number">3.0.5.</span> <span class="nav-text">order by</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#group-By"><span class="nav-number">3.0.6.</span> <span class="nav-text">group By</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#insql-notinsql"><span class="nav-number">3.0.7.</span> <span class="nav-text">insql&#x2F;notinsql</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%89%B9%E6%AE%8A%E7%9A%84Wrapper%E6%A8%A1%E5%BC%8F"><span class="nav-number">4.</span> <span class="nav-text">特殊的Wrapper模式</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%89%B9%E6%AE%8A%E6%8F%92%E4%BB%B6"><span class="nav-number">4.0.1.</span> <span class="nav-text">特殊插件</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Hibernate%E6%A1%86%E6%9E%B6%E4%B8%8B%E7%9A%84SQL%E6%B3%A8%E5%85%A5"><span class="nav-number">5.</span> <span class="nav-text">Hibernate框架下的SQL注入</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-%E5%91%BD%E5%90%8D%E5%8F%82%E6%95%B0%EF%BC%88named-parameter%EF%BC%89"><span class="nav-number">5.0.1.</span> <span class="nav-text">1.命名参数（named parameter）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-%E4%BD%8D%E7%BD%AE%E5%8F%82%E6%95%B0%EF%BC%88Positional-parameter%EF%BC%89"><span class="nav-number">5.0.2.</span> <span class="nav-text">2.位置参数（Positional parameter）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-%E5%91%BD%E5%90%8D%E5%8F%82%E6%95%B0%E5%88%97%E8%A1%A8%EF%BC%88named-parameter-list%EF%BC%89"><span class="nav-number">5.0.3.</span> <span class="nav-text">3.命名参数列表（named parameter list）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-%E7%B1%BB%E5%AE%9E%E4%BE%8B%EF%BC%88JavaBean%EF%BC%89"><span class="nav-number">5.0.4.</span> <span class="nav-text">4.类实例（JavaBean）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-HQL%E6%8B%BC%E6%8E%A5%E6%96%B9%E6%B3%95"><span class="nav-number">5.0.5.</span> <span class="nav-text">5.HQL拼接方法</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">John Doe</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">57</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
